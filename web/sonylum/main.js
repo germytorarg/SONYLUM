@@ -26,13 +26,15 @@
       d: parse("data-drop"),
       m: parse("data-drop-m"),
       seq: el.dataset.seq ? el.dataset.seq.split(" ") : null,
-      env: $("img[data-env]", el)
+      env: $("img[data-env]", el),
+      bgs: el.id === "metamorfosis" ? $$(".meta-bgs img", el) : null
     };
   });
 
   var meta = $("#metamorfosis");
   var metaSteps = $$(".meta-step", meta);
   var metaBar = $("#metaBar");
+  var metaBgs = $$(".meta-bgs img", meta);
   var metaIdx = 0;
 
   function sectionProgress(el, H) {
@@ -72,7 +74,8 @@
 
     if (tot > 0) {
       drop.setTarget(x / tot, y / tot, r / tot, w.map(function (v) { return v / tot; }), sp / tot);
-      drop.setEnv(best && best.env && bestW > 0.25 ? best.env : null);
+      var envEl = best ? (best.bgs ? best.bgs[metaIdx] : best.env) : null;
+      drop.setEnv(envEl && bestW > 0.25 ? envEl : null);
     }
 
     // pasos de la metamorfosis
@@ -82,12 +85,15 @@
       if (idx !== metaIdx) {
         metaSteps[metaIdx].classList.remove("is-on");
         metaSteps[idx].classList.add("is-on");
+        metaBgs[metaIdx].classList.remove("is-on");
+        metaBgs[idx].classList.add("is-on");
         metaIdx = idx;
       }
       metaBar.style.transform = "scaleX(" + mp.toFixed(4) + ")";
     }
 
     pan(W, H, mob);
+    experimental(W, H, mob);
     requestAnimationFrame(choreograph);
   }
 
@@ -116,6 +122,101 @@
   measurePan();
 
   requestAnimationFrame(choreograph);
+
+
+  /* ---------- capa experimental: especímenes, archivo, velocidad de scroll ---------- */
+  var specimens = $$(".specimen").map(function (el) { return { el: el, d: +el.dataset.depth || 0, ph: Math.random() * 6 }; });
+  var rows = $$(".archive-row").map(function (el) { return { el: el, dir: +el.dataset.dir || 1, plates: $$(".plate", el) }; });
+  var archive = $("#archivo");
+  var lastY = scrollY, vel = 0, mxN = 0, myN = 0, tExp = 0;
+  if (finePointer) addEventListener("pointermove", function (e) { mxN = e.clientX / innerWidth - 0.5; myN = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+  function experimental(W, H, mob) {
+    var y = scrollY;
+    vel += ((y - lastY) - vel) * 0.18; lastY = y;
+    tExp += 0.016;
+    if (reduce) return;
+    var skew = Math.max(-8, Math.min(8, vel * 0.12));
+
+    specimens.forEach(function (sp) {
+      var ty = -y * sp.d * 0.6 + Math.sin(tExp * 0.8 + sp.ph) * 8 + myN * sp.d * 60;
+      var tx = Math.cos(tExp * 0.6 + sp.ph) * 6 + mxN * sp.d * 80;
+      sp.el.style.transform = "translate3d(" + tx.toFixed(1) + "px," + ty.toFixed(1) + "px,0) skewY(" + (skew * 0.5).toFixed(2) + "deg)";
+    });
+
+    if (archive) {
+      var r = archive.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < H) {
+        var p = (H - r.top) / (H + r.height); // 0..1 mientras cruza la pantalla
+        rows.forEach(function (row) {
+          var x = (p - 0.5) * row.dir * W * 0.9;
+          row.el.style.transform = "translate3d(" + x.toFixed(1) + "px,0,0) skewX(" + (-skew * row.dir).toFixed(2) + "deg)";
+          if (!finePointer) {
+            row.plates.forEach(function (pl) {
+              var pr = pl.getBoundingClientRect();
+              pl.classList.toggle("is-lit", Math.abs(pr.left + pr.width / 2 - W / 2) < pr.width * 0.6);
+            });
+          }
+        });
+      }
+    }
+  }
+
+  /* ---------- vista previa de cada sitio ---------- */
+  var peek = $("#sitePeek"), peekImg = $("#peekImg"), peekFbImg = $("#peekFbImg");
+  var peekUrl = $("#peekUrl"), peekName = $("#peekName"), peekFbUrl = $("#peekFbUrl"), peekGo = $("#peekGo");
+  var lastPointer = "mouse", peekFor = null, px = 0, py = 0, pfx = 0, pfy = 0, peekRaf = 0;
+  addEventListener("pointerdown", function (e) { lastPointer = e.pointerType; }, true);
+
+  function shotFor(card, done) {
+    var site = card.dataset.site;
+    var tries = [card.dataset.shot, "https://s.wordpress.com/mshots/v1/" + encodeURIComponent("https://" + site) + "?w=760&h=475"];
+    var i = 0;
+    peekImg.onload = function () { if (peekFor === card) peek.classList.remove("no-shot"); };
+    peekImg.onerror = function () {
+      i++;
+      if (i < tries.length) peekImg.src = tries[i];
+      else if (peekFor === card) peek.classList.add("no-shot");
+    };
+    peek.classList.add("no-shot"); // mientras carga, se ve la ficha
+    peekImg.src = tries[0];
+  }
+  function openPeek(card, touch) {
+    peekFor = card;
+    peekUrl.textContent = card.dataset.site;
+    peekFbUrl.textContent = card.dataset.site;
+    peekName.textContent = card.dataset.name;
+    peekFbImg.src = $("img", card).getAttribute("src");
+    peekGo.href = card.href;
+    peek.classList.toggle("is-touch", !!touch);
+    peek.hidden = false;
+    shotFor(card);
+    if (!touch && !peekRaf) { pfx = px; pfy = py; peekRaf = requestAnimationFrame(followPeek); }
+  }
+  function closePeek() { peek.hidden = true; peekFor = null; }
+  function followPeek() {
+    if (peek.hidden || peek.classList.contains("is-touch")) { peekRaf = 0; return; }
+    pfx += (px - pfx) * 0.18; pfy += (py - pfy) * 0.18;
+    var w = peek.offsetWidth, h = peek.offsetHeight;
+    var x = Math.min(innerWidth - w - 16, pfx + 24), y = Math.min(innerHeight - h - 16, Math.max(80, pfy - h * 0.4));
+    if (pfx + 24 + w > innerWidth - 16) x = pfx - w - 24;
+    peek.style.translate = x.toFixed(1) + "px " + y.toFixed(1) + "px";
+    peekRaf = requestAnimationFrame(followPeek);
+  }
+  $$(".work").forEach(function (card) {
+    card.addEventListener("mouseenter", function () { if (finePointer) openPeek(card, false); });
+    card.addEventListener("mouseleave", function () { if (finePointer) closePeek(); });
+    card.addEventListener("click", function (e) {
+      if (finePointer && lastPointer === "mouse") return; // en desktop el click abre el sitio
+      if (peekFor === card && !peek.hidden) return;   // segundo toque: ir al sitio
+      e.preventDefault();
+      openPeek(card, true);
+    });
+  });
+  addEventListener("pointermove", function (e) { px = e.clientX; py = e.clientY; }, { passive: true });
+  $("#peekClose").addEventListener("click", closePeek);
+  addEventListener("keydown", function (e) { if (e.key === "Escape" && !peek.hidden) closePeek(); });
+  addEventListener("scroll", function () { if (!peek.hidden && peek.classList.contains("is-touch")) { var r = peekFor && peekFor.getBoundingClientRect(); if (!r || r.bottom < 0 || r.top > innerHeight) closePeek(); } }, { passive: true });
 
   /* ---------- reveal ---------- */
   var io = new IntersectionObserver(function (entries) {
@@ -187,10 +288,13 @@
     var energy = $("#energy"), out = $("#energyOut");
     energy.addEventListener("input", function () { out.textContent = energy.value; drop.setEnergy(energy.value / 100); });
     $("#splash").addEventListener("click", function () { drop.splash(); });
+    var size = $("#size"), sizeOut = $("#sizeOut");
+    size.addEventListener("input", function () { sizeOut.textContent = size.value; drop.setScale(size.value / 100); });
     $("#reset").addEventListener("click", function () {
       segs[0].querySelector('[data-tint="rojo"]').click();
       segs[1].querySelector('[data-shape="auto"]').click();
       energy.value = 55; out.textContent = "55"; drop.setEnergy(0.55);
+      size.value = 100; sizeOut.textContent = "100"; drop.setScale(1);
     });
   }
 })();

@@ -39,7 +39,7 @@
     "  vec3 q=p/s;",
     "  q.xz*=rot(uT*.31);q.xy*=rot(sin(uT*.23)*.6);q.yz*=rot(.35+sin(uT*.17)*.3);",
     "  float ws=uW.x+uW.y+uW.z+uW.w+1e-4;",
-    "  float d=(uW.x*(length(q)-1.)+uW.y*sdBox(q,vec3(.8),.17)+uW.z*(sdTri(q,vec2(1.45,.62))-.1)+uW.w*sdTorus(q,vec2(.8,.3)))/ws;",
+    "  float d=(uW.x*(length(q)-1.)+uW.y*sdBox(q,vec3(.86),.15)+uW.z*(sdTri(q,vec2(1.45,.62))-.1)+uW.w*sdTorus(q,vec2(.8,.3)))/ws;",
     "  d+=sin(q.x*3.1+uT*1.7)*sin(q.y*2.7+uT*1.3)*sin(q.z*3.3+uT*1.1)*(.03+.1*uEnergy);",
     "  d*=s;",
     "  float sp=max(uSpread,uSplash);",
@@ -151,7 +151,7 @@
       w: SHAPES.sphere.slice(0, 4), tw: SHAPES.sphere.slice(0, 4),
       spread: 0, tspread: 0, splash: 0,
       energy: 0.55, tint: TINTS.rojo, tintC: TINTS.rojo.c.slice(), tintA: TINTS.rojo.a,
-      override: null, t: Math.random() * 40,
+      override: null, scale: 1, t: Math.random() * 40,
       drag: false, dragMoved: 0, px: -9999, py: -9999, lastPX: 0, lastPY: 0, free: 0,
       env: null, envWanted: null, envAmt: 0, envRect: [0, 0, 1, 1]
     };
@@ -262,7 +262,7 @@
         s.x += s.vx * dt; s.y += s.vy * dt;
       }
       var lerp = function (a, b, f) { return a + (b - a) * Math.min(1, f * dt); };
-      s.r = lerp(s.r, s.tr, 0.06);
+      s.r = lerp(s.r, s.tr * s.scale, 0.06);
       var tw = s.override ? SHAPES[s.override] : s.tw.concat([s.tspread]);
       for (var i = 0; i < 4; i++) s.w[i] = lerp(s.w[i], tw[i], 0.07);
       s.spread = lerp(s.spread, s.override ? tw[4] : s.tspread, 0.05);
@@ -327,6 +327,7 @@
       },
       setEnv: function (imgEl) { s.envWanted = imgEl ? loadEnv(imgEl) : null; },
       setEnergy: function (v) { s.energy = v; },
+      setScale: function (v) { s.scale = v; },
       setTint: function (name) { if (TINTS[name]) s.tint = TINTS[name]; },
       setOverride: function (name) { s.override = name && SHAPES[name] ? name : null; },
       splash: splash,

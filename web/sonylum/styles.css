@@ -430,6 +430,115 @@ em { font-style: italic; }
 .caps-list .cap:nth-child(3).is-in { transition-delay: 120ms; }
 .caps-list .cap:nth-child(4).is-in { transition-delay: 180ms; }
 
+/* ---------- Capa experimental: hero a sangre, especímenes de vidrio ---------- */
+.hero-media { width: 100%; }
+.hero-media img { filter: saturate(1.15) contrast(1.1) brightness(0.9); object-position: 50% 60%; }
+.hero-media::after {
+  background:
+    linear-gradient(90deg, rgba(12,11,10,.82) 0%, rgba(12,11,10,.25) 46%, rgba(12,11,10,0) 70%),
+    linear-gradient(0deg, rgba(12,11,10,.85) 0%, rgba(12,11,10,0) 42%);
+}
+.hero-title { mix-blend-mode: difference; text-shadow: none; }
+.hero-title em { color: var(--red); }
+
+.specimen {
+  position: absolute; z-index: 1; margin: 0;
+  padding: 7px 7px 0;
+  background: rgba(236, 230, 218, 0.07);
+  border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 30px 60px -24px rgba(0,0,0,.7);
+  will-change: transform;
+}
+.specimen img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; mix-blend-mode: luminosity; opacity: .9; transition: mix-blend-mode 0s, opacity 400ms ease; }
+.specimen figcaption { font: 500 10px/1 "JetBrains Mono", monospace; letter-spacing: .03em; color: var(--bone-2); padding: 8px 2px 9px; white-space: nowrap; }
+.sp-a { width: clamp(120px, 12vw, 210px); left: 47%; top: 15%; rotate: -5deg; }
+.sp-b { width: clamp(160px, 19vw, 320px); right: 3%; top: 54%; rotate: 3deg; }
+.sp-b img { aspect-ratio: 2 / 1; }
+.sp-c { width: clamp(90px, 8vw, 150px); right: 22%; top: 12%; rotate: 7deg; }
+.sp-c img { aspect-ratio: 1; mix-blend-mode: normal; }
+
+/* ---------- Metamorfosis: una imagen por estado ---------- */
+.meta-bgs { position: absolute; inset: 0; z-index: 0; }
+.meta-bgs img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 0; transform: scale(1.12); filter: saturate(1.2) brightness(.62);
+  clip-path: inset(50% 0 50% 0);
+  transition: opacity 900ms ease, transform 1600ms var(--ease-out), clip-path 1100ms var(--ease-in-out);
+}
+.meta-bgs img.is-on { opacity: 1; transform: scale(1); clip-path: inset(0 0 0 0); }
+.meta-bgs::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12,11,10,.88) 0%, rgba(12,11,10,.35) 55%, rgba(12,11,10,.55) 100%); }
+.meta-sticky > *:not(.meta-bgs) { position: relative; z-index: 1; }
+.meta-cols { position: absolute !important; }
+.meta-step h2 { mix-blend-mode: difference; }
+.meta-step small { display: block; margin-top: 22px; font: 500 11px/1.4 "JetBrains Mono", monospace; color: var(--mute); }
+
+/* ---------- Capacidades: cabecera ---------- */
+.caps-head { display: grid; gap: 28px; margin-bottom: clamp(48px, 6vw, 96px); }
+.caps .sec-title { margin-bottom: 0; }
+.caps-intro { margin: 0; max-width: 46ch; color: var(--bone-2); font-size: clamp(16px, 1.3vw, 19px); }
+
+/* ---------- Archivo ---------- */
+.archive { position: relative; padding: clamp(96px, 12vw, 180px) 0 clamp(80px, 10vw, 140px); overflow: hidden; }
+.archive-head { padding: 0 var(--gut); display: grid; gap: 24px; margin-bottom: clamp(40px, 5vw, 72px); }
+.archive-intro { margin: 0; max-width: 40ch; color: var(--bone-2); font-size: clamp(16px, 1.3vw, 19px); }
+.archive-rows { display: grid; gap: var(--gut); }
+.archive-row { display: flex; gap: var(--gut); width: max-content; will-change: transform; }
+.archive-row[data-dir="1"] { margin-left: -40vw; }
+.plate {
+  margin: 0; flex: none; position: relative;
+  height: clamp(220px, 34vh, 380px);
+  padding: 8px;
+  background: rgba(236,230,218,.05); border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  display: grid; grid-template-rows: 1fr auto;
+}
+.plate img { height: 100%; width: auto; aspect-ratio: 4 / 5; object-fit: cover; filter: grayscale(1) contrast(1.1); transition: filter 600ms ease; min-height: 0; }
+.plate-w img { aspect-ratio: 16 / 10; }
+.plate-t img { aspect-ratio: 3 / 5; }
+.plate figcaption { display: grid; gap: 2px; padding: 10px 2px 4px; font-size: 13px; color: var(--mute); line-height: 1.3; }
+.plate figcaption b { color: var(--bone); font-weight: 600; }
+@media (hover: hover) and (pointer: fine) { .plate:hover img { filter: none; } }
+.plate.is-lit img { filter: none; }
+
+/* ---------- Vista previa del sitio ---------- */
+.site-peek {
+  position: fixed; left: 0; top: 0; z-index: 55;
+  width: min(380px, calc(100vw - 32px));
+  background: rgba(21, 19, 18, 0.5); border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 40px 90px -30px rgba(0,0,0,.8);
+  transform-origin: 0 0;
+  transition: opacity 180ms ease, scale 260ms var(--ease-out);
+  pointer-events: none;
+}
+.site-peek.is-touch { pointer-events: auto; left: 50% !important; top: auto !important; bottom: calc(16px + env(safe-area-inset-bottom)); translate: -50% 0 !important; transform-origin: 50% 100%; }
+@starting-style { .site-peek { opacity: 0; scale: .92; } }
+.peek-bar { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 6px 0 12px; border-bottom: 1px solid var(--line); }
+.peek-bar > i { width: 8px; height: 8px; background: var(--line-strong); }
+.peek-bar > i:first-child { background: var(--red); }
+.peek-url { margin-left: 8px; font: 500 12px/1 "JetBrains Mono", monospace; color: var(--bone-2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.peek-close { display: none; width: 30px; height: 30px; border: 0; background: transparent; font-size: 16px; }
+.is-touch .peek-close { display: inline-grid; place-items: center; }
+.peek-shot { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: var(--ink-2); }
+.peek-shot > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.peek-fallback { position: absolute; inset: 0; display: none; place-content: end start; gap: 4px; padding: 18px; }
+.peek-fallback img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(.55); transform: scale(1.06); z-index: -1; }
+.peek-fallback b { font-weight: 800; font-stretch: 112%; font-size: 34px; letter-spacing: -0.05em; line-height: .95; }
+.peek-fallback span { font: 500 12px/1 "JetBrains Mono", monospace; color: var(--bone-2); }
+.site-peek.no-shot .peek-fallback { display: grid; isolation: isolate; }
+.site-peek.no-shot .peek-shot > img { display: none; }
+.peek-go { display: none; margin: 10px; justify-content: center; }
+.is-touch .peek-go { display: flex; }
+
+/* ---------- Contacto con imagen ---------- */
+.cta { position: relative; isolation: isolate; overflow: hidden; }
+.cta-media { position: absolute; z-index: -1; margin: 0; right: 0; bottom: 0; width: 62%; height: 100%; }
+.cta-media img { width: 100%; height: 100%; object-fit: cover; object-position: 70% 50%; opacity: .55; filter: grayscale(1) contrast(1.2); }
+.cta-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ink) 0%, rgba(12,11,10,0) 45%), linear-gradient(0deg, var(--ink) 0%, rgba(12,11,10,0) 30%), linear-gradient(180deg, var(--ink) 0%, rgba(12,11,10,0) 30%); }
+.cta-title { mix-blend-mode: difference; }
+.foot-credits { flex: 1 1 320px; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 1024px) {
   .nav-links { display: none; }
@@ -506,4 +615,19 @@ em { font-style: italic; }
 }
 @media (prefers-reduced-transparency: reduce) {
   .nav, .sheet, .btn-glass, .hero-hint, .cap-float, .work-glass, .panel { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--ink-2); }
+}
+
+@media (max-width: 767px) {
+  .hero-media { height: 100%; }
+  .hero-media::after { background: linear-gradient(0deg, rgba(12,11,10,.92) 0%, rgba(12,11,10,.3) 55%, rgba(12,11,10,.2) 100%); }
+  .sp-a { left: auto; right: 6%; top: 12%; width: 104px; }
+  .sp-b { right: auto; left: 5%; top: 18%; width: 150px; }
+  .sp-c { display: none; }
+  .meta-bgs::after { background: linear-gradient(0deg, rgba(12,11,10,.92) 0%, rgba(12,11,10,.45) 60%); }
+  .plate { height: 230px; }
+  .archive-row[data-dir="1"] { margin-left: -120vw; }
+  .cta-media { width: 100%; height: 60%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .meta-bgs img { transition: none; clip-path: none; }
 }
