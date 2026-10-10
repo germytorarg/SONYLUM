@@ -9,7 +9,7 @@
   /* ---------- Rings: the motif. Hero, manifesto and CTA share one engine. ---------- */
   const createRings = (canvas, opts) => {
     const ctx = canvas.getContext("2d");
-    const s = { w: 0, h: 0, t: Math.random() * 10, grow: reduce ? 1 : opts.grow ?? 1, boost: 0, px: 0, py: 0, tx: 0, ty: 0, running: false, color: "" };
+    const s = { ripples: [], w: 0, h: 0, t: Math.random() * 10, grow: reduce ? 1 : opts.grow ?? 1, boost: 0, px: 0, py: 0, tx: 0, ty: 0, running: false, color: "" };
     const readColor = () => { s.color = css(opts.colorVar); };
     const resize = () => {
       const r = canvas.getBoundingClientRect();
@@ -46,10 +46,25 @@
           ctx.fill();
         }
       }
+      // Ripples: a wave leaves the center (or your tap) and fades as it travels
+      s.ripples = s.ripples.filter((rp) => t - rp.born < rp.life);
+      s.ripples.forEach((rp) => {
+        const p = (t - rp.born) / rp.life;
+        const e = 1 - Math.pow(1 - p, 3);
+        const r = base * 0.9 + (span * 1.15 - base * 0.9) * e;
+        ctx.beginPath();
+        ctx.arc(rp.x ?? cx, rp.y ?? cy, r, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${color}, ${(1 - p) * 0.75 * grow})`;
+        ctx.lineWidth = 1.6 * (1 - p) + 0.4;
+        ctx.stroke();
+      });
     };
+    s.emit = (x, y) => { if (!reduce) s.ripples.push({ born: s.t, life: opts.rippleLife ?? 2.6, x, y }); };
+    let lastPulse = 0;
     const loop = () => {
       if (!s.running) return;
       s.t += 0.016;
+      if (opts.pulse && s.grow > 0.9 && s.t - lastPulse > opts.pulse / (1 + s.boost * 2)) { lastPulse = s.t; s.emit(); }
       s.px += (s.tx - s.px) * 0.06;
       s.py += (s.ty - s.py) * 0.06;
       draw();
@@ -73,11 +88,17 @@
       });
       area.addEventListener("pointerleave", () => { s.tx = 0; s.ty = 0; });
     }
+    if (area && !reduce) {
+      area.addEventListener("pointerdown", (e) => {
+        const r = canvas.getBoundingClientRect();
+        s.emit(e.clientX - r.left, e.clientY - r.top);
+      });
+    }
     return s;
   };
 
   const heroRings = createRings($('[data-rings]:not([data-rings="panel"]):not([data-rings="cta"])'), {
-    colorVar: "--ring", count: 7, inner: 0.38, alpha: 0.5, parallax: 18, dots: true, grow: 0,
+    colorVar: "--ring", count: 7, inner: 0.38, alpha: 0.5, parallax: 18, dots: true, grow: 0, pulse: 3.2,
     span: (w) => w * 0.5, pointerArea: $("[data-stage]"),
   });
   const panelRings = createRings($('[data-rings="panel"]'), {
@@ -85,7 +106,7 @@
     span: (w, h) => Math.hypot(w, h) * 0.55, pointerArea: $("[data-manifesto]"),
   });
   const ctaRings = createRings($('[data-rings="cta"]'), {
-    colorVar: "--ring-panel", count: 10, inner: 0.1, alpha: 0.32, parallax: 24, dots: true,
+    colorVar: "--ring-panel", count: 10, inner: 0.1, alpha: 0.32, parallax: 24, dots: true, pulse: 2.4, rippleLife: 3.2,
     span: (w, h) => Math.hypot(w, h) * 0.5, pointerArea: $("[data-cta]"),
   });
 
@@ -110,8 +131,12 @@
       const open = p.classList.contains("is-open");
       pillars.forEach((o) => { o.classList.remove("is-open"); $(".pillar-head", o).setAttribute("aria-expanded", "false"); });
       if (!open) { p.classList.add("is-open"); $(".pillar-head", p).setAttribute("aria-expanded", "true"); }
+      syncVenn();
     });
   });
+  const vennCircles = $$("[data-venn-c]");
+  function syncVenn() { vennCircles.forEach((c, i) => c.classList.toggle("is-on", pillars[i]?.classList.contains("is-open"))); }
+  syncVenn();
 
   /* ---------- Temas: caption swaps with a blur bridge ---------- */
   const caption = $("[data-temas-caption]");
@@ -119,6 +144,12 @@
   const setTema = (btn) => {
     if (btn.classList.contains("is-active")) return;
     temaBtns.forEach((b) => b.classList.toggle("is-active", b === btn));
+    if (!reduce) {
+      const ring = document.createElement("span");
+      ring.className = "temas-ripple";
+      $(".temas-card").append(ring);
+      ring.animate([{ transform: "scale(.55)", opacity: .9 }, { transform: "scale(1)", opacity: 0 }], { duration: 700, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }).onfinish = () => ring.remove();
+    }
     const swap = () => { caption.textContent = btn.dataset.caption; };
     if (hasGsap && !reduce) {
       gsap.killTweensOf(caption);
@@ -210,6 +241,34 @@
     return out;
   };
 
+  /* ---------- Section headings rise out of a mask ---------- */
+  $$(".enfoque-intro h2, .temas h2, .proceso h2, .about-copy h2, .faq h2").forEach((h) => {
+    h.classList.add("h-split");
+    const words = splitWords(h, "w");
+    gsap.from(words, {
+      yPercent: 110, rotate: 3, duration: 1.1, stagger: 0.06, ease: "expo.out",
+      scrollTrigger: { trigger: h, start: "top 85%" },
+    });
+  });
+
+  /* ---------- Venn: the three conditions find each other ---------- */
+  const venn = $("[data-venn]");
+  if (venn) {
+    const offsets = [[0, -60], [-60, 40], [60, 40]];
+    vennCircles.forEach((c, i) => {
+      gsap.fromTo(c, { x: offsets[i][0], y: offsets[i][1], opacity: 0 }, {
+        x: 0, y: 0, opacity: 1, duration: 1.6, ease: "expo.out", delay: i * 0.08,
+        scrollTrigger: { trigger: venn, start: "top 80%" },
+        // then a slow breathing drift so the shape never sits still
+        onComplete: () => gsap.to(c, { x: offsets[i][0] * 0.08, y: offsets[i][1] * 0.08, duration: 3.2 + i * 0.4, ease: "sine.inOut", yoyo: true, repeat: -1 }),
+      });
+    });
+    gsap.from("[data-venn-core]", {
+      scale: 0, transformOrigin: "200px 200px", duration: 1, ease: "back.out(2)", delay: 0.6,
+      scrollTrigger: { trigger: venn, start: "top 80%" },
+    });
+  }
+
   /* ---------- Opening: curtain lifts, hero assembles ---------- */
   const titleWords = splitWords($("[data-split]"), "w");
   gsap.set(titleWords, { yPercent: 115, rotate: 4 });
@@ -238,12 +297,12 @@
   /* ---------- Manifesto: panel opens, words light up ---------- */
   gsap.fromTo(".manifesto-panel", { scale: 0.9, borderRadius: 120 }, {
     scale: 1, borderRadius: 32, ease: "none",
-    scrollTrigger: { trigger: "[data-manifesto]", start: "top bottom", end: "top 15%", scrub: true },
+    scrollTrigger: { trigger: "[data-manifesto]", start: "top bottom", end: "top top", scrub: true },
   });
   const mWords = splitWords($("[data-scrub]"), "sw", false);
   gsap.fromTo(mWords, { opacity: 0.12, filter: "blur(3px)" }, {
     opacity: 1, filter: "blur(0px)", stagger: 0.1, ease: "none",
-    scrollTrigger: { trigger: "[data-scrub]", start: "top 75%", end: "bottom 45%", scrub: 0.6 },
+    scrollTrigger: { trigger: "[data-manifesto]", start: "top top", end: "+=120%", scrub: 0.6, pin: true, anticipatePin: 1 },
   });
 
   /* ---------- Ribbon: drifts on its own, speeds up with your scroll ---------- */
@@ -282,8 +341,51 @@
   /* ---------- Proceso: the line draws, steps switch on ---------- */
   const fill = $("[data-timeline-fill]");
   const mobile = window.matchMedia("(max-width: 860px)");
+  const pathEl = $("[data-path-draw]");
+  const pathSvg = $("[data-path]");
+  const pathDot = $("[data-path-dot]");
+  // The stroke is non-scaling, so dashes live in screen pixels. Measure the path in
+  // screen space once per layout, then drive the dash and the dot from the same number.
+  const len = pathEl.getTotalLength();
+  let table = [], screenLen = 0;
+  const measure = () => {
+    const w = pathSvg.clientWidth, h = pathSvg.clientHeight;
+    table = []; screenLen = 0;
+    let prev = null;
+    for (let i = 0; i <= 240; i++) {
+      const pt = pathEl.getPointAtLength((len * i) / 240);
+      const x = (pt.x / 1000) * w, y = (pt.y / 120) * h;
+      if (prev) screenLen += Math.hypot(x - prev.x, y - prev.y);
+      table.push({ x, y, s: screenLen });
+      prev = { x, y };
+    }
+  };
+  const drawn = { p: 0 };
+  const placeDot = (p) => {
+    if (!table.length) measure();
+    const target = screenLen * p;
+    let i = table.findIndex((r) => r.s >= target);
+    if (i <= 0) i = Math.max(i, 1);
+    const a = table[i - 1], b = table[i] || a;
+    const k = b.s === a.s ? 0 : (target - a.s) / (b.s - a.s);
+    const x = a.x + (b.x - a.x) * k, y = a.y + (b.y - a.y) * k;
+    pathEl.style.strokeDasharray = `${target} ${screenLen + 10}`;
+    pathDot.style.transform = `translate(${x}px, ${y - 120}px)`;
+  };
   const setupTimeline = () => {
-    const prop = mobile.matches ? "scaleY" : "scaleX";
+    if (!mobile.matches) {
+      return gsap.fromTo(drawn, { p: 0 }, {
+        p: 1, ease: "none",
+        onUpdate() { placeDot(drawn.p); },
+        scrollTrigger: {
+          trigger: "[data-timeline]", start: "top 80%", end: "bottom 55%", scrub: 0.6,
+          onUpdate: (self) => {
+            steps.forEach((s, i) => s.classList.toggle("is-on", self.progress >= i / steps.length + 0.02));
+          },
+        },
+      });
+    }
+    const prop = "scaleY";
     gsap.set(fill, { scaleX: 1, scaleY: 1 });
     return gsap.fromTo(fill, { [prop]: 0 }, {
       [prop]: 1, ease: "none",
@@ -294,6 +396,8 @@
     });
   };
   let tl = setupTimeline();
+  ScrollTrigger.addEventListener("refresh", () => { if (!mobile.matches) { measure(); placeDot(drawn.p); } });
+  if (!mobile.matches) placeDot(0);
   mobile.addEventListener("change", () => { tl.scrollTrigger.kill(); tl.kill(); tl = setupTimeline(); ScrollTrigger.refresh(); });
 
   /* ---------- Sobre mí: the portrait opens, the word drifts behind it ---------- */
