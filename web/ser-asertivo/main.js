@@ -275,19 +275,29 @@
   // Pinned: as you read, the three conditions travel toward each other and "vos" appears where they meet
   const mWords = splitWords($("[data-scrub]"), "sw", false);
   const vennCircles = $$("[data-venn-c]");
-  const offsets = mobileQuery().matches ? [[0, -70], [-80, 50], [80, 50]] : [[0, -90], [-110, 60], [110, 60]];
+  // Each circle starts apart, passes through the others in transparency and they fuse into one; Sandra appears inside
+  const offsets = mobileQuery().matches ? [[0, -110], [-100, 70], [100, 70]] : [[0, -150], [-140, 90], [140, 90]];
   const mtl = gsap.timeline({
     defaults: { ease: "none" },
-    scrollTrigger: { trigger: "[data-manifesto]", start: "top top", end: "+=140%", scrub: 0.6, pin: true, anticipatePin: 1 },
+    scrollTrigger: { trigger: "[data-manifesto]", start: "top top", end: "+=150%", scrub: 0.6, pin: true, anticipatePin: 1 },
   });
   vennCircles.forEach((c, i) => {
-    mtl.fromTo(c, { x: offsets[i][0], y: offsets[i][1] }, { x: 0, y: 0, duration: 0.85, ease: "power2.inOut" }, 0);
+    mtl.fromTo(c, { x: offsets[i][0], y: offsets[i][1] }, { x: 0, y: 0, duration: 0.8, ease: "power2.inOut" }, 0);
   });
   mtl.fromTo(mWords, { opacity: 0.18 }, { opacity: 1, duration: 0.08, stagger: 0.8 / mWords.length }, 0.05)
-    // grow the radius itself: exact center, no transform-origin math on SVG groups
-    .fromTo("[data-venn-core] circle", { attr: { r: 0 } }, { attr: { r: 30 }, duration: 0.12, ease: "back.out(2.2)" }, 0.82)
-    .fromTo("[data-venn-core] text", { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.88)
-    .to(vennCircles, { duration: 0.05 }, 0.95);
+    .fromTo("[data-venn-c] text", { opacity: 1 }, { opacity: 0, duration: 0.12 }, 0.3)
+    .fromTo("[data-venn-photo]", { opacity: 0 }, { opacity: 1, duration: 0.25 }, 0.68)
+    .fromTo("[data-venn-c] circle", { fillOpacity: 0.16 }, { fillOpacity: 0.07, duration: 0.25 }, 0.68)
+    .fromTo("[data-venn-you]", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.12 }, 0.86);
+
+  /* ---------- Translucent circles drift through the sections at their own speed ---------- */
+  $$("[data-orb]").forEach((orb) => {
+    const sp = parseFloat(orb.dataset.orb);
+    gsap.fromTo(orb, { yPercent: sp, xPercent: -sp * 0.3, rotate: 0 }, {
+      yPercent: -sp, xPercent: sp * 0.3, ease: "none",
+      scrollTrigger: { trigger: orb.parentElement, start: "top bottom", end: "bottom top", scrub: true },
+    });
+  });
 
   /* ---------- Ribbon: drifts on its own, speeds up with your scroll ---------- */
   const track = $("[data-ribbon]");

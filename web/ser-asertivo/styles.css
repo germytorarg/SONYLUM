@@ -410,20 +410,37 @@ section { padding: clamp(88px, 12vw, 160px) var(--gutter); max-width: var(--max)
 /* ---------- Motion graphics ---------- */
 .h-split .w { padding-bottom: .12em; margin-bottom: -.12em; }
 
-/* Venn: three conditions meet in the person (lives in the plum panel) */
+/* Venn: three translucent circles fuse into one (lives in the plum panel) */
 .manifesto-panel { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 80px); }
 .manifesto-panel .manifesto-text { text-align: left; justify-self: start; max-width: 17ch; font-size: clamp(1.9rem, 3.6vw, 3.4rem); }
 .venn { display: block; width: 100%; max-width: 640px; justify-self: center; overflow: visible; }
-.venn-c circle { fill: rgba(var(--ring-panel), .07); stroke: rgba(var(--ring-panel), .7); stroke-width: 1; mix-blend-mode: screen; }
-.venn-c text { font: italic 400 19px var(--serif); fill: var(--panel-ink-2); text-anchor: middle; }
-.venn-core circle { fill: var(--accent-soft); }
-@media (prefers-color-scheme: dark) { .venn-core circle { fill: var(--accent); } }
-.venn-core text { font: italic 500 20px var(--serif); fill: var(--panel); text-anchor: middle; }
+.venn-c circle { fill: rgb(var(--ring-panel)); fill-opacity: .07; stroke: rgba(var(--ring-panel), .6); stroke-width: 1; mix-blend-mode: screen; }
+.venn-c:nth-of-type(2) circle { fill: #c9b3ee; }
+.venn-c:nth-of-type(3) circle { fill: #e2d4f7; }
+.venn-c text { font: italic 400 22px var(--serif); fill: var(--panel-ink); text-anchor: middle; }
+.venn-photo { opacity: 1; filter: grayscale(.25) contrast(1.05); }
+.venn-you { font: italic 400 26px var(--serif); fill: var(--accent-soft); text-anchor: middle; }
+@media (prefers-color-scheme: dark) { .venn-you { fill: var(--accent); } }
 @media (max-width: 860px) {
-  .manifesto-panel { grid-template-columns: 1fr; align-content: center; gap: 24px; padding-block: 72px; }
-  .manifesto-panel .manifesto-text { text-align: center; justify-self: center; font-size: clamp(1.45rem, 6.4vw, 2rem); max-width: 20ch; }
-  .venn { max-width: 340px; }
+  .manifesto-panel { grid-template-columns: 1fr; align-content: center; gap: 16px; padding-block: 64px; }
+  .manifesto-panel .manifesto-text { text-align: center; justify-self: center; font-size: clamp(1.4rem, 6vw, 1.9rem); max-width: 20ch; }
+  .venn { max-width: 320px; }
 }
+
+/* Translucent orbs passing through the page */
+.enfoque, .temas, .proceso, .about { position: relative; overflow-x: clip; }
+.orb {
+  position: absolute; z-index: 2; pointer-events: none; border-radius: 50%; aspect-ratio: 1;
+  background: radial-gradient(circle at 32% 30%, rgba(var(--ring), .2), rgba(var(--ring), .07) 55%, rgba(var(--ring), .02) 70%);
+  border: 1px solid rgba(var(--ring), .16);
+  mix-blend-mode: multiply;
+}
+@media (prefers-color-scheme: dark) { .orb { mix-blend-mode: screen; } }
+.orb-1 { width: clamp(220px, 32vw, 460px); left: -8%; top: 4%; }
+.orb-2 { width: clamp(140px, 16vw, 240px); right: 4%; bottom: -6%; }
+.orb-3 { width: clamp(260px, 38vw, 560px); right: -12%; top: -10%; }
+.orb-4 { width: clamp(180px, 24vw, 340px); left: 30%; top: 10%; }
+.orb-5 { width: clamp(240px, 30vw, 440px); left: 18%; bottom: -14%; }
 
 .cta-venn {
   position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: -1;
