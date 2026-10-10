@@ -11,9 +11,8 @@
   <meta property="og:description" content="Conocerse es comprenderse. Comprenderse para elegir.">
   <meta property="og:image" content="assets/sa-highlight.jpg">
   <link rel="icon" href="assets/sa-highlight.jpg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..500&display=swap">
+  <link rel="preload" href="vendor/fonts/Newsreader-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/fonts/fonts.css">
   <link rel="stylesheet" href="vendor/phosphor/style.css">
   <link rel="stylesheet" href="styles.css">
   <script>document.documentElement.classList.add("js");</script>
@@ -72,10 +71,15 @@
       </div>
     </section>
 
-    <!-- Manifesto: the peak of the scroll -->
+    <!-- Manifesto: the three conditions come together as you read -->
     <section class="manifesto" aria-label="Qué es ser asertivo" data-manifesto>
       <div class="manifesto-panel">
-        <canvas class="rings rings-panel" data-rings="panel" aria-hidden="true"></canvas>
+        <svg class="venn" viewBox="-40 -10 480 400" role="img" aria-label="Empatía, aceptación y autenticidad se unen en vos" data-venn>
+          <g class="venn-c" data-venn-c="0"><circle cx="200" cy="130" r="104"/><text x="200" y="84">Empatía</text></g>
+          <g class="venn-c" data-venn-c="1"><circle cx="140" cy="234" r="104"/><text x="100" y="276">Aceptación</text></g>
+          <g class="venn-c" data-venn-c="2"><circle cx="260" cy="234" r="104"/><text x="300" y="276">Autenticidad</text></g>
+          <g class="venn-core" data-venn-core><circle cx="200" cy="200" r="30"/><text x="200" y="207">vos</text></g>
+        </svg>
         <p class="manifesto-text" data-scrub>
           Ser asertivo no es decir todo. Es saber qué sentís, qué necesitás y cómo pedirlo, sin dejarte de lado y sin pasar por encima de nadie.
           <span class="manifesto-key">Comprenderse para elegir.</span>
@@ -96,12 +100,6 @@
       <div class="enfoque-intro">
         <h2>Vos sabés más de tu vida que nadie.</h2>
         <p>Trabajo con el Enfoque Centrado en la Persona, creado por Carl Rogers. No te digo qué hacer: armamos juntos las condiciones para que encuentres tu propia respuesta.</p>
-        <svg class="venn" viewBox="0 0 400 380" role="img" aria-label="Empatía, aceptación y autenticidad se cruzan en vos" data-venn>
-          <g class="venn-c" data-venn-c="0"><circle cx="200" cy="130" r="104"/><text x="200" y="88">Empatía</text></g>
-          <g class="venn-c" data-venn-c="1"><circle cx="140" cy="234" r="104"/><text x="104" y="272">Aceptación</text></g>
-          <g class="venn-c" data-venn-c="2"><circle cx="260" cy="234" r="104"/><text x="296" y="272">Autenticidad</text></g>
-          <g class="venn-core" data-venn-core><circle cx="200" cy="200" r="30"/><text x="200" y="206">vos</text></g>
-        </svg>
       </div>
       <ul class="pillars" data-pillars>
         <li class="pillar is-open">
@@ -214,10 +212,12 @@
       </div>
     </section>
 
-    <!-- CTA: the rings come back, you are the center now -->
+    <!-- CTA -->
     <section class="cta" aria-labelledby="cta-title">
       <div class="cta-panel" data-cta>
-        <canvas class="rings rings-panel" data-rings="cta" aria-hidden="true"></canvas>
+        <svg class="cta-venn" viewBox="0 0 400 380" aria-hidden="true">
+          <circle cx="200" cy="130" r="104"/><circle cx="140" cy="234" r="104"/><circle cx="260" cy="234" r="104"/>
+        </svg>
         <h2 id="cta-title" data-cta-title>¿Charlamos?</h2>
         <p>El primer paso es el más corto: un mensaje.</p>
         <a class="btn btn-light btn-lg magnetic" href="https://wa.link/wqr6qj" target="_blank" rel="noopener">

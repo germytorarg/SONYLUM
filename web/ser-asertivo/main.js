@@ -101,14 +101,6 @@
     colorVar: "--ring", count: 7, inner: 0.38, alpha: 0.5, parallax: 18, dots: true, grow: 0, pulse: 3.2,
     span: (w) => w * 0.5, pointerArea: $("[data-stage]"),
   });
-  const panelRings = createRings($('[data-rings="panel"]'), {
-    colorVar: "--ring-panel", count: 11, inner: 0.12, alpha: 0.3, parallax: 30, dots: true,
-    span: (w, h) => Math.hypot(w, h) * 0.55, pointerArea: $("[data-manifesto]"),
-  });
-  const ctaRings = createRings($('[data-rings="cta"]'), {
-    colorVar: "--ring-panel", count: 10, inner: 0.1, alpha: 0.32, parallax: 24, dots: true, pulse: 2.4, rippleLife: 3.2,
-    span: (w, h) => Math.hypot(w, h) * 0.5, pointerArea: $("[data-cta]"),
-  });
 
   /* ---------- Buttons: hover fill starts where the pointer enters ---------- */
   $$(".btn").forEach((btn) => {
@@ -131,12 +123,9 @@
       const open = p.classList.contains("is-open");
       pillars.forEach((o) => { o.classList.remove("is-open"); $(".pillar-head", o).setAttribute("aria-expanded", "false"); });
       if (!open) { p.classList.add("is-open"); $(".pillar-head", p).setAttribute("aria-expanded", "true"); }
-      syncVenn();
     });
   });
-  const vennCircles = $$("[data-venn-c]");
-  function syncVenn() { vennCircles.forEach((c, i) => c.classList.toggle("is-on", pillars[i]?.classList.contains("is-open"))); }
-  syncVenn();
+
 
   /* ---------- Temas: caption swaps with a blur bridge ---------- */
   const caption = $("[data-temas-caption]");
@@ -216,6 +205,8 @@
     });
   }
 
+  const mobileQuery = () => window.matchMedia("(max-width: 860px)");
+
   /* ---------- Word splitter ---------- */
   const splitWords = (el, cls, masked = true) => {
     const out = [];
@@ -251,24 +242,6 @@
     });
   });
 
-  /* ---------- Venn: the three conditions find each other ---------- */
-  const venn = $("[data-venn]");
-  if (venn) {
-    const offsets = [[0, -60], [-60, 40], [60, 40]];
-    vennCircles.forEach((c, i) => {
-      gsap.fromTo(c, { x: offsets[i][0], y: offsets[i][1], opacity: 0 }, {
-        x: 0, y: 0, opacity: 1, duration: 1.6, ease: "expo.out", delay: i * 0.08,
-        scrollTrigger: { trigger: venn, start: "top 80%" },
-        // then a slow breathing drift so the shape never sits still
-        onComplete: () => gsap.to(c, { x: offsets[i][0] * 0.08, y: offsets[i][1] * 0.08, duration: 3.2 + i * 0.4, ease: "sine.inOut", yoyo: true, repeat: -1 }),
-      });
-    });
-    gsap.from("[data-venn-core]", {
-      scale: 0, transformOrigin: "200px 200px", duration: 1, ease: "back.out(2)", delay: 0.6,
-      scrollTrigger: { trigger: venn, start: "top 80%" },
-    });
-  }
-
   /* ---------- Opening: curtain lifts, hero assembles ---------- */
   const titleWords = splitWords($("[data-split]"), "w");
   gsap.set(titleWords, { yPercent: 115, rotate: 4 });
@@ -299,11 +272,22 @@
     scale: 1, borderRadius: 32, ease: "none",
     scrollTrigger: { trigger: "[data-manifesto]", start: "top bottom", end: "top top", scrub: true },
   });
+  // Pinned: as you read, the three conditions travel toward each other and "vos" appears where they meet
   const mWords = splitWords($("[data-scrub]"), "sw", false);
-  gsap.fromTo(mWords, { opacity: 0.12, filter: "blur(3px)" }, {
-    opacity: 1, filter: "blur(0px)", stagger: 0.1, ease: "none",
-    scrollTrigger: { trigger: "[data-manifesto]", start: "top top", end: "+=120%", scrub: 0.6, pin: true, anticipatePin: 1 },
+  const vennCircles = $$("[data-venn-c]");
+  const offsets = mobileQuery().matches ? [[0, -70], [-80, 50], [80, 50]] : [[0, -90], [-110, 60], [110, 60]];
+  const mtl = gsap.timeline({
+    defaults: { ease: "none" },
+    scrollTrigger: { trigger: "[data-manifesto]", start: "top top", end: "+=140%", scrub: 0.6, pin: true, anticipatePin: 1 },
   });
+  vennCircles.forEach((c, i) => {
+    mtl.fromTo(c, { x: offsets[i][0], y: offsets[i][1] }, { x: 0, y: 0, duration: 0.85, ease: "power2.inOut" }, 0);
+  });
+  mtl.fromTo(mWords, { opacity: 0.18 }, { opacity: 1, duration: 0.08, stagger: 0.8 / mWords.length }, 0.05)
+    // grow the radius itself: exact center, no transform-origin math on SVG groups
+    .fromTo("[data-venn-core] circle", { attr: { r: 0 } }, { attr: { r: 30 }, duration: 0.12, ease: "back.out(2.2)" }, 0.82)
+    .fromTo("[data-venn-core] text", { opacity: 0 }, { opacity: 1, duration: 0.06 }, 0.88)
+    .to(vennCircles, { duration: 0.05 }, 0.95);
 
   /* ---------- Ribbon: drifts on its own, speeds up with your scroll ---------- */
   const track = $("[data-ribbon]");
@@ -415,7 +399,7 @@
     scrollTrigger: { trigger: ".about", start: "top bottom", end: "bottom top", scrub: true },
   });
 
-  /* ---------- CTA: panel opens, rings answer the button ---------- */
+  /* ---------- CTA: panel opens ---------- */
   gsap.fromTo(".cta-panel", { scale: 0.92, borderRadius: 120 }, {
     scale: 1, borderRadius: 32, ease: "none",
     scrollTrigger: { trigger: ".cta", start: "top bottom", end: "top 20%", scrub: true },
@@ -425,9 +409,4 @@
     yPercent: 115, duration: 1.3, ease: "expo.out",
     scrollTrigger: { trigger: ".cta-panel", start: "top 60%" },
   });
-  const ctaBtn = $(".cta .btn");
-  if (finePointer) {
-    ctaBtn.addEventListener("pointerenter", () => gsap.to(ctaRings, { boost: 1, duration: 0.8, ease: "expo.out" }));
-    ctaBtn.addEventListener("pointerleave", () => gsap.to(ctaRings, { boost: 0, duration: 0.5, ease: "power2.out" }));
-  }
 })();
