@@ -435,10 +435,10 @@ em { font-style: italic; }
 .hero-media img { filter: saturate(1.15) contrast(1.1) brightness(0.9); object-position: 50% 60%; }
 .hero-media::after {
   background:
-    linear-gradient(90deg, rgba(12,11,10,.82) 0%, rgba(12,11,10,.25) 46%, rgba(12,11,10,0) 70%),
+    linear-gradient(90deg, rgba(12,11,10,.9) 0%, rgba(12,11,10,.55) 42%, rgba(12,11,10,.1) 72%),
     linear-gradient(0deg, rgba(12,11,10,.85) 0%, rgba(12,11,10,0) 42%);
 }
-.hero-title { mix-blend-mode: difference; text-shadow: none; }
+.hero-title { mix-blend-mode: normal; text-shadow: 0 4px 60px rgba(12,11,10,.55); }
 .hero-title em { color: var(--red); }
 
 .specimen {

@@ -9,14 +9,7 @@
 <link rel="preload" href="vendor/fonts/Archivo-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/phosphor/style.css">
 <link rel="stylesheet" href="styles.css">
-<script>
-  /* Si una imagen local todavía no se descargó, usa el original generado (ver fetch-images.sh). */
-  document.addEventListener("error", function (e) {
-    var el = e.target;
-    if (el.tagName === "IMG" && el.dataset.remote && !el.dataset.swapped) { el.dataset.swapped = "1"; el.src = el.dataset.remote; }
-  }, true);
-  document.documentElement.classList.add("js");
-</script>
+<script>document.documentElement.classList.add("js");</script>
 </head>
 <body>
 
@@ -51,20 +44,20 @@
   <!-- HERO -->
   <section class="hero" id="inicio" data-drop="0.79 0.56 0.28 sphere 0" data-drop-m="0.66 0.34 0.34 sphere 0">
     <figure class="hero-media">
-      <img src="assets/img/rodaje.jpg" data-remote="https://www.figma.com/api/mcp/asset/5ed542d6-fb36-495e-a8b2-805f64bb8999.png" alt="Set de filmación a oscuras con una cámara de cine y luz roja" fetchpriority="high" data-env>
+      <img src="assets/img/galeria.jpg" alt="Instalación de videoarte con pantallas gigantes en rojo" fetchpriority="high" data-env>
     </figure>
 
     <!-- especímenes flotantes: capas de vidrio a distintas profundidades -->
     <figure class="specimen sp-a" data-depth="0.35" aria-hidden="true">
-      <img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="">
+      <img src="assets/img/vertical.jpg" alt="">
       <figcaption>Rodaje vertical 9:16</figcaption>
     </figure>
     <figure class="specimen sp-b" data-depth="-0.25" aria-hidden="true">
-      <img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="">
+      <img src="assets/img/negativos.jpg" alt="">
       <figcaption>Negativos 35 mm</figcaption>
     </figure>
     <figure class="specimen sp-c" data-depth="0.6" aria-hidden="true">
-      <img src="assets/img/boda.jpg" data-remote="https://www.figma.com/api/mcp/asset/3f8471f0-1439-464f-8001-c0a2ad610bc2.png" alt="">
+      <img src="assets/img/boda.jpg" alt="">
       <figcaption>Film de boda</figcaption>
     </figure>
 
@@ -96,10 +89,10 @@
   <section class="meta" id="metamorfosis" data-drop="0.62 0.5 0.42 seq 0" data-drop-m="0.5 0.7 0.4 seq 0" data-seq="sphere box prism torus">
     <div class="meta-sticky">
       <div class="meta-bgs" aria-hidden="true">
-        <img class="is-on" src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="">
-        <img src="assets/img/bauhaus.jpg" data-remote="https://www.figma.com/api/mcp/asset/9ca2f785-d4b5-4703-a632-439e8d218efe.png" alt="">
-        <img src="assets/img/prisma.jpg" data-remote="https://www.figma.com/api/mcp/asset/16dab7e8-8e26-4d30-97cc-7cc7133a7504.png" alt="">
-        <img src="assets/img/gotas.jpg" data-remote="https://www.figma.com/api/mcp/asset/78097919-d063-4ce5-a154-59e2fcc7af58.png" alt="">
+        <img class="is-on" src="assets/img/liquido.jpg" alt="">
+        <img src="assets/img/negativos.jpg" alt="">
+        <img src="assets/img/prisma.jpg" alt="">
+        <img src="assets/img/anillo.jpg" alt="">
       </div>
       <div class="meta-cols" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <p class="meta-lead">Una idea puede tomar cualquier forma.</p>
@@ -126,7 +119,7 @@
           <span class="cap-t">Web y experiencias</span>
           <span class="cap-d">Sitios, interfaces y universos digitales. Diseño a medida, código propio, cero plantillas.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/liquido.jpg" alt="" loading="lazy">
         </a>
       </li>
       <li class="cap reveal">
@@ -135,7 +128,7 @@
           <span class="cap-t">Motion y producción</span>
           <span class="cap-d">Reels, campañas, edición y video vertical 9:16. Imagen que no se queda quieta.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/rodaje.jpg" data-remote="https://www.figma.com/api/mcp/asset/5ed542d6-fb36-495e-a8b2-805f64bb8999.png" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/negativos.jpg" alt="" loading="lazy">
         </a>
       </li>
       <li class="cap reveal">
@@ -144,7 +137,7 @@
           <span class="cap-t">IA y automatización</span>
           <span class="cap-d">Flujos y agentes que conectan una idea con un resultado medible.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/prisma.jpg" data-remote="https://www.figma.com/api/mcp/asset/16dab7e8-8e26-4d30-97cc-7cc7133a7504.png" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/prisma.jpg" alt="" loading="lazy">
         </a>
       </li>
       <li class="cap reveal">
@@ -153,7 +146,7 @@
           <span class="cap-t">Estrategia y campañas</span>
           <span class="cap-d">Posicionamiento, creatividad comercial y comunicación con intención.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/obelisco.jpg" data-remote="https://www.figma.com/api/mcp/asset/d959dd8f-afc3-4364-a8ea-4e37a61ee2fc.png" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/obelisco.jpg" alt="" loading="lazy">
         </a>
       </li>
     </ul>
@@ -168,19 +161,18 @@
     </div>
     <div class="archive-rows">
       <div class="archive-row" data-dir="-1">
-        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
-        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="Rodaje vertical con celular frente a una bailarina" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
-        <figure class="plate plate-t"><img src="assets/img/bauhaus.jpg" data-remote="https://www.figma.com/api/mcp/asset/9ca2f785-d4b5-4703-a632-439e8d218efe.png" alt="Fachada modernista con grilla de ventanales" loading="lazy"><figcaption><b>Grilla</b>Sistema y estructura</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/rodaje.jpg" data-remote="https://www.figma.com/api/mcp/asset/5ed542d6-fb36-495e-a8b2-805f64bb8999.png" alt="Cámara de cine en un set con luz roja" loading="lazy"><figcaption><b>Set</b>Producción audiovisual</figcaption></figure>
-        <figure class="plate"><img src="assets/img/boda.jpg" data-remote="https://www.figma.com/api/mcp/asset/3f8471f0-1439-464f-8001-c0a2ad610bc2.png" alt="Pareja a contraluz en una ventana al atardecer" loading="lazy"><figcaption><b>Boda</b>Films de autor</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
+        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" alt="Rodaje vertical con celular, el Obelisco de fondo" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/galeria.jpg" alt="Instalación de videoarte con pantallas en rojo" loading="lazy"><figcaption><b>Instalación</b>Arte y video</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/anillo.jpg" alt="Anillo de luz entre humo rojo" loading="lazy"><figcaption><b>Escena</b>Dirección de arte</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/prisma.jpg" alt="Prisma de vidrio que abre un haz de luz roja" loading="lazy"><figcaption><b>Luz</b>Fotografía</figcaption></figure>
       </div>
       <div class="archive-row" data-dir="1">
-        <figure class="plate plate-w"><img src="assets/img/obelisco.jpg" data-remote="https://www.figma.com/api/mcp/asset/d959dd8f-afc3-4364-a8ea-4e37a61ee2fc.png" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy"><figcaption><b>Ciudad</b>Buenos Aires</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/prisma.jpg" data-remote="https://www.figma.com/api/mcp/asset/16dab7e8-8e26-4d30-97cc-7cc7133a7504.png" alt="Prisma de vidrio que abre un haz de luz" loading="lazy"><figcaption><b>Luz</b>Dirección de arte</figcaption></figure>
-        <figure class="plate"><img src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="Gota de vidrio líquido sobre negro" loading="lazy"><figcaption><b>Materia</b>Experimentos visuales</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/gotas.jpg" data-remote="https://www.figma.com/api/mcp/asset/78097919-d063-4ce5-a154-59e2fcc7af58.png" alt="Gota que se divide en gotas más chicas" loading="lazy"><figcaption><b>Movimiento</b>Motion graphics</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
-        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="Rodaje vertical con celular frente a una bailarina" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/boda.jpg" alt="Pareja de novios a contraluz al atardecer" loading="lazy"><figcaption><b>Boda</b>Films de autor</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/obelisco.jpg" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy"><figcaption><b>Ciudad</b>Buenos Aires</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/liquido.jpg" alt="Gota de vidrio líquido sobre negro" loading="lazy"><figcaption><b>Materia</b>Motion graphics</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
+        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" alt="Rodaje vertical con celular, el Obelisco de fondo" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
       </div>
     </div>
   </section>
@@ -194,19 +186,19 @@
       </div>
       <div class="works-track" id="worksTrack">
         <a class="work" href="https://sonylum.ar" target="_blank" rel="noopener" data-site="sonylum.ar" data-name="Sonylum" data-shot="assets/sites/sonylum.jpg">
-          <img src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="Gota de vidrio líquido sobre negro" loading="lazy">
+          <img src="assets/img/galeria.jpg" alt="Instalación de videoarte con pantallas en rojo" loading="lazy">
           <div class="work-glass"><span class="work-k">Estudio digital</span><b>Sonylum</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
         <a class="work work-tall" href="https://creandocontenidos.ar" target="_blank" rel="noopener" data-site="creandocontenidos.ar" data-name="Creando Contenidos" data-shot="assets/sites/creandocontenidos.jpg">
-          <img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="Rodaje vertical con celular frente a una bailarina" loading="lazy">
+          <img src="assets/img/vertical.jpg" alt="Rodaje vertical con celular, el Obelisco de fondo" loading="lazy">
           <div class="work-glass"><span class="work-k">Contenido vertical 9:16</span><b>Creando Contenidos</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
         <a class="work" href="https://localba.ar" target="_blank" rel="noopener" data-site="localba.ar" data-name="LocalBA" data-shot="assets/sites/localba.jpg">
-          <img src="assets/img/obelisco.jpg" data-remote="https://www.figma.com/api/mcp/asset/d959dd8f-afc3-4364-a8ea-4e37a61ee2fc.png" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy">
+          <img src="assets/img/obelisco.jpg" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy">
           <div class="work-glass"><span class="work-k">Experiencias en Buenos Aires</span><b>LocalBA</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
         <a class="work" href="https://tefilmo.ar" target="_blank" rel="noopener" data-site="tefilmo.ar" data-name="Tefilmo" data-shot="assets/sites/tefilmo.jpg">
-          <img src="assets/img/boda.jpg" data-remote="https://www.figma.com/api/mcp/asset/3f8471f0-1439-464f-8001-c0a2ad610bc2.png" alt="Pareja a contraluz en una ventana al atardecer" loading="lazy">
+          <img src="assets/img/boda.jpg" alt="Pareja de novios a contraluz al atardecer" loading="lazy">
           <div class="work-glass"><span class="work-k">Films de boda</span><b>Tefilmo</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
       </div>
@@ -216,7 +208,7 @@
   <!-- LABORATORIO -->
   <section class="lab" id="laboratorio" data-drop="0.36 0.3 0.2 torus 0" data-drop-m="0.78 0.12 0.16 torus 0">
     <figure class="lab-media">
-      <img src="assets/img/gotas.jpg" data-remote="https://www.figma.com/api/mcp/asset/78097919-d063-4ce5-a154-59e2fcc7af58.png" alt="" loading="lazy" data-env>
+      <img src="assets/img/anillo.jpg" alt="" loading="lazy" data-env>
     </figure>
     <div class="lab-grid">
       <div class="lab-copy reveal">
@@ -262,7 +254,7 @@
 
   <!-- CONTACTO -->
   <section class="cta" id="contacto" data-drop="0.8 0.66 0.18 sphere 0" data-drop-m="0.76 0.4 0.17 sphere 0">
-    <figure class="cta-media" aria-hidden="true"><img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="" loading="lazy" data-env></figure>
+    <figure class="cta-media" aria-hidden="true"><img src="assets/img/negativos.jpg" alt="" loading="lazy" data-env></figure>
     <h2 class="cta-title"><span>Hagámosla</span><span><em>real.</em></span></h2>
     <div class="cta-row">
       <a class="btn btn-solid btn-xl" href="https://wa.me/?text=Hola%20SONYLUM%2C%20quiero%20hablar%20sobre%20un%20proyecto" target="_blank" rel="noopener">Hablemos <i class="ph ph-whatsapp-logo" aria-hidden="true"></i></a>
