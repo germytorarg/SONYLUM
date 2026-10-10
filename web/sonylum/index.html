@@ -9,7 +9,14 @@
 <link rel="preload" href="vendor/fonts/Archivo-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/phosphor/style.css">
 <link rel="stylesheet" href="styles.css">
-<script>document.documentElement.classList.add("js");</script>
+<script>
+  /* Si una imagen local todavía no se descargó, usa el original generado (ver fetch-images.sh). */
+  document.addEventListener("error", function (e) {
+    var el = e.target;
+    if (el.tagName === "IMG" && el.dataset.remote && !el.dataset.swapped) { el.dataset.swapped = "1"; el.src = el.dataset.remote; }
+  }, true);
+  document.documentElement.classList.add("js");
+</script>
 </head>
 <body>
 
@@ -44,21 +51,21 @@
   <!-- HERO -->
   <section class="hero" id="inicio" data-drop="0.79 0.56 0.28 sphere 0" data-drop-m="0.66 0.34 0.34 sphere 0">
     <figure class="hero-media">
-      <img src="assets/img/aurora-roja.webp" alt="Aurora austral roja sobre la curva de la Tierra, vista desde el transbordador" fetchpriority="high" data-env>
+      <img src="assets/img/rodaje.jpg" data-remote="https://www.figma.com/api/mcp/asset/5ed542d6-fb36-495e-a8b2-805f64bb8999.png" alt="Set de filmación a oscuras con una cámara de cine y luz roja" fetchpriority="high" data-env>
     </figure>
 
     <!-- especímenes flotantes: capas de vidrio a distintas profundidades -->
     <figure class="specimen sp-a" data-depth="0.35" aria-hidden="true">
-      <img src="assets/img/memling.webp" alt="">
-      <figcaption>Hans Memling, ca. 1470</figcaption>
+      <img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="">
+      <figcaption>Rodaje vertical 9:16</figcaption>
     </figure>
     <figure class="specimen sp-b" data-depth="-0.25" aria-hidden="true">
-      <img src="assets/img/saturno.webp" alt="">
-      <figcaption>A la sombra de Saturno, 2006</figcaption>
+      <img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="">
+      <figcaption>Negativos 35 mm</figcaption>
     </figure>
     <figure class="specimen sp-c" data-depth="0.6" aria-hidden="true">
-      <img src="assets/img/reloj.webp" alt="">
-      <figcaption>Nebulosa reloj de arena, 1996</figcaption>
+      <img src="assets/img/boda.jpg" data-remote="https://www.figma.com/api/mcp/asset/3f8471f0-1439-464f-8001-c0a2ad610bc2.png" alt="">
+      <figcaption>Film de boda</figcaption>
     </figure>
 
     <div class="hero-grid">
@@ -89,18 +96,18 @@
   <section class="meta" id="metamorfosis" data-drop="0.62 0.5 0.42 seq 0" data-drop-m="0.5 0.7 0.4 seq 0" data-seq="sphere box prism torus">
     <div class="meta-sticky">
       <div class="meta-bgs" aria-hidden="true">
-        <img class="is-on" src="assets/img/ojo.webp" alt="">
-        <img src="assets/img/discovery-luna.webp" alt="">
-        <img src="assets/img/haces.webp" alt="">
-        <img src="assets/img/anillo.webp" alt="">
+        <img class="is-on" src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="">
+        <img src="assets/img/bauhaus.jpg" data-remote="https://www.figma.com/api/mcp/asset/9ca2f785-d4b5-4703-a632-439e8d218efe.png" alt="">
+        <img src="assets/img/prisma.jpg" data-remote="https://www.figma.com/api/mcp/asset/16dab7e8-8e26-4d30-97cc-7cc7133a7504.png" alt="">
+        <img src="assets/img/gotas.jpg" data-remote="https://www.figma.com/api/mcp/asset/78097919-d063-4ce5-a154-59e2fcc7af58.png" alt="">
       </div>
       <div class="meta-cols" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <p class="meta-lead">Una idea puede tomar cualquier forma.</p>
       <ol class="meta-steps">
-        <li class="meta-step is-on"><h2 class="kinetic">Gota.</h2><p>Toda idea empieza sin forma. La escuchamos antes de dibujarla.</p><small>La marca de una estrella moribunda. NASA/JPL, 2006</small></li>
-        <li class="meta-step"><h2 class="kinetic">Bloque.</h2><p>Después se ordena: estrategia, sistema, grilla. Nada queda librado al azar.</p><small>Discovery en la plataforma, con la Luna. NASA, 2009</small></li>
-        <li class="meta-step"><h2 class="kinetic">Prisma.</h2><p>Y se abre en luz: imagen, video, campañas que se ven y funcionan.</p><small>Haces de una nebulosa preplanetaria. Hubble, 2017</small></li>
-        <li class="meta-step"><h2 class="kinetic">Anillo.</h2><p>Hasta volver al principio. La misma idea, otra materia.</p><small>La forma real de la Nebulosa del Anillo. Hubble, 2017</small></li>
+        <li class="meta-step is-on"><h2 class="kinetic">Gota.</h2><p>Toda idea empieza sin forma. La escuchamos antes de dibujarla.</p></li>
+        <li class="meta-step"><h2 class="kinetic">Bloque.</h2><p>Después se ordena: estrategia, sistema, grilla. Nada queda librado al azar.</p></li>
+        <li class="meta-step"><h2 class="kinetic">Prisma.</h2><p>Y se abre en luz: imagen, video, campañas que se ven y funcionan.</p></li>
+        <li class="meta-step"><h2 class="kinetic">Anillo.</h2><p>Hasta volver al principio. La misma idea, otra materia.</p></li>
       </ol>
       <div class="meta-progress" aria-hidden="true"><span id="metaBar"></span></div>
     </div>
@@ -119,7 +126,7 @@
           <span class="cap-t">Web y experiencias</span>
           <span class="cap-d">Sitios, interfaces y universos digitales. Diseño a medida, código propio, cero plantillas.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/noche-iss.webp" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="" loading="lazy">
         </a>
       </li>
       <li class="cap reveal">
@@ -128,7 +135,7 @@
           <span class="cap-t">Motion y producción</span>
           <span class="cap-d">Reels, campañas, edición y video vertical 9:16. Imagen que no se queda quieta.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/lanzamiento.webp" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/rodaje.jpg" data-remote="https://www.figma.com/api/mcp/asset/5ed542d6-fb36-495e-a8b2-805f64bb8999.png" alt="" loading="lazy">
         </a>
       </li>
       <li class="cap reveal">
@@ -137,7 +144,7 @@
           <span class="cap-t">IA y automatización</span>
           <span class="cap-d">Flujos y agentes que conectan una idea con un resultado medible.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/cangrejo.webp" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/prisma.jpg" data-remote="https://www.figma.com/api/mcp/asset/16dab7e8-8e26-4d30-97cc-7cc7133a7504.png" alt="" loading="lazy">
         </a>
       </li>
       <li class="cap reveal">
@@ -146,7 +153,7 @@
           <span class="cap-t">Estrategia y campañas</span>
           <span class="cap-d">Posicionamiento, creatividad comercial y comunicación con intención.</span>
           <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/tierra-luna.webp" alt="" loading="lazy">
+          <img class="cap-img" src="assets/img/obelisco.jpg" data-remote="https://www.figma.com/api/mcp/asset/d959dd8f-afc3-4364-a8ea-4e37a61ee2fc.png" alt="" loading="lazy">
         </a>
       </li>
     </ul>
@@ -156,25 +163,24 @@
   <!-- ARCHIVO: imágenes raras que nos alimentan -->
   <section class="archive" id="archivo" data-drop="0.5 0.52 0.16 swarm 1" data-drop-m="0.5 0.5 0.18 swarm 1">
     <div class="archive-head">
-      <h2 class="sec-title reveal">Archivo de<br>cosas raras.</h2>
-      <p class="archive-intro reveal">Telescopios, pintura flamenca, transbordadores, rollos chinos. Miramos todo antes de diseñar nada.</p>
+      <h2 class="sec-title reveal">Cine, redes<br>y arte.</h2>
+      <p class="archive-intro reveal">Rodamos, editamos, publicamos y experimentamos. Todo pasa por el mismo estudio.</p>
     </div>
     <div class="archive-rows">
       <div class="archive-row" data-dir="-1">
-        <figure class="plate"><img src="assets/img/reloj.webp" alt="Nebulosa con forma de reloj de arena alrededor de una estrella moribunda" loading="lazy"><figcaption><b>Nebulosa reloj de arena</b>Hubble, 1996</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/zhao.webp" alt="Paisaje a tinta de montañas y pinos" loading="lazy"><figcaption><b>Paisaje</b>Zhao Yuan, siglo XIV</figcaption></figure>
-        <figure class="plate"><img src="assets/img/aurora-lazo.webp" alt="Aurora austral verde formando un lazo sobre la Tierra" loading="lazy"><figcaption><b>Aurora austral, lazo</b>NASA, 1991</figcaption></figure>
-        <figure class="plate plate-t"><img src="assets/img/san-cristobal.webp" alt="San Cristóbal cargando al niño sobre el río" loading="lazy"><figcaption><b>San Cristóbal</b>Domenico Ghirlandaio</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/saturno.webp" alt="Saturno eclipsando al Sol, anillos iluminados a contraluz" loading="lazy"><figcaption><b>A la sombra de Saturno</b>Cassini, 2006</figcaption></figure>
-        <figure class="plate"><img src="assets/img/gran-ola.webp" alt="Fotografía antigua de una ola rompiendo bajo un cielo dramático" loading="lazy"><figcaption><b>La gran ola, Sète</b>Gustave Le Gray, 1857</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
+        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="Rodaje vertical con celular frente a una bailarina" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
+        <figure class="plate plate-t"><img src="assets/img/bauhaus.jpg" data-remote="https://www.figma.com/api/mcp/asset/9ca2f785-d4b5-4703-a632-439e8d218efe.png" alt="Fachada modernista con grilla de ventanales" loading="lazy"><figcaption><b>Grilla</b>Sistema y estructura</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/rodaje.jpg" data-remote="https://www.figma.com/api/mcp/asset/5ed542d6-fb36-495e-a8b2-805f64bb8999.png" alt="Cámara de cine en un set con luz roja" loading="lazy"><figcaption><b>Set</b>Producción audiovisual</figcaption></figure>
+        <figure class="plate"><img src="assets/img/boda.jpg" data-remote="https://www.figma.com/api/mcp/asset/3f8471f0-1439-464f-8001-c0a2ad610bc2.png" alt="Pareja a contraluz en una ventana al atardecer" loading="lazy"><figcaption><b>Boda</b>Films de autor</figcaption></figure>
       </div>
       <div class="archive-row" data-dir="1">
-        <figure class="plate"><img src="assets/img/sol.webp" alt="Protuberancia solar con forma de asa sobre el Sol" loading="lazy"><figcaption><b>Protuberancia en forma de asa</b>SOHO, 2001</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/atlantis.webp" alt="El transbordador Atlantis visto desde la estación Mir" loading="lazy"><figcaption><b>Atlantis desde la Mir</b>NASA, 1996</figcaption></figure>
-        <figure class="plate"><img src="assets/img/cangrejo-herschel.webp" alt="Nebulosa del Cangrejo en violeta" loading="lazy"><figcaption><b>Nebulosa del Cangrejo</b>Herschel y Hubble, 2013</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/seis-rios.webp" alt="Pintura japonesa con viajeros a caballo junto a un río azul" loading="lazy"><figcaption><b>Seis ríos joya</b>Sakai Ōho, ca. 1839</figcaption></figure>
-        <figure class="plate plate-t"><img src="assets/img/palmeras.webp" alt="El Discovery en la plataforma visto entre palmeras" loading="lazy"><figcaption><b>Discovery entre palmeras</b>NASA, 1985</figcaption></figure>
-        <figure class="plate"><img src="assets/img/anillo.webp" alt="Nebulosa del Anillo" loading="lazy"><figcaption><b>Nebulosa del Anillo</b>Hubble, 2017</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/obelisco.jpg" data-remote="https://www.figma.com/api/mcp/asset/d959dd8f-afc3-4364-a8ea-4e37a61ee2fc.png" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy"><figcaption><b>Ciudad</b>Buenos Aires</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/prisma.jpg" data-remote="https://www.figma.com/api/mcp/asset/16dab7e8-8e26-4d30-97cc-7cc7133a7504.png" alt="Prisma de vidrio que abre un haz de luz" loading="lazy"><figcaption><b>Luz</b>Dirección de arte</figcaption></figure>
+        <figure class="plate"><img src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="Gota de vidrio líquido sobre negro" loading="lazy"><figcaption><b>Materia</b>Experimentos visuales</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/gotas.jpg" data-remote="https://www.figma.com/api/mcp/asset/78097919-d063-4ce5-a154-59e2fcc7af58.png" alt="Gota que se divide en gotas más chicas" loading="lazy"><figcaption><b>Movimiento</b>Motion graphics</figcaption></figure>
+        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
+        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="Rodaje vertical con celular frente a una bailarina" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
       </div>
     </div>
   </section>
@@ -188,19 +194,19 @@
       </div>
       <div class="works-track" id="worksTrack">
         <a class="work" href="https://sonylum.ar" target="_blank" rel="noopener" data-site="sonylum.ar" data-name="Sonylum" data-shot="assets/sites/sonylum.jpg">
-          <img src="assets/img/cangrejo-herschel.webp" alt="Nebulosa del Cangrejo en violeta" loading="lazy">
+          <img src="assets/img/liquido.jpg" data-remote="https://www.figma.com/api/mcp/asset/5a4aaf47-86e7-4a2b-b55c-3a66f6ae27b5.png" alt="Gota de vidrio líquido sobre negro" loading="lazy">
           <div class="work-glass"><span class="work-k">Estudio digital</span><b>Sonylum</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
         <a class="work work-tall" href="https://creandocontenidos.ar" target="_blank" rel="noopener" data-site="creandocontenidos.ar" data-name="Creando Contenidos" data-shot="assets/sites/creandocontenidos.jpg">
-          <img src="assets/img/palmeras.webp" alt="El transbordador Discovery visto entre palmeras" loading="lazy">
+          <img src="assets/img/vertical.jpg" data-remote="https://www.figma.com/api/mcp/asset/db3c26f6-c4e1-4d7f-b278-2d4d4353418c.png" alt="Rodaje vertical con celular frente a una bailarina" loading="lazy">
           <div class="work-glass"><span class="work-k">Contenido vertical 9:16</span><b>Creando Contenidos</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
         <a class="work" href="https://localba.ar" target="_blank" rel="noopener" data-site="localba.ar" data-name="LocalBA" data-shot="assets/sites/localba.jpg">
-          <img src="assets/img/seis-rios.webp" alt="Viajeros a caballo junto a un río, pintura japonesa" loading="lazy">
+          <img src="assets/img/obelisco.jpg" data-remote="https://www.figma.com/api/mcp/asset/d959dd8f-afc3-4364-a8ea-4e37a61ee2fc.png" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy">
           <div class="work-glass"><span class="work-k">Experiencias en Buenos Aires</span><b>LocalBA</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
         <a class="work" href="https://tefilmo.ar" target="_blank" rel="noopener" data-site="tefilmo.ar" data-name="Tefilmo" data-shot="assets/sites/tefilmo.jpg">
-          <img src="assets/img/memling.webp" alt="Díptico de una pareja en oración, Hans Memling" loading="lazy">
+          <img src="assets/img/boda.jpg" data-remote="https://www.figma.com/api/mcp/asset/3f8471f0-1439-464f-8001-c0a2ad610bc2.png" alt="Pareja a contraluz en una ventana al atardecer" loading="lazy">
           <div class="work-glass"><span class="work-k">Films de boda</span><b>Tefilmo</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
         </a>
       </div>
@@ -210,7 +216,7 @@
   <!-- LABORATORIO -->
   <section class="lab" id="laboratorio" data-drop="0.36 0.3 0.2 torus 0" data-drop-m="0.78 0.12 0.16 torus 0">
     <figure class="lab-media">
-      <img src="assets/img/sol.webp" alt="" loading="lazy" data-env>
+      <img src="assets/img/gotas.jpg" data-remote="https://www.figma.com/api/mcp/asset/78097919-d063-4ce5-a154-59e2fcc7af58.png" alt="" loading="lazy" data-env>
     </figure>
     <div class="lab-grid">
       <div class="lab-copy reveal">
@@ -256,7 +262,7 @@
 
   <!-- CONTACTO -->
   <section class="cta" id="contacto" data-drop="0.8 0.66 0.18 sphere 0" data-drop-m="0.76 0.4 0.17 sphere 0">
-    <figure class="cta-media" aria-hidden="true"><img src="assets/img/tierra-luna.webp" alt="" loading="lazy" data-env></figure>
+    <figure class="cta-media" aria-hidden="true"><img src="assets/img/negativos.jpg" data-remote="https://www.figma.com/api/mcp/asset/eade7a6b-04de-4965-b04f-567572782125.png" alt="" loading="lazy" data-env></figure>
     <h2 class="cta-title"><span>Hagámosla</span><span><em>real.</em></span></h2>
     <div class="cta-row">
       <a class="btn btn-solid btn-xl" href="https://wa.me/?text=Hola%20SONYLUM%2C%20quiero%20hablar%20sobre%20un%20proyecto" target="_blank" rel="noopener">Hablemos <i class="ph ph-whatsapp-logo" aria-hidden="true"></i></a>
@@ -277,7 +283,6 @@
 
 <footer class="foot">
   <span>© 2026 SONYLUM. Villa Luro, Buenos Aires.</span>
-  <span class="foot-credits">Imágenes: NASA y The Metropolitan Museum of Art (Open Access). Dominio público.</span>
   <nav aria-label="Redes">
     <a href="https://instagram.com/sonylumarg" target="_blank" rel="noopener"><i class="ph ph-instagram-logo" aria-hidden="true"></i> Instagram</a>
     <a href="https://sonylum.ar" target="_blank" rel="noopener">sonylum.ar</a>
