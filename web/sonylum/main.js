@@ -191,7 +191,7 @@
     if (typeof sm.showModal === "function") sm.showModal(); else sm.setAttribute("open", "");
   }
   function closeSite() { if (sm.open) sm.close(); }
-  sm.addEventListener("close", function () { smFrame.src = "about:blank"; });
+  sm.addEventListener("close", function () { if (!sm.open) smFrame.src = "about:blank"; });
   $$(".work-open").forEach(function (b) { b.addEventListener("click", function () { openSite(b); }); });
   $("#smClose").addEventListener("click", closeSite);
   sm.addEventListener("click", function (e) { if (e.target === sm) closeSite(); });
