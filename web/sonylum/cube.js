@@ -4,7 +4,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeVertices, mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
-import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
 
 const MODEL_URL = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260929_212926_92423081-b0e4-4f5a-b650-14af6c05c058.glb";
 const canvas = document.getElementById("scene");
@@ -146,8 +146,17 @@ if (renderer) {
     }
     document.documentElement.classList.add("webgl-ready");
   }
-  // Cubo facetado: bordes biselados en pocos planos y normales planas, como el modelo original.
-  attach(new RoundedBoxGeometry(1, 1, 1, 2, 0.16).toNonIndexed());
+  // Cubo facetado tipo gema: caras grandes, biseles planos en cada arista y un triángulo en cada esquina.
+  // Es el respaldo; en el dominio real se reemplaza por el modelo original de /stack.
+  function facetedCube(c = 0.2) {
+    const pts = [], a = 1, b = 1 - c;
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) {
+      pts.push(new THREE.Vector3(sx * b, sy * b, sz * a), new THREE.Vector3(sx * b, sy * a, sz * b), new THREE.Vector3(sx * a, sy * b, sz * b));
+    }
+    const g = new ConvexGeometry(pts);
+    return g.index ? g.toNonIndexed() : g;
+  }
+  attach(facetedCube(0.2));
 
   // El modelo original de /stack reemplaza al cubo procedural cuando termina de cargar.
   const loadModel = () => new GLTFLoader().load(MODEL_URL, (gltf) => {
@@ -174,8 +183,8 @@ if (renderer) {
 
   function placement() {
     const W = innerWidth, H = innerHeight;
-    return DESKTOP || W >= 1024 ? { x: 0.78, y: 0.45, size: Math.min(H * 0.3, W * 0.18), font: Math.min(H * 0.2, W * 0.1), maxW: W * 0.36 }
-                                : { x: 0.5, y: 0.25, size: Math.min(H * 0.23, W * 0.46), font: Math.min(H * 0.13, W * 0.21), maxW: W * 0.8 };
+    return DESKTOP || W >= 1024 ? { x: 0.77, y: 0.45, size: Math.min(H * 0.36, W * 0.22), font: Math.min(H * 0.22, W * 0.11), maxW: W * 0.38 }
+                                : { x: 0.5, y: 0.25, size: Math.min(H * 0.27, W * 0.56), font: Math.min(H * 0.14, W * 0.23), maxW: W * 0.86 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;

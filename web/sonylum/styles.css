@@ -84,8 +84,8 @@ img { display: block; max-width: 100%; }
 @keyframes spin { to { rotate: 360deg; } }
 
 .chips { position: absolute; left: 0; right: 0; height: 40px; overflow: hidden; translate: 0 -50%; opacity: .8; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.c1 { top: calc(var(--cy) - 13vh); opacity: .55; }
-.c2 { top: calc(var(--cy) + 13vh); opacity: .4; }
+.c1 { top: calc(var(--cy) - 15vh); opacity: .55; }
+.c2 { top: calc(var(--cy) + 15vh); opacity: .4; }
 .chips-track { display: flex; align-items: center; gap: 10px; width: max-content; height: 100%; animation: chips 30s linear infinite; }
 .c2 .chips-track { animation-direction: reverse; animation-duration: 38s; }
 .chip {
@@ -105,7 +105,7 @@ img { display: block; max-width: 100%; }
 /* ---------- Al tocar el cubo: lista de webs ---------- */
 .cube-grab, .cube-grab body { cursor: grabbing; user-select: none; }
 .vault {
-  position: fixed; z-index: 45; left: var(--cx); top: calc(var(--cy) + 14vh); translate: -50% 0;
+  position: fixed; z-index: 45; left: var(--cx); top: calc(var(--cy) + 16vh); translate: -50% 0;
   width: min(340px, calc(100vw - 32px)); padding: 8px; border-radius: 20px;
   background: rgba(6, 6, 9, 0.78); border: 1px solid rgba(255,255,255,.14);
   -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
@@ -148,7 +148,7 @@ img { display: block; max-width: 100%; }
 /* ---------- Pantallas ---------- */
 main { position: relative; z-index: 10; }
 .scr { min-height: 100dvh; display: grid; align-items: end; padding: 0 var(--gut) calc(150px + env(safe-area-inset-bottom)); scroll-snap-align: start; }
-.scr-in { --pad-top: 44dvh; width: min(100%, 720px); padding-top: var(--pad-top); padding-right: 64px; position: relative; isolation: isolate; }
+.scr-in { --pad-top: 46dvh; width: min(100%, 720px); padding-top: var(--pad-top); padding-right: 64px; position: relative; isolation: isolate; }
 /* cristal oscuro debajo de los textos: siempre se leen, aunque pase el cubo o las píldoras */
 .scr-in::before {
   content: ""; position: absolute; z-index: -1; left: -18px; right: 40px; bottom: -22px; top: calc(var(--pad-top) - 26px);
@@ -157,7 +157,7 @@ main { position: relative; z-index: 10; }
   -webkit-backdrop-filter: blur(18px) saturate(110%); backdrop-filter: blur(18px) saturate(110%);
   border: 1px solid rgba(255,255,255,.06);
 }
-#s2 .scr-in, #s3 .scr-in, #s4 .scr-in { --pad-top: 44dvh; }
+#s2 .scr-in, #s3 .scr-in, #s4 .scr-in { --pad-top: 46dvh; }
 
 .eyebrow { display: flex; align-items: center; gap: 16px; margin: 0 0 22px; font-size: 12px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase; color: var(--fg-2); }
 .eyebrow i { width: 48px; height: 1px; background: var(--fg-2); }
@@ -271,10 +271,10 @@ main { position: relative; z-index: 10; }
 
 /* ---------- Escritorio ---------- */
 @media (min-width: 1024px) {
-  :root { --cx: 78%; --cy: 45%; }
-  .c1 { top: calc(var(--cy) - 18vh); } .c2 { top: calc(var(--cy) + 18vh); }
+  :root { --cx: 77%; --cy: 45%; }
+  .c1 { top: calc(var(--cy) - 21vh); } .c2 { top: calc(var(--cy) + 21vh); }
   .chips { left: 60%; }
-  .badge { top: calc(var(--cy) - 24vh); }
+  .badge { top: calc(var(--cy) - 29vh); }
   .scr { align-items: center; padding-bottom: 90px; }
   .scr-in { --pad-top: 12vh; }
   #s2 .scr-in, #s3 .scr-in, #s4 .scr-in { --pad-top: 14vh; }
