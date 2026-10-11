@@ -62,7 +62,7 @@ img { display: block; max-width: 100%; }
 /* ---------- Cubo y escenario ---------- */
 #scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; pointer-events: none; }
 .fallback-cube {
-  position: fixed; left: var(--cx); top: var(--cy); z-index: 0; width: min(50vw, 330px); aspect-ratio: 1;
+  position: fixed; left: var(--cx); top: var(--cy); z-index: 0; width: min(28vw, 150px); aspect-ratio: 1;
   transform: translate(-50%, -50%) rotateX(58deg) rotateZ(45deg);
   border: 1px solid rgba(255,255,255,.52); border-radius: 22px;
   background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.025) 42%, rgba(167,139,250,.12));
@@ -71,9 +71,9 @@ img { display: block; max-width: 100%; }
 }
 .webgl-ready .fallback-cube { opacity: 0; }
 .stage { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-:root { --cx: 50%; --cy: 30%; }
+:root { --cx: 50%; --cy: 24%; }
 .orbit {
-  position: absolute; left: var(--cx); top: var(--cy); width: min(82vw, 640px); aspect-ratio: 1;
+  position: absolute; left: var(--cx); top: var(--cy); width: min(66vw, 460px); aspect-ratio: 1;
   translate: -50% -50%; border: 1px solid rgba(255,255,255,.06); border-radius: 50%;
   animation: spin 22s linear infinite;
 }
@@ -84,8 +84,8 @@ img { display: block; max-width: 100%; }
 @keyframes spin { to { rotate: 360deg; } }
 
 .chips { position: absolute; left: 0; right: 0; height: 40px; overflow: hidden; translate: 0 -50%; opacity: .8; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.c1 { top: calc(var(--cy) - 11vh); }
-.c2 { top: calc(var(--cy) + 11vh); opacity: .55; }
+.c1 { top: calc(var(--cy) - 9vh); }
+.c2 { top: calc(var(--cy) + 9vh); opacity: .55; }
 .chips-track { display: flex; align-items: center; gap: 10px; width: max-content; height: 100%; animation: chips 30s linear infinite; }
 .c2 .chips-track { animation-direction: reverse; animation-duration: 38s; }
 .chip {
@@ -96,11 +96,34 @@ img { display: block; max-width: 100%; }
 .chip::before { content: ""; width: 7px; height: 7px; border: 1px solid rgba(255,255,255,.75); border-radius: 2px; rotate: 45deg; box-shadow: 0 0 12px rgba(167,139,250,.2); }
 @keyframes chips { to { transform: translateX(-50%); } }
 .badge {
-  position: absolute; left: var(--cx); top: calc(var(--cy) - min(19vh, 190px)); translate: -50% 0;
+  position: absolute; left: var(--cx); top: calc(var(--cy) - 15vh); translate: -50% 0;
   font-size: 10px; letter-spacing: .2em; color: rgba(255,255,255,.48); white-space: nowrap; transition: opacity 300ms ease;
 }
 .badge b { color: var(--fg); font-weight: 600; }
 .badge.swap { opacity: 0; }
+
+/* ---------- Contador al tocar el cubo ---------- */
+.cube-grab, .cube-grab body { cursor: grabbing; user-select: none; }
+.tally {
+  position: fixed; z-index: 35; left: var(--cx); top: calc(var(--cy) + 12vh); translate: -50% 0;
+  display: grid; grid-template-columns: auto auto auto; align-items: center; gap: 14px;
+  padding: 12px 18px 12px 22px; border-radius: 999px;
+  background: rgba(14, 12, 24, 0.42); border: 1px solid rgba(255,255,255,.22);
+  -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 20px 60px -20px rgba(0,0,0,.8);
+  transition: opacity 220ms ease, transform 320ms var(--ease);
+}
+.tally[hidden] { display: none; }
+@starting-style { .tally { opacity: 0; transform: translateY(10px) scale(.96); } }
+.tally.out { opacity: 0; transform: translateY(6px) scale(.98); transition-duration: 180ms; }
+.tally b { font-weight: 800; font-size: 34px; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1; }
+.tally span { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--fg-2); line-height: 1.35; }
+.tally .ph { color: var(--violet-2); font-size: 18px; }
+.tally:active { transform: scale(.97); }
+
+.stat { display: flex; align-items: center; gap: 22px; margin: -6px 0 30px; }
+.stat b { font-weight: 300; font-size: clamp(72px, 9vw, 120px); line-height: .9; letter-spacing: -0.06em; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,.85); font-variant-numeric: tabular-nums; }
+.stat span { max-width: 26ch; color: var(--fg-2); font-size: 15px; line-height: 1.5; }
 
 /* ---------- Riel de secciones ---------- */
 .rail { position: fixed; right: 0; top: 50%; translate: 0 -10%; z-index: 30; display: grid; gap: 10px; }
@@ -122,8 +145,8 @@ img { display: block; max-width: 100%; }
 /* ---------- Pantallas ---------- */
 main { position: relative; z-index: 10; }
 .scr { min-height: 100dvh; display: grid; align-items: end; padding: 0 var(--gut) calc(150px + env(safe-area-inset-bottom)); scroll-snap-align: start; }
-.scr-in { width: min(100%, 720px); padding-top: 46dvh; padding-right: 64px; }
-#s2 .scr-in, #s3 .scr-in, #s4 .scr-in { padding-top: 46dvh; }
+.scr-in { width: min(100%, 720px); padding-top: 40dvh; padding-right: 64px; }
+#s2 .scr-in, #s3 .scr-in, #s4 .scr-in { padding-top: 40dvh; }
 
 .eyebrow { display: flex; align-items: center; gap: 16px; margin: 0 0 22px; font-size: 12px; font-weight: 500; letter-spacing: .26em; text-transform: uppercase; color: var(--fg-2); }
 .eyebrow i { width: 48px; height: 1px; background: var(--fg-2); }
@@ -198,11 +221,11 @@ main { position: relative; z-index: 10; }
 @media (hover: hover) and (pointer: fine) { .wa:hover, .links a:hover { color: var(--fg); } }
 
 /* entrada de cada pantalla */
-.js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .works, .js .scr .wa, .js .scr .links {
+.js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .works, .js .scr .wa, .js .scr .links, .js .scr .stat {
   opacity: 0; transform: translateY(26px);
   transition: opacity 700ms ease, transform 1000ms var(--ease);
 }
-.js .scr.in .eyebrow, .js .scr.in .hd > *, .js .scr.in .lead, .js .scr.in .ctas, .js .scr.in .cards, .js .scr.in .caps, .js .scr.in .works, .js .scr.in .wa, .js .scr.in .links { opacity: 1; transform: none; }
+.js .scr.in .eyebrow, .js .scr.in .hd > *, .js .scr.in .lead, .js .scr.in .ctas, .js .scr.in .cards, .js .scr.in .caps, .js .scr.in .works, .js .scr.in .wa, .js .scr.in .links, .js .scr.in .stat { opacity: 1; transform: none; }
 .scr.in .hd > :nth-child(2) { transition-delay: 70ms; }
 .scr.in .hd > :nth-child(3) { transition-delay: 140ms; }
 .scr.in .lead, .scr.in .cards, .scr.in .caps, .scr.in .works, .scr.in .wa { transition-delay: 200ms; }
@@ -237,7 +260,10 @@ main { position: relative; z-index: 10; }
 
 /* ---------- Escritorio ---------- */
 @media (min-width: 1024px) {
-  :root { --cx: 75%; --cy: 47%; }
+  :root { --cx: 80%; --cy: 44%; }
+  .c1 { top: calc(var(--cy) - 13vh); } .c2 { top: calc(var(--cy) + 13vh); }
+  .chips { left: 60%; }
+  .badge { top: calc(var(--cy) - 18vh); }
   .scr { align-items: center; padding-bottom: 90px; }
   .scr-in { padding-top: 12vh; }
   #s2 .scr-in, #s3 .scr-in, #s4 .scr-in { padding-top: 14vh; }
@@ -245,7 +271,7 @@ main { position: relative; z-index: 10; }
   .works { display: grid; grid-template-columns: 1fr 1fr; }
   .works li:nth-child(odd) { border-right: 1px solid var(--line-2); }
   .works li:nth-last-child(2) { border-bottom: 0; }
-  .scr-in { width: min(100%, 50vw, 760px); }
+  .scr-in { width: min(100%, 58vw, 780px); }
   .scr { padding-bottom: 120px; }
 }
 @media (max-width: 767px) {

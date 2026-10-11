@@ -11,8 +11,8 @@ const canvas = document.getElementById("scene");
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
 const DESKTOP = matchMedia("(min-width: 1024px)").matches;
-const DPR = DESKTOP ? Math.min(devicePixelRatio, 1.15) : Math.min(devicePixelRatio, 1.75);
-const RT_SCALE = DESKTOP ? 0.58 : 0.82;
+const DPR = DESKTOP ? 1 : Math.min(devicePixelRatio, 1.5);
+const RT_SCALE = DESKTOP ? 0.5 : 0.6;
 
 let renderer;
 try {
@@ -91,7 +91,7 @@ if (renderer) {
       vec2 uv=gl_FragCoord.xy/uResolution;
       vec3 n=normalize(vNormal); if(uBackside>0.5) n=-n;
       vec3 eye=normalize(vEye); vec3 color=vec3(0.0);
-      const int LOOP=8;
+      const int LOOP=5;
       for(int i=0;i<LOOP;i++){
         float slide=float(i)/float(LOOP)*0.045;
         vec3 rr=refract(eye,n,1.0/uIorR), ry=refract(eye,n,1.0/uIorY), rg=refract(eye,n,1.0/uIorG);
@@ -146,7 +146,8 @@ if (renderer) {
     }
     document.documentElement.classList.add("webgl-ready");
   }
-  attach(new RoundedBoxGeometry(1, 1, 1, 6, 0.115));
+  // Cubo facetado: bordes biselados en pocos planos y normales planas, como el modelo original.
+  attach(new RoundedBoxGeometry(1, 1, 1, 2, 0.16).toNonIndexed());
 
   // El modelo original de /stack reemplaza al cubo procedural cuando termina de cargar.
   const loadModel = () => new GLTFLoader().load(MODEL_URL, (gltf) => {
@@ -173,8 +174,8 @@ if (renderer) {
 
   function placement() {
     const W = innerWidth, H = innerHeight;
-    return DESKTOP || W >= 1024 ? { x: 0.75, y: 0.47, size: Math.min(H * 0.36, W * 0.22), font: Math.min(H * 0.24, W * 0.11), maxW: W * 0.4 }
-                                : { x: 0.5, y: 0.3, size: Math.min(H * 0.3, W * 0.5), font: Math.min(H * 0.17, W * 0.25), maxW: W * 0.86 };
+    return DESKTOP || W >= 1024 ? { x: 0.8, y: 0.44, size: Math.min(H * 0.2, W * 0.12), font: Math.min(H * 0.15, W * 0.075), maxW: W * 0.3 }
+                                : { x: 0.5, y: 0.24, size: Math.min(H * 0.16, W * 0.32), font: Math.min(H * 0.1, W * 0.16), maxW: W * 0.62 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;
@@ -246,13 +247,58 @@ if (renderer) {
   if (finePointer && !reduce) {
     addEventListener("pointermove", (e) => {
       if (lastX !== null) {
-        const dx = (e.clientX - lastX) * 0.006, dy = (e.clientY - lastY) * 0.006;
+        if (drag) { lastX = e.clientX; lastY = e.clientY; return; }
+        const dx = (e.clientX - lastX) * 0.004, dy = (e.clientY - lastY) * 0.004;
         rotate(dx, dy);
         velX = dx * 0.6; velY = dy * 0.6; idleSince = performance.now();
       }
       lastX = e.clientX; lastY = e.clientY;
     }, { passive: true });
   }
+
+  // Tocar o arrastrar el cubo: gira loco. Solo se activa sobre el cubo, el resto de la página scrollea normal.
+  function onCube(x, y, target) {
+    if (target && target.closest && target.closest("a,button,input,label,.card,.works,.caps,.peek,.rail,.top")) return false;
+    const dx = x - innerWidth * pos.x, dy = y - innerHeight * pos.y;
+    return Math.hypot(dx, dy) < pos.size * 0.85;
+  }
+  let drag = null;
+  function grab(x, y, target) {
+    if (!onCube(x, y, target)) return false;
+    drag = { x, y, t: performance.now(), moved: 0, vx: 0, vy: 0 };
+    document.documentElement.classList.add("cube-grab");
+    return true;
+  }
+  function pull(x, y) {
+    if (!drag) return;
+    const now = performance.now(), dt = Math.max(1, now - drag.t);
+    const dx = (x - drag.x) * 0.012, dy = (y - drag.y) * 0.012;
+    rotate(dx, dy);
+    drag.vx = dx * 16.7 / dt; drag.vy = dy * 16.7 / dt;
+    drag.moved += Math.abs(x - drag.x) + Math.abs(y - drag.y);
+    drag.x = x; drag.y = y; drag.t = now; idleSince = now;
+  }
+  function drop() {
+    if (!drag) return;
+    if (drag.moved < 8) {           // toque: giro loco
+      velX += (velX >= 0 ? 1 : -1) * (0.55 + Math.random() * 0.25);
+      velY += (Math.random() - 0.5) * 0.5;
+    } else {                        // arrastre: lo suelta con su velocidad, amplificada
+      velX += drag.vx * 2.2; velY += drag.vy * 2.2;
+    }
+    velX = Math.max(-1.4, Math.min(1.4, velX)); velY = Math.max(-1.2, Math.min(1.2, velY));
+    idleSince = performance.now();
+    dispatchEvent(new CustomEvent("sony:cubetap"));
+    drag = null;
+    document.documentElement.classList.remove("cube-grab");
+  }
+  addEventListener("pointerdown", (e) => { if (e.pointerType !== "touch" && grab(e.clientX, e.clientY, e.target)) e.preventDefault(); });
+  addEventListener("pointermove", (e) => { if (e.pointerType !== "touch") pull(e.clientX, e.clientY); }, { passive: true });
+  addEventListener("pointerup", (e) => { if (e.pointerType !== "touch") drop(); });
+  addEventListener("touchstart", (e) => { const t = e.touches[0]; if (e.touches.length === 1 && grab(t.clientX, t.clientY, e.target)) e.preventDefault(); }, { passive: false });
+  addEventListener("touchmove", (e) => { if (!drag) return; const t = e.touches[0]; pull(t.clientX, t.clientY); e.preventDefault(); }, { passive: false });
+  addEventListener("touchend", drop);
+  addEventListener("touchcancel", drop);
 
   window.sonyCube = {
     setWords(list) {
@@ -278,7 +324,7 @@ if (renderer) {
     requestAnimationFrame(loop);
     if (document.hidden) return;
     const active = Math.abs(velX) + Math.abs(velY) > 0.0002 || fade < 1;
-    const fps = DESKTOP ? (active ? 50 : 30) : 60;
+    const fps = active || drag ? (DESKTOP ? 50 : 45) : 30;
     if (now - presented < 1000 / fps) return;
     presented = now;
     const frame = Math.min((now - last) / 1000, 0.055) * 60; last = now;
@@ -292,9 +338,9 @@ if (renderer) {
     if (!reduce && !paused) {
       if (Math.abs(velX) + Math.abs(velY) > 0.00002) {
         rotate(velX * frame, velY * frame);
-        const d = Math.pow(0.9, frame); velX *= d; velY *= d;
+        const d = Math.pow(0.94, frame); velX *= d; velY *= d;
       }
-      const blend = THREE.MathUtils.clamp(((now - idleSince) / 1000 - 0.9) / 1.4, 0, 1);
+      const blend = drag ? 0 : THREE.MathUtils.clamp(((now - idleSince) / 1000 - 0.9) / 1.4, 0, 1);
       if (blend > 0) rotate((DESKTOP ? 0.0016 : 0.0027) * frame * blend, 0.00045 * frame * blend);
     }
     render();

@@ -50,6 +50,32 @@
   activate(screens[0]);
   requestAnimationFrame(function () { screens[0].classList.add("in"); });
 
+  /* ---------- 254 proyectos: aparece al tocar el cubo y cuenta en la sección 04 ---------- */
+  var TOTAL = 254;
+  function countUp(el, ms) {
+    if (reduce) { el.textContent = TOTAL; return; }
+    var t0 = performance.now();
+    (function step(now) {
+      var p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(TOTAL * e);
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+  var tally = $("#tally"), tallyNum = $("#tallyNum"), tallyTimer = 0;
+  addEventListener("sony:cubetap", function () {
+    clearTimeout(tallyTimer);
+    if (tally.hidden) { tally.classList.remove("out"); tally.hidden = false; countUp(tallyNum, 900); }
+    tallyTimer = setTimeout(function () {
+      tally.classList.add("out");
+      setTimeout(function () { tally.hidden = true; tally.classList.remove("out"); }, 200);
+    }, 3200);
+  });
+  tally.addEventListener("click", function () { tally.hidden = true; });
+  var statEl = $(".stat b"), statDone = false;
+  new IntersectionObserver(function (es, ob) {
+    es.forEach(function (e) { if (e.isIntersecting && !statDone) { statDone = true; countUp(statEl, 1400); ob.disconnect(); } });
+  }, { threshold: 0.6 }).observe(statEl);
+
   /* ---------- reloj de Buenos Aires ---------- */
   var dEl = $("#clockDate"), tEl = $("#clockTime");
   var fDate = new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short", day: "numeric", month: "short" });
