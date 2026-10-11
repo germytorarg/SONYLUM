@@ -185,11 +185,11 @@
     <div class="sm-bar">
       <img class="sm-logo" id="smLogo" alt="">
       <span class="sm-url"><b id="smName">Sonylum</b><span id="smUrl">sonylum.ar</span></span>
-      <a class="sm-open" id="smOpen" href="#" target="_blank" rel="noopener" aria-label="Abrir en una pestaña nueva"><i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
-      <button type="button" class="sm-x" id="smClose" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+      <a class="sm-btn sm-open" id="smOpen" href="#" target="_blank" rel="noopener">Abrir <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+      <button type="button" class="sm-btn sm-x" id="smClose" autofocus>Cerrar <i class="ph ph-x" aria-hidden="true"></i></button>
     </div>
     <div class="sm-view">
-      <div class="sm-wait" id="smWait"><span></span>Cargando sitio</div>
+      <div class="sm-wait" id="smWait"><span></span><p id="smMsg">Cargando sitio</p><a class="sm-btn sm-btn-solid" id="smGo" href="#" target="_blank" rel="noopener" hidden>Abrir sitio <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a></div>
       <iframe id="smFrame" title="Sitio" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
   </div>

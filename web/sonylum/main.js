@@ -178,20 +178,29 @@
 
   /* proyectos: cada uno abre su sitio en vivo dentro de un modal */
   var sm = $("#sm"), smFrame = $("#smFrame"), smWait = $("#smWait");
+  var smSlow = 0;
   function openSite(btn) {
     var url = btn.dataset.url;
     if (!url) return;
     $("#smLogo").removeAttribute("src");
     $("#smName").textContent = btn.dataset.name;
     $("#smUrl").textContent = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
-    $("#smOpen").href = url;
-    smWait.hidden = false;
-    smFrame.onload = function () { smWait.hidden = true; };
+    $("#smOpen").href = $("#smGo").href = url;
+    smWait.hidden = false; smWait.classList.remove("is-slow");
+    $("#smMsg").textContent = "Cargando sitio"; $("#smGo").hidden = true;
+    clearTimeout(smSlow);
+    // si el sitio tarda o no se deja mostrar adentro, se ofrece abrirlo aparte
+    smSlow = setTimeout(function () {
+      smWait.classList.add("is-slow");
+      $("#smMsg").textContent = "Si el sitio no aparece, abrilo en una pestaña nueva";
+      $("#smGo").hidden = false;
+    }, 5000);
+    smFrame.onload = function () { if (smFrame.getAttribute("src") === url) { clearTimeout(smSlow); smWait.hidden = true; } };
     smFrame.src = url;
     if (typeof sm.showModal === "function") sm.showModal(); else sm.setAttribute("open", "");
   }
   function closeSite() { if (sm.open) sm.close(); }
-  sm.addEventListener("close", function () { if (!sm.open) smFrame.src = "about:blank"; });
+  sm.addEventListener("close", function () { clearTimeout(smSlow); if (!sm.open) smFrame.src = "about:blank"; });
   $$(".work-open").forEach(function (b) { b.addEventListener("click", function () { openSite(b); }); });
   $("#smClose").addEventListener("click", closeSite);
   sm.addEventListener("click", function (e) { if (e.target === sm) closeSite(); });

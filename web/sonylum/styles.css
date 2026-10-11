@@ -473,6 +473,18 @@ main { position: relative; z-index: 10; }
 
 @media (max-width: 767px) and (max-height: 720px) { .clock span { display: none; } }   /* celulares bajos: solo la hora, no tapa el botón */
 
+/* ---------- Modal de proyectos: botones con texto ---------- */
+.sm-btn { width: auto; height: 40px; padding: 0 14px 0 16px; gap: 8px; display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--fg); white-space: nowrap; transition: background-color 200ms ease, border-color 200ms ease; }
+.sm-btn .ph { font-size: 14px; }
+.sm-btn:active { transform: scale(.97); }
+.sm-x { background: rgba(255,255,255,.06); }
+.sm-btn-solid { height: 46px; padding: 0 20px; background: var(--fg); color: #0b0a10; border-color: transparent; }
+@media (hover: hover) and (pointer: fine) { .sm-btn:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.3); } .sm-btn-solid:hover { background: #fff; } }
+.sm-wait p { margin: 0; max-width: 28ch; text-align: center; line-height: 1.6; }
+.sm-wait.is-slow span { display: none; }
+.sm-wait .sm-btn[hidden] { display: none; }
+@media (max-width: 520px) { .sm-url span { display: none; } .sm-bar { gap: 8px; padding-left: 14px; } .sm-btn { padding: 0 12px; } }
+
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
