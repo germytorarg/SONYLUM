@@ -485,6 +485,15 @@ main { position: relative; z-index: 10; }
 .sm-wait .sm-btn[hidden] { display: none; }
 @media (max-width: 520px) { .sm-url span { display: none; } .sm-bar { gap: 8px; padding-left: 14px; } .sm-btn { padding: 0 12px; } }
 
+/* ---------- Logos del ecosistema: más visibles y parejos (mismo peso óptico, alineados con el rótulo) ---------- */
+.card-logo { --lh: 22px; top: 33px; right: 20px; height: var(--lh); max-width: 42%; object-fit: contain; object-position: right center; translate: 0 -50%; opacity: .72; }
+.card-logo[src*="creandocontenidos"] { --lh: 29px; }
+.card-logo[src*="localba"] { --lh: 24px; }
+.card-logo[src*="tefilmo"] { --lh: 21px; }
+.card.is-lit .card-logo { opacity: 1; }
+@media (hover: hover) and (pointer: fine) { .card:hover .card-logo { opacity: 1; } }
+@media (max-width: 767px) { .card-logo { height: calc(var(--lh) * 1.15); opacity: .8; } }
+
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
