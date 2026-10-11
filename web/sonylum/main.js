@@ -50,32 +50,6 @@
   activate(screens[0]);
   requestAnimationFrame(function () { screens[0].classList.add("in"); });
 
-  /* ---------- 254 proyectos: aparece al tocar el cubo y cuenta en la sección 04 ---------- */
-  var TOTAL = 254;
-  function countUp(el, ms) {
-    if (reduce) { el.textContent = TOTAL; return; }
-    var t0 = performance.now();
-    (function step(now) {
-      var p = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(TOTAL * e);
-      if (p < 1) requestAnimationFrame(step);
-    })(t0);
-  }
-  var tally = $("#tally"), tallyNum = $("#tallyNum"), tallyTimer = 0;
-  addEventListener("sony:cubetap", function () {
-    clearTimeout(tallyTimer);
-    if (tally.hidden) { tally.classList.remove("out"); tally.hidden = false; countUp(tallyNum, 900); }
-    tallyTimer = setTimeout(function () {
-      tally.classList.add("out");
-      setTimeout(function () { tally.hidden = true; tally.classList.remove("out"); }, 200);
-    }, 3200);
-  });
-  tally.addEventListener("click", function () { tally.hidden = true; });
-  var statEl = $(".stat b"), statDone = false;
-  new IntersectionObserver(function (es, ob) {
-    es.forEach(function (e) { if (e.isIntersecting && !statDone) { statDone = true; countUp(statEl, 1400); ob.disconnect(); } });
-  }, { threshold: 0.6 }).observe(statEl);
-
   /* ---------- reloj de Buenos Aires ---------- */
   var dEl = $("#clockDate"), tEl = $("#clockTime");
   var fDate = new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short", day: "numeric", month: "short" });
@@ -117,8 +91,8 @@
     peekFor = card;
     peekUrl.textContent = peekFbUrl.textContent = card.dataset.site;
     peekName.textContent = card.dataset.name;
-    peekFbImg.src = $("img", card).getAttribute("src");
-    peekGo.href = card.href;
+    peekFbImg.src = card.dataset.img || $("img", card).getAttribute("src");
+    peekGo.href = card.dataset.href || card.href;
     peek.classList.toggle("is-touch", !!touch);
     peek.hidden = false;
     loadShot(card);
@@ -149,6 +123,19 @@
       openPeek(card, true);
     });
   });
+  /* al tocar el cubo: lista de webs; cada una abre su vista previa */
+  var vault = $("#vault");
+  function closeVault() { vault.hidden = true; $$(".vault-item").forEach(function (b) { b.setAttribute("aria-pressed", "false"); }); }
+  addEventListener("sony:cubetap", function () { if (vault.hidden) vault.hidden = false; });
+  $("#vaultClose").addEventListener("click", function () { closeVault(); closePeek(); });
+  $$(".vault-item").forEach(function (item) {
+    item.addEventListener("click", function () {
+      var again = peekFor === item && !peek.hidden;
+      $$(".vault-item").forEach(function (b) { b.setAttribute("aria-pressed", String(b === item && !again)); });
+      if (again) { closePeek(); return; }
+      openPeek(item, true);
+    });
+  });
   $("#peekClose").addEventListener("click", closePeek);
-  addEventListener("keydown", function (e) { if (e.key === "Escape" && !peek.hidden) closePeek(); });
+  addEventListener("keydown", function (e) { if (e.key === "Escape") { closePeek(); closeVault(); } });
 })();

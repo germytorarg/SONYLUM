@@ -102,28 +102,31 @@ img { display: block; max-width: 100%; }
 .badge b { color: var(--fg); font-weight: 600; }
 .badge.swap { opacity: 0; }
 
-/* ---------- Contador al tocar el cubo ---------- */
+/* ---------- Al tocar el cubo: lista de webs ---------- */
 .cube-grab, .cube-grab body { cursor: grabbing; user-select: none; }
-.tally {
-  position: fixed; z-index: 35; left: var(--cx); top: calc(var(--cy) + 12vh); translate: -50% 0;
-  display: grid; grid-template-columns: auto auto auto; align-items: center; gap: 14px;
-  padding: 12px 18px 12px 22px; border-radius: 999px;
-  background: rgba(14, 12, 24, 0.42); border: 1px solid rgba(255,255,255,.22);
-  -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 20px 60px -20px rgba(0,0,0,.8);
-  transition: opacity 220ms ease, transform 320ms var(--ease);
+.vault {
+  position: fixed; z-index: 45; left: var(--cx); top: calc(var(--cy) + 11vh); translate: -50% 0;
+  width: min(340px, calc(100vw - 32px)); padding: 8px; border-radius: 20px;
+  background: rgba(14, 12, 24, 0.5); border: 1px solid rgba(255,255,255,.2);
+  -webkit-backdrop-filter: blur(20px) saturate(160%); backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.16), 0 30px 80px -24px rgba(0,0,0,.85);
+  transform-origin: 50% 0; transition: opacity 200ms ease, transform 300ms var(--ease);
 }
-.tally[hidden] { display: none; }
-@starting-style { .tally { opacity: 0; transform: translateY(10px) scale(.96); } }
-.tally.out { opacity: 0; transform: translateY(6px) scale(.98); transition-duration: 180ms; }
-.tally b { font-weight: 800; font-size: 34px; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1; }
-.tally span { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--fg-2); line-height: 1.35; }
-.tally .ph { color: var(--violet-2); font-size: 18px; }
-.tally:active { transform: scale(.97); }
+.vault[hidden] { display: none; }
+@starting-style { .vault { opacity: 0; transform: translateY(-8px) scale(.96); } }
+.vault-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 10px 14px; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--fg-2); }
+.vault-head button { width: 34px; height: 34px; display: grid; place-items: center; font-size: 16px; border-radius: 50%; }
+.vault-item {
+  width: 100%; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2px 12px; text-align: left;
+  padding: 12px 14px; border-radius: 12px; transition: background-color 200ms ease, transform 160ms var(--ease);
+}
+.vault-item b { font-weight: 700; font-size: 16px; letter-spacing: -0.02em; }
+.vault-item span { grid-column: 1; font-size: 12px; color: var(--mute); }
+.vault-item .ph { grid-column: 2; grid-row: 1 / span 2; color: var(--violet-2); font-size: 18px; }
+.vault-item:active { transform: scale(.98); }
+.vault-item[aria-pressed="true"] { background: rgba(167,139,250,.14); }
+@media (hover: hover) and (pointer: fine) { .vault-item:hover { background: rgba(255,255,255,.06); } }
 
-.stat { display: flex; align-items: center; gap: 22px; margin: -6px 0 30px; }
-.stat b { font-weight: 300; font-size: clamp(72px, 9vw, 120px); line-height: .9; letter-spacing: -0.06em; color: transparent; -webkit-text-stroke: 1.5px rgba(255,255,255,.85); font-variant-numeric: tabular-nums; }
-.stat span { max-width: 26ch; color: var(--fg-2); font-size: 15px; line-height: 1.5; }
 
 /* ---------- Riel de secciones ---------- */
 .rail { position: fixed; right: 0; top: 50%; translate: 0 -10%; z-index: 30; display: grid; gap: 10px; }
@@ -221,11 +224,11 @@ main { position: relative; z-index: 10; }
 @media (hover: hover) and (pointer: fine) { .wa:hover, .links a:hover { color: var(--fg); } }
 
 /* entrada de cada pantalla */
-.js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .works, .js .scr .wa, .js .scr .links, .js .scr .stat {
+.js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .works, .js .scr .wa, .js .scr .links {
   opacity: 0; transform: translateY(26px);
   transition: opacity 700ms ease, transform 1000ms var(--ease);
 }
-.js .scr.in .eyebrow, .js .scr.in .hd > *, .js .scr.in .lead, .js .scr.in .ctas, .js .scr.in .cards, .js .scr.in .caps, .js .scr.in .works, .js .scr.in .wa, .js .scr.in .links, .js .scr.in .stat { opacity: 1; transform: none; }
+.js .scr.in .eyebrow, .js .scr.in .hd > *, .js .scr.in .lead, .js .scr.in .ctas, .js .scr.in .cards, .js .scr.in .caps, .js .scr.in .works, .js .scr.in .wa, .js .scr.in .links { opacity: 1; transform: none; }
 .scr.in .hd > :nth-child(2) { transition-delay: 70ms; }
 .scr.in .hd > :nth-child(3) { transition-delay: 140ms; }
 .scr.in .lead, .scr.in .cards, .scr.in .caps, .scr.in .works, .scr.in .wa { transition-delay: 200ms; }
