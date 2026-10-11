@@ -114,7 +114,7 @@ if (renderer) {
       color+=spec*(uBackside>0.5?0.35:1.0);
       float f=pow(1.0+dot(eye,n),uFresnelPower);
       color=mix(color,vec3(1.0),f*(uBackside>0.5?0.25:0.55));
-      color+=vec3(0.010,0.004,0.018);
+      color+=vec3(0.006);
       gl_FragColor=vec4(color,1.0);
       #include <colorspace_fragment>
     }`;
@@ -174,8 +174,8 @@ if (renderer) {
 
   function placement() {
     const W = innerWidth, H = innerHeight;
-    return DESKTOP || W >= 1024 ? { x: 0.8, y: 0.44, size: Math.min(H * 0.2, W * 0.12), font: Math.min(H * 0.15, W * 0.075), maxW: W * 0.3 }
-                                : { x: 0.5, y: 0.24, size: Math.min(H * 0.16, W * 0.32), font: Math.min(H * 0.1, W * 0.16), maxW: W * 0.62 };
+    return DESKTOP || W >= 1024 ? { x: 0.78, y: 0.45, size: Math.min(H * 0.3, W * 0.18), font: Math.min(H * 0.2, W * 0.1), maxW: W * 0.36 }
+                                : { x: 0.5, y: 0.25, size: Math.min(H * 0.23, W * 0.46), font: Math.min(H * 0.13, W * 0.21), maxW: W * 0.8 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;
@@ -187,7 +187,7 @@ if (renderer) {
     bgCtx.textAlign = "center";
     bgCtx.textBaseline = "alphabetic";
     bgCtx.globalAlpha = alpha;
-    bgCtx.fillStyle = "#e6e5ec";
+    bgCtx.fillStyle = "#d9d9de";
     const cx = W * P.x, cy = H * P.y, gap = fs * 0.92, cap = fs * 0.7;
     bgCtx.fillText(list[0], cx, cy + cap / 2 - gap / 2);
     if (list[1]) bgCtx.fillText(list[1], cx, cy + cap / 2 + gap / 2);
@@ -205,8 +205,8 @@ if (renderer) {
     drawWords(words, e, P, W, H);
     const cx = W * P.x, cy = H * P.y;
     const grad = bgCtx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.42);
-    grad.addColorStop(0, "rgba(124,92,255,0.10)");
-    grad.addColorStop(1, "rgba(124,92,255,0)");
+    grad.addColorStop(0, "rgba(255,255,255,0.05)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
     bgCtx.globalCompositeOperation = "screen";
     bgCtx.fillStyle = grad;
     bgCtx.fillRect(0, 0, W, H);
