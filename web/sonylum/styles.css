@@ -375,6 +375,28 @@ main { position: relative; z-index: 10; }
   .work-open, .work-more a { padding-left: 24px; }
 }
 
+/* ---------- Secciones internas un poco más compactas (la portada queda igual) ---------- */
+.scr:not(#s1) .hd { font-size: clamp(44px, 6.4vw, 96px); margin-bottom: 24px; }
+.scr:not(#s1) .lead { font-size: clamp(16px, 1.45vw, 19px); margin-bottom: 30px; }
+.card { padding: 24px 36px 26px 30px; }
+.card b { font-size: clamp(22px, 2.3vw, 28px); }
+.card span { font-size: 15.5px; }
+.flip-face { min-height: 156px; padding: 20px 70px 18px 20px; }
+.flip-face strong { font-size: clamp(18px, 1.9vw, 22px); }
+.flip-txt { font-size: 13.5px; }
+.flip-back .flip-txt { font-size: 14px; }
+.works li, .work-open, .work-more a { padding: 22px 64px 22px 30px; }
+.works li:has(.work-open), .works li.work-more { padding: 0; }
+.works b { font-size: clamp(20px, 2.1vw, 26px); }
+.works span { font-size: 15.5px; }
+.works em { top: 22px; }
+.cv { padding-top: 20px; padding-bottom: 20px; }
+.cv b { font-size: clamp(22px, 2.3vw, 28px); }
+@media (max-width: 420px) {
+  .card, .works li, .work-open, .work-more a { padding-left: 24px; }
+  .works li:has(.work-open), .works li.work-more { padding: 0; }
+}
+
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
