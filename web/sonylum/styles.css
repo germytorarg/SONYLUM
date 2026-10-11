@@ -375,6 +375,64 @@ main { position: relative; z-index: 10; }
   .work-open, .work-more a { padding-left: 24px; }
 }
 
+/* ---------- Escala compacta: todo más chico ---------- */
+body { font-size: 14px; }
+.logo b, .logo span { font-size: 14px; }
+.logo-mark { width: 16px; height: 32px; }
+.eyebrow { margin-bottom: 14px; font-size: 10px; gap: 12px; }
+.eyebrow i { width: 32px; }
+.hd { margin-bottom: 16px; font-size: clamp(30px, 3.7vw, 54px); }
+.lead { margin-bottom: 20px; font-size: 14px; }
+.pill { height: 50px; padding: 0 22px; gap: 20px; font-size: 11px; }
+.pill .ph { font-size: 14px; }
+.cards { gap: 12px; }
+.card { padding: 14px 30px 16px 18px; gap: 2px; }
+.card small, .works small { font-size: 10px; }
+.card b { font-size: 18px; margin-top: 6px; }
+.card span { font-size: 13px; }
+.card .ph { right: 16px; bottom: 16px; font-size: 16px; }
+.card-logo { top: 16px; right: 16px; height: 13px; }
+.flips { gap: 10px; }
+.flip-face { min-height: 112px; padding: 16px 58px 14px 16px; gap: 6px; }
+.flip-face > b { font-size: 10px; }
+.flip-face strong { font-size: 15px; }
+.flip-txt { font-size: 12px; line-height: 1.5; }
+.flip-back .flip-txt { font-size: 12.5px; }
+.flip-ico { top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 11px; font-size: 16px; }
+.works li { gap: 2px; padding: 12px 48px 12px 18px; }
+.work-open, .work-more a { gap: 2px; padding: 12px 48px 12px 18px; }
+.works b { font-size: 16px; }
+.works span { font-size: 12.5px; }
+.works em { right: 16px; top: 12px; font-size: 10px; }
+.work-more .ph { right: 18px; font-size: 18px; }
+.cvs { gap: 10px; }
+.cv { padding: 16px 84px 16px 18px; gap: 3px; border-radius: 16px; }
+.cv small { font-size: 10px; }
+.cv b { font-size: 18px; }
+.cv span { font-size: 12.5px; }
+.cv .ph { right: 16px; font-size: 18px; }
+.cv-face { right: 44px; width: 28px; height: 28px; }
+.wa { padding: 22px 0; font-size: 12px; margin-bottom: 20px; }
+.wa .ph { font-size: 18px; }
+.links { gap: 10px; }
+.links a { font-size: 11px; }
+.clock b { font-size: clamp(16px, 1.5vw, 22px); }
+.clock span { font-size: 10px; }
+.chip { height: 26px; padding: 0 10px; font-size: 9px; }
+.rail a { width: 34px; height: 36px; padding-left: 10px; font-size: 10px; }
+.rail a.is-on { width: 42px; }
+@media (hover: hover) and (pointer: fine) { .rail a:hover { width: 40px; } }
+.rail { gap: 4px; }
+.scr-in { width: min(100%, 600px); }
+@media (min-width: 1024px) {
+  .scr-in { width: min(100%, 46vw, 620px); }
+  .scr-in::before { left: -24px; top: calc(var(--pad-top) - 24px); bottom: -24px; }
+}
+@media (max-width: 420px) {
+  .pill { height: 46px; padding: 0 18px; gap: 14px; }
+  .card, .works li, .work-open, .work-more a { padding-left: 18px; }
+}
+
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
