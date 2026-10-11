@@ -6,7 +6,9 @@
 <meta name="theme-color" content="#050507">
 <title>SONYLUM® Estudio</title>
 <meta name="description" content="SONYLUM: estrategia, código, inteligencia artificial y producción audiovisual. Estudio en Villa Luro, Buenos Aires.">
-<link rel="preload" href="vendor/fonts/Archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="vendor/fonts/Poppins-300.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="vendor/fonts/Poppins-800.woff2" as="font" type="font/woff2" crossorigin>
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
 <link rel="stylesheet" href="vendor/phosphor/style.css">
 <link rel="stylesheet" href="styles.css">
 <script>document.documentElement.classList.add("js");</script>
@@ -16,24 +18,19 @@
 <a class="skip" href="#s1">Saltar al contenido</a>
 
 <header class="top">
-  <a class="logo" href="#s1" aria-label="Sonylum, inicio"><span class="logo-mark" aria-hidden="true"></span><b>SONYLUM</b></a>
+  <a class="logo" href="#s1" aria-label="Sonylum, inicio"><i class="logo-mark" aria-hidden="true"></i><b>SONYLUM</b><span>estudio</span></a>
   <button class="eq" id="motionBtn" type="button" aria-pressed="true" aria-label="Pausar movimiento"><i></i><i></i><i></i></button>
 </header>
 
-<!-- Escenario fijo: órbitas, píldoras y el cuadrado -->
+<!-- El cubo de vidrio de sonylum.ar/stack, fijo detrás de todo -->
+<div class="fallback-cube" aria-hidden="true"></div>
+<canvas id="scene" aria-hidden="true"></canvas>
+
 <div class="stage" id="stage" aria-hidden="true">
-  <div class="ghost" id="ghost">ESTUDIO</div>
-  <div class="orbit o1"><span class="dot"></span></div>
-  <div class="orbit o2"><span class="dot"></span><span class="dot d2"></span></div>
-  <div class="orbit o3"><span class="dot"></span></div>
+  <div class="orbit"><span class="odot d1"></span><span class="odot d2"></span><span class="odot d3"></span></div>
   <div class="chips c1"><div class="chips-track" id="chipsA"></div></div>
   <div class="chips c2"><div class="chips-track" id="chipsB"></div></div>
-  <div class="ticks"><i></i><i></i></div>
-  <div class="dia-wrap">
-    <div class="dia" id="dia"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <div class="dia-glow"></div>
-    <div class="dia-label" id="diaLabel">ESTUDIO / ACTIVO</div>
-  </div>
+  <div class="badge" id="badge"><b>ESTUDIO</b> / LIVE SYSTEM</div>
 </div>
 
 <nav class="rail" aria-label="Secciones">
@@ -44,14 +41,14 @@
   <a href="#s5">05</a>
 </nav>
 
-<div class="clock" aria-live="off"><span id="clockDate">BUENOS AIRES</span><b id="clockTime">00:00:00</b></div>
+<div class="clock"><span id="clockDate">BUENOS AIRES</span><b id="clockTime">00:00:<em>00</em></b></div>
 
 <main>
   <!-- 01 -->
-  <section class="scr" id="s1" data-label="ESTUDIO / ACTIVO" data-ghost="ESTUDIO" data-rz="45" data-spread="1">
+  <section class="scr" id="s1" data-words="SONY|LUM" data-badge="ESTUDIO">
     <div class="scr-in">
       <p class="eyebrow"><i></i><b>01</b>Estudio digital · Sistema en línea</p>
-      <h1 class="hd"><span>Estrategia,</span><span>imagen y</span><strong>código.</strong></h1>
+      <h1 class="hd"><span>Estrategia,</span><span>imagen y</span><strong><span class="nw">código.<i class="pt" aria-hidden="true"></i></span></strong></h1>
       <p class="lead">Somos SONYLUM. Unimos estrategia, código, inteligencia artificial y producción audiovisual para convertir ideas en experiencias que funcionan.</p>
       <div class="ctas">
         <a class="pill pill-solid" href="#s2">Explorar ecosistema <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
@@ -61,10 +58,10 @@
   </section>
 
   <!-- 02 -->
-  <section class="scr" id="s2" data-label="ECOSISTEMA / ACTIVO" data-ghost="ÓRBITA" data-rz="135" data-spread="1.6">
+  <section class="scr" id="s2" data-words="ECO|SISTEMA" data-badge="ECOSISTEMA">
     <div class="scr-in">
       <p class="eyebrow"><i></i><b>02</b>Marcas en órbita</p>
-      <h2 class="hd"><span>Un ecosistema.</span><strong>Cuatro miradas.</strong></h2>
+      <h2 class="hd"><span>Un ecosistema.</span><strong>Cuatro <span class="nw">miradas.<i class="pt" aria-hidden="true"></i></span></strong></h2>
       <div class="cards">
         <a class="card" href="https://sonylum.ar" target="_blank" rel="noopener" data-site="sonylum.ar" data-name="Sonylum" data-shot="assets/sites/sonylum.jpg">
           <img src="assets/img/galeria.jpg" alt="" loading="lazy">
@@ -87,10 +84,10 @@
   </section>
 
   <!-- 03 -->
-  <section class="scr" id="s3" data-label="CAPACIDADES / ACTIVO" data-ghost="SISTEMA" data-rz="225" data-spread="0.7">
+  <section class="scr" id="s3" data-words="SISTE|MA" data-badge="CAPACIDADES">
     <div class="scr-in">
       <p class="eyebrow"><i></i><b>03</b>Capacidades · Sin cajitas</p>
-      <h2 class="hd"><span>Pensamos el</span><span>sistema.</span><strong>Después lo hacemos.</strong></h2>
+      <h2 class="hd"><span>Pensamos el</span><span>sistema.</span><strong>Después lo <span class="nw">hacemos.<i class="pt" aria-hidden="true"></i></span></strong></h2>
       <ol class="caps">
         <li><b>01</b><div><h3>Producto digital</h3><p>Arquitectura, UX/UI, desarrollo, performance y deploy.</p></div></li>
         <li><b>02</b><div><h3>Inteligencia artificial</h3><p>Prompts de precisión, agentes, automatizaciones y flujos creativos.</p></div></li>
@@ -101,10 +98,10 @@
   </section>
 
   <!-- 04 -->
-  <section class="scr" id="s4" data-label="PROYECTOS / ACTIVO" data-ghost="PANTALLA" data-rz="315" data-spread="2">
+  <section class="scr" id="s4" data-words="PANTA|LLA" data-badge="PROYECTOS">
     <div class="scr-in">
       <p class="eyebrow"><i></i><b>04</b>Proyectos</p>
-      <h2 class="hd"><span>Ideas que</span><span>salieron</span><strong>de la pantalla.</strong></h2>
+      <h2 class="hd"><span>Ideas que</span><span>salieron</span><strong>de la <span class="nw">pantalla.<i class="pt" aria-hidden="true"></i></span></strong></h2>
       <ol class="works">
         <li><small>Imp / Exp</small><b>TERRACOMEX</b><span>Plataforma e identidad digital.</span><em>01</em></li>
         <li><small>Directorio</small><b>RADAR COMERCIAL</b><span>Producto, búsqueda y territorio.</span><em>02</em></li>
@@ -117,10 +114,10 @@
   </section>
 
   <!-- 05 -->
-  <section class="scr" id="s5" data-label="CONTACTO / ACTIVO" data-ghost="CONTACTO" data-rz="405" data-spread="1">
+  <section class="scr" id="s5" data-words="HABLE|MOS" data-badge="CONTACTO">
     <div class="scr-in">
       <p class="eyebrow"><i></i><b>05</b>Canal directo · Buenos Aires</p>
-      <h2 class="hd"><span>Hagamos algo</span><span>que no parezca</span><strong>una plantilla.</strong></h2>
+      <h2 class="hd"><span>Hagamos algo</span><span>que no parezca</span><strong>una <span class="nw">plantilla.<i class="pt" aria-hidden="true"></i></span></strong></h2>
       <p class="lead">Contanos qué querés mover: una marca, una web, una campaña o una idea todavía medio salvaje.</p>
       <a class="wa" href="https://wa.me/?text=Hola%20SONYLUM%2C%20quiero%20hablar%20sobre%20un%20proyecto" target="_blank" rel="noopener">Abrir WhatsApp <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
       <div class="links">
@@ -142,5 +139,6 @@
 </div>
 
 <script src="main.js"></script>
+<script type="module" src="cube.js"></script>
 </body>
 </html>

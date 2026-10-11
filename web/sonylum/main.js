@@ -5,11 +5,10 @@
   var root = document.documentElement;
   var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   var finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
-  var stage = $("#stage");
 
   /* ---------- píldoras de tecnologías ---------- */
-  var A = ["Web", "UX/UI", "Branding", "SEO", "Next.js", "Three.js", "WebGL", "Webhooks", "Make", "WhatsApp API"];
-  var B = ["IA", "Agentes", "Prompts", "Reels 9:16", "Edición", "Motion", "Cámara", "Fotografía", "Campañas", "Drone"];
+  var A = ["Web", "UX/UI", "Branding", "SEO técnico", "React", "Three.js", "WebGL", "Webhooks", "Supabase", "Cloudflare"];
+  var B = ["IA Agents", "Automatización", "Prompts", "Reels 9:16", "Edición", "Motion", "Cámara", "Fotografía", "Campañas", "Drone"];
   function fill(el, list) {
     var html = list.concat(list).map(function (t) { return '<span class="chip">' + t.toUpperCase() + "</span>"; }).join("");
     el.innerHTML = html;
@@ -20,7 +19,7 @@
   /* ---------- pantalla activa: riel, cuadrado, palabra de fondo ---------- */
   var screens = $$(".scr");
   var rail = $$(".rail a");
-  var label = $("#diaLabel"), ghost = $("#ghost");
+  var badge = $("#badge");
   var active = null;
   function activate(sec) {
     if (active === sec) return;
@@ -31,14 +30,13 @@
       a.classList.toggle("is-on", on);
       if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
     });
-    stage.style.setProperty("--rz", sec.dataset.rz);
-    stage.style.setProperty("--spread", sec.dataset.spread);
-    label.classList.add("swap"); ghost.classList.add("swap");
+    window.sonyWords = sec.dataset.words.split("|");
+    if (window.sonyCube) window.sonyCube.setWords(window.sonyWords);
+    badge.classList.add("swap");
     setTimeout(function () {
-      label.textContent = sec.dataset.label;
-      ghost.textContent = sec.dataset.ghost;
-      label.classList.remove("swap"); ghost.classList.remove("swap");
-    }, reduce ? 0 : 260);
+      badge.innerHTML = "<b>" + sec.dataset.badge + "</b> / LIVE SYSTEM";
+      badge.classList.remove("swap");
+    }, reduce ? 0 : 220);
   }
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {
@@ -52,30 +50,15 @@
   activate(screens[0]);
   requestAnimationFrame(function () { screens[0].classList.add("in"); });
 
-  /* ---------- inclinación del cuadrado con el puntero o el giroscopio ---------- */
-  var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
-  function tilt() {
-    cx += (tx - cx) * 0.08; cy += (ty - cy) * 0.08;
-    stage.style.setProperty("--tx", cx.toFixed(2) + "deg");
-    stage.style.setProperty("--ty", cy.toFixed(2) + "deg");
-    raf = (Math.abs(tx - cx) > 0.05 || Math.abs(ty - cy) > 0.05) ? requestAnimationFrame(tilt) : 0;
-  }
-  if (!reduce && finePointer) {
-    addEventListener("pointermove", function (e) {
-      tx = (e.clientY / innerHeight - 0.5) * -14;
-      ty = (e.clientX / innerWidth - 0.5) * 18;
-      if (!raf) raf = requestAnimationFrame(tilt);
-    }, { passive: true });
-  }
-
   /* ---------- reloj de Buenos Aires ---------- */
   var dEl = $("#clockDate"), tEl = $("#clockTime");
   var fDate = new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short", day: "numeric", month: "short" });
   var fTime = new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
   function tick() {
     var now = new Date();
-    dEl.textContent = fDate.format(now).replace(/\./g, "").replace(",", "") + " · Buenos Aires";
-    tEl.textContent = fTime.format(now);
+    dEl.textContent = (fDate.format(now).replace(/\./g, "").replace(",", "") + " · Buenos Aires").toUpperCase();
+    var t = fTime.format(now).split(":");
+    tEl.innerHTML = t[0] + ":" + t[1] + ":<em>" + t[2] + "</em>";
   }
   tick(); setInterval(tick, 1000);
 
@@ -83,6 +66,7 @@
   var mBtn = $("#motionBtn");
   mBtn.addEventListener("click", function () {
     var paused = root.classList.toggle("is-paused");
+    dispatchEvent(new CustomEvent("sony:motion", { detail: !paused }));
     mBtn.setAttribute("aria-pressed", String(!paused));
     mBtn.setAttribute("aria-label", paused ? "Reanudar movimiento" : "Pausar movimiento");
   });
