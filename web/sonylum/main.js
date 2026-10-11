@@ -41,13 +41,19 @@
     }, reduce ? 0 : 220);
   }
   var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) {
-        e.target.classList.add("in");
-        if (e.intersectionRatio > 0.35 || e.boundingClientRect.top < innerHeight * 0.4) activate(e.target);
-      }
-    });
-  }, { threshold: [0.15, 0.35, 0.6] });
+    entries.forEach(function (e) { if (e.isIntersecting) e.target.classList.add("in"); });
+  }, { threshold: 0.15 });
+  // la sección activa es la que cruza la línea del 45% de la pantalla (sirve con secciones cortas)
+  var scrT = 0;
+  function pickActive() {
+    scrT = 0;
+    var line = innerHeight * 0.45, pick = screens[0];
+    for (var i = 0; i < screens.length; i++) { if (screens[i].getBoundingClientRect().top <= line) pick = screens[i]; }
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) pick = screens[screens.length - 1];
+    activate(pick);
+  }
+  addEventListener("scroll", function () { if (!scrT) scrT = requestAnimationFrame(pickActive); }, { passive: true });
+  addEventListener("resize", pickActive, { passive: true });
   screens.forEach(function (s) { io.observe(s); });
   activate(screens[0]);
   requestAnimationFrame(function () { screens[0].classList.add("in"); });

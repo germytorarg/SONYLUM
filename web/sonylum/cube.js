@@ -186,14 +186,14 @@ if (renderer) {
 
   function placement() {
     const W = innerWidth, H = innerHeight;
-    return DESKTOP || W >= 1024 ? { x: 0.75, y: 0.5, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.18, W * 0.09), maxW: W * 0.4 }
+    return DESKTOP || W >= 1024 ? { x: 0.75, y: 0.5, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.1, W * 0.06), maxW: W * 0.4, below: H * 0.17 + 40 }
                                 : { x: 0.5, y: window.sonyHeroY || 0.25, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;
     let fs = P.font;
     bgCtx.font = `800 ${fs}px Poppins`;
-    const widest = Math.max(...list.map((t) => bgCtx.measureText(t).width));
+    const widest = P.below ? bgCtx.measureText(list.join("")).width : Math.max(...list.map((t) => bgCtx.measureText(t).width));
     if (widest > P.maxW) fs *= P.maxW / widest;
     bgCtx.font = `800 ${fs}px Poppins`;
     bgCtx.textAlign = "center";
@@ -201,6 +201,8 @@ if (renderer) {
     bgCtx.globalAlpha = alpha;
     bgCtx.fillStyle = "#e9e9e9";
     const cx = W * P.x, cy = H * P.y, gap = fs * 0.92, cap = fs * 0.7;
+    // en desktop la palabra va en una línea, debajo del cubo y de su fila de etiquetas
+    if (P.below) { bgCtx.fillText(list.join(""), cx, cy + P.below + cap); bgCtx.globalAlpha = 1; return; }
     bgCtx.fillText(list[0], cx, cy + cap / 2 - gap / 2);
     if (list[1]) bgCtx.fillText(list[1], cx, cy + cap / 2 + gap / 2);
     bgCtx.globalAlpha = 1;
