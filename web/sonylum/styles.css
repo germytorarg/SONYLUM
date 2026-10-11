@@ -397,6 +397,22 @@ main { position: relative; z-index: 10; }
   .works li:has(.work-open), .works li.work-more { padding: 0; }
 }
 
+/* ---------- Todo un 10% más chico (menos el cubo), menos aire entre secciones ---------- */
+.top, .rail, .clock { zoom: .9; }
+.scr-in { zoom: .9; padding-top: calc(var(--pad-top) / .9); }
+.scr-in::before { top: calc(var(--pad-top) / .9 - 26px); }
+.scr { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+:root { --cy: 27%; }
+.scr-in { --pad-top: 45dvh; }
+#s2 .scr-in, #s3 .scr-in, #s4 .scr-in { --pad-top: 45dvh; }
+@media (min-width: 1024px) {
+  :root { --cy: 49%; }
+  .scr { padding-bottom: 64px; }
+  .scr-in { --pad-top: 10vh; }
+  #s2 .scr-in, #s3 .scr-in, #s4 .scr-in { --pad-top: 10vh; }
+  .scr-in::before { top: calc(var(--pad-top) / .9 - 32px); }
+}
+
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {

@@ -187,8 +187,8 @@ if (renderer) {
 
   function placement() {
     const W = innerWidth, H = innerHeight;
-    return DESKTOP || W >= 1024 ? { x: 0.72, y: 0.45, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.18, W * 0.09), maxW: W * 0.34 }
-                                : { x: 0.5, y: 0.24, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
+    return DESKTOP || W >= 1024 ? { x: 0.72, y: 0.49, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.18, W * 0.09), maxW: W * 0.34 }
+                                : { x: 0.5, y: 0.27, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;
