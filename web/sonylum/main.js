@@ -50,7 +50,57 @@
   activate(screens[0]);
   requestAnimationFrame(function () { screens[0].classList.add("in"); });
 
-  /* ---------- reloj de Buenos Aires ---------- */
+  /* ---------- proyectos: buscador y modal ---------- */
+  var P = (window.SONY_PROJECTS || []).map(function (p, i) { p.n = String(i + 1).padStart(2, "0"); return p; });
+  var list = $("#works"), q = $("#q"), qCount = $("#qCount"), empty = $("#worksEmpty");
+  var norm = function (t) { return (t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); };
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function renderProjects() {
+    var term = norm(q.value.trim());
+    var hits = P.filter(function (p) { return !term || norm(p.name + " " + p.cat + " " + p.desc + " " + (p.tags || "")).indexOf(term) > -1; });
+    list.innerHTML = hits.map(function (p) {
+      return '<li><button type="button" class="work-item" data-n="' + p.n + '"><small>' + esc(p.cat) + "</small><b>" + esc(p.name) + "</b><span>" + esc(p.desc) + "</span><em>" + p.n + "</em></button></li>";
+    }).join("");
+    qCount.textContent = term ? hits.length + " de " + P.length : P.length + " proyectos";
+    empty.hidden = hits.length > 0;
+    list.hidden = !hits.length;
+    if (!hits.length) empty.textContent = "No encontramos “" + q.value.trim() + "”. Probá con otro nombre, rubro o servicio.";
+  }
+  q.addEventListener("input", renderProjects);
+  renderProjects();
+
+  var pm = $("#pm"), pmShot = $("#pmShot"), pmImg = $("#pmImg");
+  function openProject(p) {
+    $("#pmCat").textContent = p.cat;
+    $("#pmNum").textContent = p.n + " / " + String(P.length).padStart(2, "0");
+    $("#pmTitle").textContent = p.name;
+    $("#pmPoster").textContent = p.name;
+    $("#pmDesc").textContent = p.desc;
+    var go = $("#pmGo");
+    go.hidden = !p.url;
+    if (p.url) go.href = p.url;
+    $("#pmAsk").href = "https://wa.me/?text=" + encodeURIComponent("Hola SONYLUM, quiero saber más sobre el proyecto " + p.name);
+    pmShot.classList.remove("has-img");
+    pmImg.removeAttribute("src");
+    if (p.url) {
+      var host = p.url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+      var tries = ["assets/sites/" + host.split(".")[0] + ".jpg", "https://s.wordpress.com/mshots/v1/" + encodeURIComponent(p.url) + "?w=1100&h=690"], i = 0;
+      pmImg.onload = function () { pmShot.classList.add("has-img"); };
+      pmImg.onerror = function () { i++; if (i < tries.length) pmImg.src = tries[i]; };
+      pmImg.src = tries[0];
+    }
+    if (typeof pm.showModal === "function") pm.showModal(); else pm.setAttribute("open", "");
+  }
+  function closeProject() { if (pm.open) pm.close(); }
+  list.addEventListener("click", function (e) {
+    var b = e.target.closest(".work-item"); if (!b) return;
+    var p = P.filter(function (x) { return x.n === b.dataset.n; })[0];
+    if (p) openProject(p);
+  });
+  $("#pmClose").addEventListener("click", closeProject);
+  pm.addEventListener("click", function (e) { if (e.target === pm) closeProject(); });
+
+
   var dEl = $("#clockDate"), tEl = $("#clockTime");
   var fDate = new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short", day: "numeric", month: "short" });
   var fTime = new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
