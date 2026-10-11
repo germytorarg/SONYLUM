@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0c0b0a">
+<meta name="theme-color" content="#050507">
 <title>SONYLUM® Estudio</title>
-<meta name="description" content="SONYLUM: estrategia, diseño, producción audiovisual y sistemas digitales. Estudio en Villa Luro, Buenos Aires.">
+<meta name="description" content="SONYLUM: estrategia, código, inteligencia artificial y producción audiovisual. Estudio en Villa Luro, Buenos Aires.">
 <link rel="preload" href="vendor/fonts/Archivo-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/phosphor/style.css">
 <link rel="stylesheet" href="styles.css">
@@ -13,275 +13,134 @@
 </head>
 <body>
 
-<a class="skip" href="#main">Saltar al contenido</a>
+<a class="skip" href="#s1">Saltar al contenido</a>
 
-<header class="nav" id="nav">
-  <a class="brand" href="#inicio" aria-label="Sonylum, inicio">SONYLUM<sup>®</sup></a>
-  <nav class="nav-links" aria-label="Principal">
-    <a href="#capacidades">Capacidades</a>
-    <a href="#archivo">Archivo</a>
-    <a href="#proyectos">Proyectos</a>
-    <a href="#laboratorio">Laboratorio</a>
-  </nav>
-  <a class="btn btn-solid nav-cta" href="https://wa.me/?text=Hola%20SONYLUM%2C%20quiero%20hablar%20sobre%20un%20proyecto" target="_blank" rel="noopener">Hablemos <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
-  <button class="menu-btn" id="menuBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="sheet"><i class="ph ph-list" aria-hidden="true"></i></button>
+<header class="top">
+  <a class="logo" href="#s1" aria-label="Sonylum, inicio"><span class="logo-mark" aria-hidden="true"></span><b>SONYLUM</b></a>
+  <button class="eq" id="motionBtn" type="button" aria-pressed="true" aria-label="Pausar movimiento"><i></i><i></i><i></i></button>
 </header>
 
-<div class="sheet" id="sheet" hidden>
-  <a href="#capacidades">Capacidades</a>
-  <a href="#archivo">Archivo</a>
-  <a href="#proyectos">Proyectos</a>
-  <a href="#laboratorio">Laboratorio</a>
-  <a href="#contacto">Contacto</a>
+<!-- Escenario fijo: órbitas, píldoras y el cuadrado -->
+<div class="stage" id="stage" aria-hidden="true">
+  <div class="ghost" id="ghost">ESTUDIO</div>
+  <div class="orbit o1"><span class="dot"></span></div>
+  <div class="orbit o2"><span class="dot"></span><span class="dot d2"></span></div>
+  <div class="orbit o3"><span class="dot"></span></div>
+  <div class="chips c1"><div class="chips-track" id="chipsA"></div></div>
+  <div class="chips c2"><div class="chips-track" id="chipsB"></div></div>
+  <div class="ticks"><i></i><i></i></div>
+  <div class="dia-wrap">
+    <div class="dia" id="dia"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="dia-glow"></div>
+    <div class="dia-label" id="diaLabel">ESTUDIO / ACTIVO</div>
+  </div>
 </div>
 
-<!-- La gota: un único cuerpo de vidrio líquido que recorre toda la página. -->
-<canvas id="drop" class="drop-canvas" aria-hidden="true"></canvas>
-<div class="drop-fallback" id="dropFallback" aria-hidden="true"></div>
+<nav class="rail" aria-label="Secciones">
+  <a href="#s1" class="is-on" aria-current="true">01</a>
+  <a href="#s2">02</a>
+  <a href="#s3">03</a>
+  <a href="#s4">04</a>
+  <a href="#s5">05</a>
+</nav>
 
-<main id="main">
+<div class="clock" aria-live="off"><span id="clockDate">BUENOS AIRES</span><b id="clockTime">00:00:00</b></div>
 
-  <!-- HERO -->
-  <section class="hero" id="inicio" data-drop="0.79 0.56 0.28 sphere 0" data-drop-m="0.66 0.34 0.34 sphere 0">
-    <figure class="hero-media">
-      <img src="assets/img/galeria.jpg" alt="Instalación de videoarte con pantallas gigantes en rojo" fetchpriority="high" data-env>
-    </figure>
-
-    <!-- especímenes flotantes: capas de vidrio a distintas profundidades -->
-    <figure class="specimen sp-a" data-depth="0.35" aria-hidden="true">
-      <img src="assets/img/vertical.jpg" alt="">
-      <figcaption>Rodaje vertical 9:16</figcaption>
-    </figure>
-    <figure class="specimen sp-b" data-depth="-0.25" aria-hidden="true">
-      <img src="assets/img/negativos.jpg" alt="">
-      <figcaption>Negativos 35 mm</figcaption>
-    </figure>
-    <figure class="specimen sp-c" data-depth="0.6" aria-hidden="true">
-      <img src="assets/img/boda.jpg" alt="">
-      <figcaption>Film de boda</figcaption>
-    </figure>
-
-    <div class="hero-grid">
-      <h1 class="hero-title">
-        <span class="line"><span class="word">No seguimos</span></span>
-        <span class="line"><span class="word">la <em>forma.</em></span></span>
-      </h1>
-      <div class="hero-foot">
-        <p class="hero-sub">La cambiamos. Diseño, estrategia, producción audiovisual y sistemas digitales que nunca se quedan quietos.</p>
-        <div class="hero-ctas">
-          <a class="btn btn-solid" href="https://wa.me/?text=Hola%20SONYLUM%2C%20quiero%20hablar%20sobre%20un%20proyecto" target="_blank" rel="noopener">Hablemos <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
-          <a class="btn btn-glass" href="#proyectos">Ver proyectos</a>
-        </div>
+<main>
+  <!-- 01 -->
+  <section class="scr" id="s1" data-label="ESTUDIO / ACTIVO" data-ghost="ESTUDIO" data-rz="45" data-spread="1">
+    <div class="scr-in">
+      <p class="eyebrow"><i></i><b>01</b>Estudio digital · Sistema en línea</p>
+      <h1 class="hd"><span>Estrategia,</span><span>imagen y</span><strong>código.</strong></h1>
+      <p class="lead">Somos SONYLUM. Unimos estrategia, código, inteligencia artificial y producción audiovisual para convertir ideas en experiencias que funcionan.</p>
+      <div class="ctas">
+        <a class="pill pill-solid" href="#s2">Explorar ecosistema <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+        <a class="pill" href="#s5">Hablemos <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
       </div>
-      <p class="hero-hint"><i class="ph ph-hand-grabbing" aria-hidden="true"></i> Arrastrá la gota. Tirala.</p>
     </div>
   </section>
 
-  <!-- MARQUESINA -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>Estrategia</span><i></i><span class="o">Diseño</span><i></i><span>Motion</span><i></i><span class="o">Contenido</span><i></i><span>Web</span><i></i><span class="o">Automatización</span><i></i>
-      <span>Estrategia</span><i></i><span class="o">Diseño</span><i></i><span>Motion</span><i></i><span class="o">Contenido</span><i></i><span>Web</span><i></i><span class="o">Automatización</span><i></i>
-    </div>
-  </div>
-
-  <!-- METAMORFOSIS: la gota gigante cambia de forma y refracta una imagen distinta en cada paso -->
-  <section class="meta" id="metamorfosis" data-drop="0.62 0.5 0.42 seq 0" data-drop-m="0.5 0.7 0.4 seq 0" data-seq="sphere box prism torus">
-    <div class="meta-sticky">
-      <div class="meta-bgs" aria-hidden="true">
-        <img class="is-on" src="assets/img/liquido.jpg" alt="">
-        <img src="assets/img/negativos.jpg" alt="">
-        <img src="assets/img/prisma.jpg" alt="">
-        <img src="assets/img/anillo.jpg" alt="">
+  <!-- 02 -->
+  <section class="scr" id="s2" data-label="ECOSISTEMA / ACTIVO" data-ghost="ÓRBITA" data-rz="135" data-spread="1.6">
+    <div class="scr-in">
+      <p class="eyebrow"><i></i><b>02</b>Marcas en órbita</p>
+      <h2 class="hd"><span>Un ecosistema.</span><strong>Cuatro miradas.</strong></h2>
+      <div class="cards">
+        <a class="card" href="https://sonylum.ar" target="_blank" rel="noopener" data-site="sonylum.ar" data-name="Sonylum" data-shot="assets/sites/sonylum.jpg">
+          <img src="assets/img/galeria.jpg" alt="" loading="lazy">
+          <small>01 / Digital</small><b>SONYLUM</b><span>Web, UX, branding, SEO, automatización e IA.</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <a class="card" href="https://creandocontenidos.ar" target="_blank" rel="noopener" data-site="creandocontenidos.ar" data-name="Creando Contenidos" data-shot="assets/sites/creandocontenidos.jpg">
+          <img src="assets/img/vertical.jpg" alt="" loading="lazy">
+          <small>02 / Content</small><b>CREANDO CONTENIDOS</b><span>Producción vertical, campañas y piezas que se mueven.</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <a class="card" href="https://localba.ar" target="_blank" rel="noopener" data-site="localba.ar" data-name="LocalBA" data-shot="assets/sites/localba.jpg">
+          <img src="assets/img/obelisco.jpg" alt="" loading="lazy">
+          <small>03 / Experiences</small><b>LOCALBA</b><span>Buenos Aires receptivo, recorridos y mirada local.</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+        </a>
+        <a class="card" href="https://tefilmo.ar" target="_blank" rel="noopener" data-site="tefilmo.ar" data-name="Tefilmo" data-shot="assets/sites/tefilmo.jpg">
+          <img src="assets/img/boda.jpg" alt="" loading="lazy">
+          <small>04 / Weddings</small><b>TEFILMO</b><span>Bodas en vertical, invitaciones y recuerdos vivos.</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+        </a>
       </div>
-      <div class="meta-cols" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <p class="meta-lead">Una idea puede tomar cualquier forma.</p>
-      <ol class="meta-steps">
-        <li class="meta-step is-on"><h2 class="kinetic">Gota.</h2><p>Toda idea empieza sin forma. La escuchamos antes de dibujarla.</p></li>
-        <li class="meta-step"><h2 class="kinetic">Bloque.</h2><p>Después se ordena: estrategia, sistema, grilla. Nada queda librado al azar.</p></li>
-        <li class="meta-step"><h2 class="kinetic">Prisma.</h2><p>Y se abre en luz: imagen, video, campañas que se ven y funcionan.</p></li>
-        <li class="meta-step"><h2 class="kinetic">Anillo.</h2><p>Hasta volver al principio. La misma idea, otra materia.</p></li>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="scr" id="s3" data-label="CAPACIDADES / ACTIVO" data-ghost="SISTEMA" data-rz="225" data-spread="0.7">
+    <div class="scr-in">
+      <p class="eyebrow"><i></i><b>03</b>Capacidades · Sin cajitas</p>
+      <h2 class="hd"><span>Pensamos el</span><span>sistema.</span><strong>Después lo hacemos.</strong></h2>
+      <ol class="caps">
+        <li><b>01</b><div><h3>Producto digital</h3><p>Arquitectura, UX/UI, desarrollo, performance y deploy.</p></div></li>
+        <li><b>02</b><div><h3>Inteligencia artificial</h3><p>Prompts de precisión, agentes, automatizaciones y flujos creativos.</p></div></li>
+        <li><b>03</b><div><h3>Dirección visual</h3><p>Concepto, cámara, narrativa, motion y producción de contenido 9:16.</p></div></li>
+        <li><b>04</b><div><h3>Marca y crecimiento</h3><p>Identidad, mensajes, SEO/SEM y activación comercial.</p></div></li>
       </ol>
-      <div class="meta-progress" aria-hidden="true"><span id="metaBar"></span></div>
     </div>
   </section>
 
-  <!-- CAPACIDADES -->
-  <section class="caps" id="capacidades" data-drop="0.86 0.24 0.12 swarm 0.6" data-drop-m="0.8 0.14 0.14 swarm 0.6">
-    <div class="caps-head">
-      <h2 class="sec-title reveal">Ideas que<br>hacen cosas.</h2>
-      <p class="caps-intro reveal">Cuatro disciplinas, una sola obsesión: que se vea increíble y que funcione. Trabajamos de punta a punta, desde la primera conversación hasta la pieza publicada.</p>
-    </div>
-    <ul class="caps-list">
-      <li class="cap reveal">
-        <a href="https://sonylum.ar" target="_blank" rel="noopener" data-preview="0">
-          <span class="cap-n">01</span>
-          <span class="cap-t">Web y experiencias</span>
-          <span class="cap-d">Sitios, interfaces y universos digitales. Diseño a medida, código propio, cero plantillas.</span>
-          <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/liquido.jpg" alt="" loading="lazy">
-        </a>
-      </li>
-      <li class="cap reveal">
-        <a href="https://creandocontenidos.ar" target="_blank" rel="noopener" data-preview="1">
-          <span class="cap-n">02</span>
-          <span class="cap-t">Motion y producción</span>
-          <span class="cap-d">Reels, campañas, edición y video vertical 9:16. Imagen que no se queda quieta.</span>
-          <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/negativos.jpg" alt="" loading="lazy">
-        </a>
-      </li>
-      <li class="cap reveal">
-        <a href="https://sonylum.ar" target="_blank" rel="noopener" data-preview="2">
-          <span class="cap-n">03</span>
-          <span class="cap-t">IA y automatización</span>
-          <span class="cap-d">Flujos y agentes que conectan una idea con un resultado medible.</span>
-          <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/prisma.jpg" alt="" loading="lazy">
-        </a>
-      </li>
-      <li class="cap reveal">
-        <a href="mailto:hola@sonylum.ar?subject=Consulta%20de%20estrategia" data-preview="3">
-          <span class="cap-n">04</span>
-          <span class="cap-t">Estrategia y campañas</span>
-          <span class="cap-d">Posicionamiento, creatividad comercial y comunicación con intención.</span>
-          <i class="ph ph-arrow-up-right cap-a" aria-hidden="true"></i>
-          <img class="cap-img" src="assets/img/obelisco.jpg" alt="" loading="lazy">
-        </a>
-      </li>
-    </ul>
-    <div class="cap-float" id="capFloat" aria-hidden="true"><div class="cap-float-inner"></div></div>
-  </section>
-
-  <!-- ARCHIVO: imágenes raras que nos alimentan -->
-  <section class="archive" id="archivo" data-drop="0.5 0.52 0.16 swarm 1" data-drop-m="0.5 0.5 0.18 swarm 1">
-    <div class="archive-head">
-      <h2 class="sec-title reveal">Cine, redes<br>y arte.</h2>
-      <p class="archive-intro reveal">Rodamos, editamos, publicamos y experimentamos. Todo pasa por el mismo estudio.</p>
-    </div>
-    <div class="archive-rows">
-      <div class="archive-row" data-dir="-1">
-        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
-        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" alt="Rodaje vertical con celular, el Obelisco de fondo" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/galeria.jpg" alt="Instalación de videoarte con pantallas en rojo" loading="lazy"><figcaption><b>Instalación</b>Arte y video</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/anillo.jpg" alt="Anillo de luz entre humo rojo" loading="lazy"><figcaption><b>Escena</b>Dirección de arte</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/prisma.jpg" alt="Prisma de vidrio que abre un haz de luz roja" loading="lazy"><figcaption><b>Luz</b>Fotografía</figcaption></figure>
-      </div>
-      <div class="archive-row" data-dir="1">
-        <figure class="plate plate-w"><img src="assets/img/boda.jpg" alt="Pareja de novios a contraluz al atardecer" loading="lazy"><figcaption><b>Boda</b>Films de autor</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/obelisco.jpg" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy"><figcaption><b>Ciudad</b>Buenos Aires</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/liquido.jpg" alt="Gota de vidrio líquido sobre negro" loading="lazy"><figcaption><b>Materia</b>Motion graphics</figcaption></figure>
-        <figure class="plate plate-w"><img src="assets/img/negativos.jpg" alt="Negativos 35 mm sobre una mesa de luz" loading="lazy"><figcaption><b>Negativos</b>Revelado y edición</figcaption></figure>
-        <figure class="plate plate-t"><img src="assets/img/vertical.jpg" alt="Rodaje vertical con celular, el Obelisco de fondo" loading="lazy"><figcaption><b>Vertical</b>Contenido 9:16</figcaption></figure>
-      </div>
+  <!-- 04 -->
+  <section class="scr" id="s4" data-label="PROYECTOS / ACTIVO" data-ghost="PANTALLA" data-rz="315" data-spread="2">
+    <div class="scr-in">
+      <p class="eyebrow"><i></i><b>04</b>Proyectos</p>
+      <h2 class="hd"><span>Ideas que</span><span>salieron</span><strong>de la pantalla.</strong></h2>
+      <ol class="works">
+        <li><small>Imp / Exp</small><b>TERRACOMEX</b><span>Plataforma e identidad digital.</span><em>01</em></li>
+        <li><small>Directorio</small><b>RADAR COMERCIAL</b><span>Producto, búsqueda y territorio.</span><em>02</em></li>
+        <li><small>Gastronomía</small><b>FILOMENA</b><span>Presencia web y conversión.</span><em>03</em></li>
+        <li><small>Restaurant</small><b>BARAKUS</b><span>Marca, menú y experiencia.</span><em>04</em></li>
+        <li><small>Turismo</small><b>CHECK-IN PATAGONIA</b><span>Rediseño premium y reservas.</span><em>05</em></li>
+        <li><small>Evento</small><b>LA INVITACIÓN</b><span>Una boda convertida en interfaz.</span><em>06</em></li>
+      </ol>
     </div>
   </section>
 
-  <!-- PROYECTOS (paneo horizontal + vista previa del sitio) -->
-  <section class="works" id="proyectos" data-drop="0.86 0.2 0.1 swarm 1" data-drop-m="0.8 0.15 0.1 swarm 1">
-    <div class="works-sticky">
-      <div class="works-head">
-        <h2 class="sec-title">No es una<br>sola cosa.</h2>
-        <p class="works-sub">Un ecosistema de marcas. Tocá cada una para ver su sitio.</p>
+  <!-- 05 -->
+  <section class="scr" id="s5" data-label="CONTACTO / ACTIVO" data-ghost="CONTACTO" data-rz="405" data-spread="1">
+    <div class="scr-in">
+      <p class="eyebrow"><i></i><b>05</b>Canal directo · Buenos Aires</p>
+      <h2 class="hd"><span>Hagamos algo</span><span>que no parezca</span><strong>una plantilla.</strong></h2>
+      <p class="lead">Contanos qué querés mover: una marca, una web, una campaña o una idea todavía medio salvaje.</p>
+      <a class="wa" href="https://wa.me/?text=Hola%20SONYLUM%2C%20quiero%20hablar%20sobre%20un%20proyecto" target="_blank" rel="noopener">Abrir WhatsApp <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+      <div class="links">
+        <a href="https://sonylum.ar" target="_blank" rel="noopener">sonylum.ar <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+        <a href="https://instagram.com/sonylumarg" target="_blank" rel="noopener">@sonylumarg <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
       </div>
-      <div class="works-track" id="worksTrack">
-        <a class="work" href="https://sonylum.ar" target="_blank" rel="noopener" data-site="sonylum.ar" data-name="Sonylum" data-shot="assets/sites/sonylum.jpg">
-          <img src="assets/img/galeria.jpg" alt="Instalación de videoarte con pantallas en rojo" loading="lazy">
-          <div class="work-glass"><span class="work-k">Estudio digital</span><b>Sonylum</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
-        </a>
-        <a class="work work-tall" href="https://creandocontenidos.ar" target="_blank" rel="noopener" data-site="creandocontenidos.ar" data-name="Creando Contenidos" data-shot="assets/sites/creandocontenidos.jpg">
-          <img src="assets/img/vertical.jpg" alt="Rodaje vertical con celular, el Obelisco de fondo" loading="lazy">
-          <div class="work-glass"><span class="work-k">Contenido vertical 9:16</span><b>Creando Contenidos</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
-        </a>
-        <a class="work" href="https://localba.ar" target="_blank" rel="noopener" data-site="localba.ar" data-name="LocalBA" data-shot="assets/sites/localba.jpg">
-          <img src="assets/img/obelisco.jpg" alt="Avenida 9 de Julio de noche con el Obelisco" loading="lazy">
-          <div class="work-glass"><span class="work-k">Experiencias en Buenos Aires</span><b>LocalBA</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
-        </a>
-        <a class="work" href="https://tefilmo.ar" target="_blank" rel="noopener" data-site="tefilmo.ar" data-name="Tefilmo" data-shot="assets/sites/tefilmo.jpg">
-          <img src="assets/img/boda.jpg" alt="Pareja de novios a contraluz al atardecer" loading="lazy">
-          <div class="work-glass"><span class="work-k">Films de boda</span><b>Tefilmo</b><i class="ph ph-arrow-up-right" aria-hidden="true"></i></div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- LABORATORIO -->
-  <section class="lab" id="laboratorio" data-drop="0.36 0.3 0.2 torus 0" data-drop-m="0.78 0.12 0.16 torus 0">
-    <figure class="lab-media">
-      <img src="assets/img/anillo.jpg" alt="" loading="lazy" data-env>
-    </figure>
-    <div class="lab-grid">
-      <div class="lab-copy reveal">
-        <h2 class="sec-title">Tocá.<br>Cambiá.<br>Rompé la rutina.</h2>
-        <p>La gota de esta página reacciona a vos. Arrastrala, soltala con fuerza, cambiale la materia.</p>
-      </div>
-      <form class="panel reveal" id="lab" onsubmit="return false">
-        <fieldset>
-          <legend>Materia</legend>
-          <div class="seg" role="radiogroup" aria-label="Materia">
-            <button type="button" role="radio" aria-checked="true" data-tint="rojo"><i style="--c:#e2432d"></i>Rojo</button>
-            <button type="button" role="radio" aria-checked="false" data-tint="oro"><i style="--c:#d6a95c"></i>Oro</button>
-            <button type="button" role="radio" aria-checked="false" data-tint="cristal"><i style="--c:#cfe3ea"></i>Cristal</button>
-            <button type="button" role="radio" aria-checked="false" data-tint="tinta"><i style="--c:#2b2724"></i>Tinta</button>
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend>Forma</legend>
-          <div class="seg" role="radiogroup" aria-label="Forma">
-            <button type="button" role="radio" aria-checked="true" data-shape="auto">Libre</button>
-            <button type="button" role="radio" aria-checked="false" data-shape="sphere">Gota</button>
-            <button type="button" role="radio" aria-checked="false" data-shape="box">Bloque</button>
-            <button type="button" role="radio" aria-checked="false" data-shape="prism">Prisma</button>
-            <button type="button" role="radio" aria-checked="false" data-shape="torus">Anillo</button>
-            <button type="button" role="radio" aria-checked="false" data-shape="swarm">Enjambre</button>
-          </div>
-        </fieldset>
-        <label class="range">
-          <span>Energía <output id="energyOut">55</output></span>
-          <input type="range" id="energy" min="0" max="100" value="55">
-        </label>
-        <label class="range">
-          <span>Tamaño <output id="sizeOut">100</output></span>
-          <input type="range" id="size" min="60" max="220" value="100">
-        </label>
-        <div class="panel-actions">
-          <button type="button" class="btn btn-glass" id="splash"><i class="ph ph-shuffle" aria-hidden="true"></i> Salpicar</button>
-          <button type="button" class="btn btn-ghost" id="reset"><i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i> Reiniciar</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- CONTACTO -->
-  <section class="cta" id="contacto" data-drop="0.8 0.66 0.18 sphere 0" data-drop-m="0.76 0.4 0.17 sphere 0">
-    <figure class="cta-media" aria-hidden="true"><img src="assets/img/negativos.jpg" alt="" loading="lazy" data-env></figure>
-    <h2 class="cta-title"><span>Hagámosla</span><span><em>real.</em></span></h2>
-    <div class="cta-row">
-      <a class="btn btn-solid btn-xl" href="https://wa.me/?text=Hola%20SONYLUM%2C%20quiero%20hablar%20sobre%20un%20proyecto" target="_blank" rel="noopener">Hablemos <i class="ph ph-whatsapp-logo" aria-hidden="true"></i></a>
-      <a class="text-link" href="mailto:hola@sonylum.ar?subject=Quiero%20crear%20algo%20con%20SONYLUM">hola@sonylum.ar</a>
     </div>
   </section>
 </main>
 
-<!-- ventana de vista previa del sitio -->
-<div class="site-peek" id="sitePeek" role="dialog" aria-label="Vista previa del sitio" hidden>
-  <div class="peek-bar"><i></i><i></i><i></i><span class="peek-url" id="peekUrl">sonylum.ar</span><button type="button" class="peek-close" id="peekClose" aria-label="Cerrar vista previa"><i class="ph ph-x" aria-hidden="true"></i></button></div>
+<!-- vista previa del sitio -->
+<div class="peek" id="peek" role="dialog" aria-label="Vista previa del sitio" hidden>
+  <div class="peek-bar"><i></i><i></i><i></i><span id="peekUrl">sonylum.ar</span><button type="button" id="peekClose" aria-label="Cerrar vista previa"><i class="ph ph-x" aria-hidden="true"></i></button></div>
   <div class="peek-shot">
     <img id="peekImg" alt="">
-    <div class="peek-fallback" id="peekFallback"><img id="peekFbImg" alt=""><b id="peekName">Sonylum</b><span id="peekFbUrl">sonylum.ar</span></div>
+    <div class="peek-fb"><img id="peekFbImg" alt=""><b id="peekName">Sonylum</b><span id="peekFbUrl">sonylum.ar</span></div>
   </div>
-  <a class="btn btn-solid peek-go" id="peekGo" href="https://sonylum.ar" target="_blank" rel="noopener">Abrir sitio <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+  <a class="pill pill-solid peek-go" id="peekGo" href="https://sonylum.ar" target="_blank" rel="noopener">Abrir sitio <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
 </div>
 
-<footer class="foot">
-  <span>© 2026 SONYLUM. Villa Luro, Buenos Aires.</span>
-  <nav aria-label="Redes">
-    <a href="https://instagram.com/sonylumarg" target="_blank" rel="noopener"><i class="ph ph-instagram-logo" aria-hidden="true"></i> Instagram</a>
-    <a href="https://sonylum.ar" target="_blank" rel="noopener">sonylum.ar</a>
-  </nav>
-</footer>
-
-<script src="drop.js"></script>
 <script src="main.js"></script>
 </body>
 </html>
