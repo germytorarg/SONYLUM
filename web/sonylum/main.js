@@ -91,7 +91,7 @@
     peekFor = card;
     peekUrl.textContent = peekFbUrl.textContent = card.dataset.site;
     peekName.textContent = card.dataset.name;
-    peekFbImg.src = $("img", card).getAttribute("src");
+    peekFbImg.src = $(".card-bg", card).getAttribute("src");
     peekGo.href = card.href;
     peek.classList.toggle("is-touch", !!touch);
     peek.hidden = false;
