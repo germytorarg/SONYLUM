@@ -398,17 +398,24 @@ main { position: relative; z-index: 10; }
 }
 
 /* ---------- Escala: todo un 19% más chico (menos el cubo) y poco aire entre secciones ---------- */
-:root { --z: .81; --cy: 35%; }
+:root { --z: .81; --cy: 25%; }
 .top, .rail, .clock { zoom: var(--z); }
 .scr-in { zoom: var(--z); padding-top: calc(var(--pad-top) / var(--z)); --pad-top: 45dvh; }
 .scr-in::before { top: calc(var(--pad-top) / var(--z) - 26px); }
 .scr { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
 /* la portada ocupa la pantalla; el resto se pega una tras otra */
 .scr:not(#s1) { min-height: 0; padding-bottom: 12px; }
-#s2 .scr-in, #s3 .scr-in, #s4 .scr-in, #s5 .scr-in, #s6 .scr-in { --pad-top: 9dvh; }
+#s2 .scr-in, #s3 .scr-in, #s4 .scr-in, #s5 .scr-in, #s6 .scr-in { --pad-top: 68px; }
+/* portada en celular: el panel arranca siempre debajo de la segunda fila de etiquetas */
+#s1 .scr-in { --pad-top: calc(24dvh + 150px); }
+@media (max-width: 1023px) { .c1 { top: calc(var(--cy) - var(--spread, 12vh)); } .c2 { top: calc(var(--cy) + var(--spread, 12vh)); } }
 #s6 { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 @media (min-width: 1024px) {
-  :root { --cy: 49%; }
+  :root { --cy: 50%; --cx: 75%; }
+  #s1 .scr-in { --pad-top: 10vh; }
+  /* columnas simétricas: panel en la mitad izquierda, cubo centrado en la derecha */
+  .scr-in { width: calc((50vw - var(--gut) * 1.5) / var(--z)); }
+  .chips { left: 50%; right: 0; }
   .scr { padding-bottom: 40px; }
   .scr:not(#s1) { padding-bottom: 12px; }
   .scr-in { --pad-top: 10vh; }

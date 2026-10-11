@@ -66,6 +66,25 @@
     });
   }
 
+  /* ---------- portada en celular: el cubo se centra en el espacio libre sobre el panel ---------- */
+  var heroEye = $("#s1 .eyebrow"), lastHero = 0;
+  function placeHero() {
+    if (innerWidth >= 1024) { root.style.removeProperty("--cy"); root.style.removeProperty("--spread"); window.sonyHeroY = 0; lastHero = 0; return; }
+    var glassTop = heroEye.getBoundingClientRect().top + scrollY - 22;   // borde superior del vidrio
+    var cy = Math.round((64 + glassTop) / 2);                            // entre el logo y el panel
+    var spread = Math.round(Math.min(innerHeight * 0.12, (glassTop - 64) / 2 - 34)); // etiquetas sin tocar el vidrio
+    if (Math.abs(cy - lastHero) < 2) return;
+    lastHero = cy;
+    root.style.setProperty("--cy", cy + "px");
+    root.style.setProperty("--spread", spread + "px");
+    window.sonyHeroY = cy / innerHeight;
+    dispatchEvent(new Event("sony:hero"));
+  }
+  placeHero();
+  var hrT = 0;
+  addEventListener("resize", function () { clearTimeout(hrT); hrT = setTimeout(placeHero, 140); }, { passive: true });
+  if (document.fonts) document.fonts.ready.then(placeHero);
+
   /* ---------- capacidades: la tarjeta se da vuelta al tocarla ---------- */
   $$(".flip").forEach(function (f) {
     var back = 0;
