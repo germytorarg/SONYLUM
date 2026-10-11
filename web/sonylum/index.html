@@ -84,6 +84,9 @@
           <img class="card-logo" src="assets/logos/tefilmo.png" alt="Logo de Tefilmo" loading="lazy">
           <small>04 / Weddings</small><b>TEFILMO</b><span>Bodas en vertical, invitaciones y recuerdos vivos.</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
         </a>
+        <a class="card card-more" href="https://sonylum.ar" target="_blank" rel="noopener">
+          <small>+ Archivo</small><b>VER MÁS PROYECTOS</b><span>Todos los trabajos en sonylum.ar.</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+        </a>
       </div>
     </div>
   </section>
@@ -177,6 +180,22 @@
     </div>
   </section>
 </main>
+
+<!-- cada web se abre en vivo dentro de un modal -->
+<dialog class="sm" id="sm" aria-labelledby="smName">
+  <div class="sm-card">
+    <div class="sm-bar">
+      <img class="sm-logo" id="smLogo" alt="">
+      <span class="sm-url"><b id="smName">Sonylum</b><span id="smUrl">sonylum.ar</span></span>
+      <a class="sm-open" id="smOpen" href="#" target="_blank" rel="noopener" aria-label="Abrir en una pestaña nueva"><i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
+      <button type="button" class="sm-x" id="smClose" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="sm-view">
+      <div class="sm-wait" id="smWait"><span></span>Cargando sitio</div>
+      <iframe id="smFrame" title="Sitio" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</dialog>
 
 <!-- vista previa del sitio -->
 <div class="peek" id="peek" role="dialog" aria-label="Vista previa del sitio" hidden>

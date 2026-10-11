@@ -52,7 +52,13 @@
 
   /* ---------- capacidades: la tarjeta se da vuelta al tocarla ---------- */
   $$(".flip").forEach(function (f) {
-    f.addEventListener("click", function () { f.setAttribute("aria-pressed", String(f.getAttribute("aria-pressed") !== "true")); });
+    var back = 0;
+    f.addEventListener("click", function () {
+      var on = f.getAttribute("aria-pressed") !== "true";
+      f.setAttribute("aria-pressed", String(on));
+      clearTimeout(back);
+      if (on) back = setTimeout(function () { f.setAttribute("aria-pressed", "false"); }, 4500); // vuelve sola
+    });
   });
 
   /* ---------- reloj de Buenos Aires ---------- */
@@ -116,18 +122,27 @@
     peek.style.translate = x.toFixed(1) + "px " + y.toFixed(1) + "px";
     pRaf = requestAnimationFrame(follow);
   }
-  $$(".card").forEach(function (card) {
-    card.addEventListener("mouseenter", function () { if (finePointer) openPeek(card, false); });
-    card.addEventListener("mouseleave", function () { if (finePointer) closePeek(); });
-    card.addEventListener("click", function (e) {
-      if (finePointer && lastPointer === "mouse") return;      // en desktop el click abre el sitio
-      if (peekFor === card && !peek.hidden) return;            // segundo toque: ir al sitio
-      e.preventDefault();
-      closePeek();
-      card.classList.add("is-lit");
-      openPeek(card, true);
-    });
+  /* cada web del ecosistema se abre en vivo dentro de un modal */
+  var sm = $("#sm"), smFrame = $("#smFrame"), smWait = $("#smWait");
+  function openSite(card) {
+    var logo = $(".card-logo", card);
+    $("#smLogo").src = logo ? logo.getAttribute("src") : "";
+    $("#smName").textContent = card.dataset.name;
+    $("#smUrl").textContent = card.dataset.site;
+    $("#smOpen").href = card.href;
+    smWait.hidden = false;
+    smFrame.onload = function () { smWait.hidden = true; };
+    smFrame.src = card.href;
+    if (typeof sm.showModal === "function") sm.showModal(); else sm.setAttribute("open", "");
+  }
+  function closeSite() { if (sm.open) sm.close(); }
+  sm.addEventListener("close", function () { smFrame.src = "about:blank"; });
+  $$(".card[data-site]").forEach(function (card) {
+    card.addEventListener("click", function (e) { e.preventDefault(); openSite(card); });
   });
+  $("#smClose").addEventListener("click", closeSite);
+  sm.addEventListener("click", function (e) { if (e.target === sm) closeSite(); });
+
   $("#peekClose").addEventListener("click", closePeek);
   addEventListener("keydown", function (e) { if (e.key === "Escape") closePeek(); });
 })();
