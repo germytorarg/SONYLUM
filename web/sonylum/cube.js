@@ -123,6 +123,7 @@ if (renderer) {
   const frontMat = new THREE.ShaderMaterial({ uniforms: uniforms({ uTexture: bgTex, uRefractPower: 0.30, uBackside: 0.0 }), vertexShader: vert, fragmentShader: frag, side: THREE.FrontSide });
 
   let cubeBack = null, cubeFront = null, rtBack = null, rtFront = null;
+  let dirty = true;   // hay algo nuevo para dibujar
 
   function normalize(g) {
     g.computeBoundingBox();
@@ -145,6 +146,7 @@ if (renderer) {
       cubeFront = new THREE.Mesh(geo.clone(), frontMat);
       spinner.add(cubeBack, cubeFront);
     }
+    dirty = true;
     document.documentElement.classList.add("webgl-ready");
   }
   // Cubo facetado tipo gema: caras grandes, biseles planos en cada arista y un triángulo en cada esquina.
@@ -208,6 +210,7 @@ if (renderer) {
     bgCtx.globalAlpha = 1;
   }
   function drawBackground() {
+    dirty = true;
     const W = innerWidth, H = innerHeight, P = placement();
     bgCanvas.width = Math.max(2, Math.round(W * DPR));
     bgCanvas.height = Math.max(2, Math.round(H * DPR));
@@ -254,6 +257,7 @@ if (renderer) {
   const qY = new THREE.Quaternion(), qX = new THREE.Quaternion();
   const axY = new THREE.Vector3(0, 1, 0), axX = new THREE.Vector3(1, 0, 0);
   function rotate(dx, dy) {
+    dirty = true;
     qY.setFromAxisAngle(axY, dx); qX.setFromAxisAngle(axX, dy);
     spinner.quaternion.premultiply(qY).premultiply(qX);
   }
@@ -323,10 +327,11 @@ if (renderer) {
   };
 
   function render() {
+    dirty = false;
     const db = new THREE.Vector2(); renderer.getDrawingBufferSize(db);
     renderer.setRenderTarget(rtBack); renderer.autoClear = true; renderer.render(bgScene, camera);
     renderer.setRenderTarget(rtFront); renderer.render(bgScene, camera);
-    renderer.autoClear = false; renderer.clearDepth(); renderer.render(scene, camera);
+    cubeFront.visible = false; renderer.autoClear = false; renderer.clearDepth(); renderer.render(scene, camera); cubeFront.visible = true;
     renderer.setRenderTarget(null); renderer.autoClear = true; renderer.render(bgScene, camera);
     cubeBack.visible = false; renderer.autoClear = false; renderer.clearDepth(); renderer.render(scene, camera); cubeBack.visible = true;
   }
@@ -339,6 +344,7 @@ if (renderer) {
     const active = Math.abs(velX) + Math.abs(velY) > 0.0002 || fade < 1;
     const fps = active || drag ? (DESKTOP ? 50 : 45) : 30;
     if (now - presented < 1000 / fps) return;
+    if ((paused || reduce) && !active && !drag && !dirty) return;   // quieto: no redibujar lo mismo
     presented = now;
     const frame = Math.min((now - last) / 1000, 0.055) * 60; last = now;
 

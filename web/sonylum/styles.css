@@ -408,10 +408,12 @@ main { position: relative; z-index: 10; }
 #s2 .scr-in, #s3 .scr-in, #s4 .scr-in, #s5 .scr-in, #s6 .scr-in { --pad-top: 68px; }
 /* portada en celular: el panel arranca siempre debajo de la segunda fila de etiquetas */
 #s1 .scr-in { --pad-top: calc(24dvh + 150px); }
+#s1 { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }   /* el botón queda arriba del reloj */
 @media (max-width: 1023px) { .c1 { top: calc(var(--cy) - var(--spread, 12vh)); } .c2 { top: calc(var(--cy) + var(--spread, 12vh)); } }
 #s6 { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 @media (min-width: 1024px) {
   :root { --cy: 50%; --cx: 75%; }
+  #s1 { padding-bottom: 40px; }
   #s1 .scr-in { --pad-top: 10vh; }
   /* columnas simétricas: panel en la mitad izquierda, cubo centrado en la derecha */
   .scr-in { width: calc((50vw - var(--gut) * 1.5) / var(--z)); }
@@ -455,6 +457,21 @@ main { position: relative; z-index: 10; }
   .card::after, .flip-face::after, .cv::after, .works li::after { animation: none; display: none; }
   .scr.is-active .cards .card, .scr.is-active .cv { animation: none; }
 }
+
+/* ---------- Legibilidad: ninguna etiqueta por debajo de 11px reales (dentro del zoom .81 son 13.6px) ---------- */
+.eyebrow, .card small, .works small, .cv small, .flip-face > b, .flip-hint, .works em, .rail a, .clock span, .links a { font-size: calc(11px / var(--z)); }
+.eyebrow { letter-spacing: .2em; }
+.chip, .badge { font-size: 11px; }
+.pill { font-size: max(13px, calc(11px / var(--z))); }
+
+/* ---------- Áreas táctiles de 44px sin cambiar el dibujo ---------- */
+.rail a, .eq, .links a, .logo { position: relative; }
+.rail a::after { content: ""; position: absolute; inset: -4px 0 -4px -10px; }
+.eq::after { content: ""; position: absolute; inset: -13px; }
+.links a::after { content: ""; position: absolute; inset: -14px -8px; }
+.logo::after { content: ""; position: absolute; inset: -8px -6px; }
+
+@media (max-width: 767px) and (max-height: 720px) { .clock span { display: none; } }   /* celulares bajos: solo la hora, no tapa el botón */
 
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
