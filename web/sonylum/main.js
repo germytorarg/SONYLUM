@@ -50,6 +50,11 @@
   activate(screens[0]);
   requestAnimationFrame(function () { screens[0].classList.add("in"); });
 
+  /* ---------- capacidades: la tarjeta se da vuelta al tocarla ---------- */
+  $$(".flip").forEach(function (f) {
+    f.addEventListener("click", function () { f.setAttribute("aria-pressed", String(f.getAttribute("aria-pressed") !== "true")); });
+  });
+
   /* ---------- reloj de Buenos Aires ---------- */
   var dEl = $("#clockDate"), tEl = $("#clockTime");
   var fDate = new Intl.DateTimeFormat("es-AR", { timeZone: "America/Argentina/Buenos_Aires", weekday: "short", day: "numeric", month: "short" });

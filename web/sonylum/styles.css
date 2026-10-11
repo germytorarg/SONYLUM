@@ -1,5 +1,6 @@
 /* SONYLUM, sistema en línea. Negro profundo, tipografía fina con remate negro, un cuadrado de vidrio que orbita. */
 
+@font-face { font-family: "JetBrains Mono"; src: url("vendor/fonts/JetBrainsMono-var.woff2") format("woff2"); font-weight: 100 800; font-style: normal; font-display: swap; }
 @font-face { font-family: "Poppins"; src: url("vendor/fonts/Poppins-300.woff2") format("woff2"); font-weight: 300; font-style: normal; font-display: swap; }
 @font-face { font-family: "Poppins"; src: url("vendor/fonts/Poppins-400.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Poppins"; src: url("vendor/fonts/Poppins-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
@@ -200,6 +201,40 @@ main { position: relative; z-index: 10; }
 .caps h3 { margin: 0 0 4px; font-weight: 600; font-size: clamp(24px, 2.6vw, 32px); letter-spacing: -0.03em; }
 .caps p { margin: 0; color: var(--mute); font-size: 17px; }
 
+/* capacidades: tarjetas de vidrio que se dan vuelta */
+.flips { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.flip { display: block; width: 100%; padding: 0; text-align: left; perspective: 1100px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.flip-in { position: relative; display: grid; transform-style: preserve-3d; transition: transform 700ms var(--ease-io); }
+.flip[aria-pressed="true"] .flip-in { transform: rotateY(180deg); }
+.flip-face {
+  position: relative; grid-area: 1 / 1; display: grid; align-content: start; gap: 10px; min-height: 172px; padding: 22px 76px 20px 22px;
+  border-radius: 20px; border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(145deg, rgba(255,255,255,.09), rgba(124,92,255,.06) 55%, rgba(255,255,255,.02));
+  -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+}
+.flip-back { transform: rotateY(180deg); background: linear-gradient(145deg, rgba(124,92,255,.16), rgba(255,255,255,.04) 60%); border-color: rgba(167,139,250,.35); align-content: space-between; }
+.flip-face > b { font-weight: 500; font-size: 12px; letter-spacing: .12em; color: var(--fg-2); text-transform: uppercase; }
+.flip-face strong { font-weight: 700; font-size: clamp(20px, 2.1vw, 24px); letter-spacing: -0.02em; line-height: 1.15; color: var(--fg); }
+.flip-txt { font-size: 14px; line-height: 1.6; color: var(--fg-2); }
+.flip-back .flip-txt { font-size: 15px; color: var(--fg); }
+.flip-ico {
+  position: absolute; top: 18px; right: 18px; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px;
+  background: linear-gradient(140deg, rgba(255,255,255,.14), rgba(124,92,255,.08)); border: 1px solid rgba(255,255,255,.16);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2); color: #e6e1ff; font-size: 21px;
+}
+.flip-hint { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--mute); }
+.flip:active .flip-in { scale: .985; }
+@media (hover: hover) and (pointer: fine) { .flip:hover .flip-face { border-color: rgba(167,139,250,.4); } }
+@media (min-width: 1024px) { .flips { grid-template-columns: 1fr 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  .flip-in { transition: none; transform: none !important; }
+  .flip-back { transform: none; opacity: 0; }
+  .flip[aria-pressed="true"] .flip-back { opacity: 1; }
+  .flip[aria-pressed="true"] .flip-front { opacity: 0; }
+}
+
 /* proyectos */
 .works { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line-2); background: rgba(8,8,12,.6); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
 .works li { position: relative; display: grid; gap: 8px; padding: 28px 70px 28px 34px; border-bottom: 1px solid var(--line-2); }
@@ -238,11 +273,11 @@ main { position: relative; z-index: 10; }
 @media (hover: hover) and (pointer: fine) { .wa:hover, .links a:hover { color: var(--fg); } }
 
 /* entrada de cada pantalla */
-.js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .works, .js .scr .wa, .js .scr .links, .js .scr .cvs {
+.js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .flips, .js .scr .works, .js .scr .wa, .js .scr .links, .js .scr .cvs {
   opacity: 0; transform: translateY(26px);
   transition: opacity 700ms ease, transform 1000ms var(--ease);
 }
-.js .scr.in .eyebrow, .js .scr.in .hd > *, .js .scr.in .lead, .js .scr.in .ctas, .js .scr.in .cards, .js .scr.in .caps, .js .scr.in .works, .js .scr.in .wa, .js .scr.in .links, .js .scr.in .cvs { opacity: 1; transform: none; }
+.js .scr.in .eyebrow, .js .scr.in .hd > *, .js .scr.in .lead, .js .scr.in .ctas, .js .scr.in .cards, .js .scr.in .caps, .js .scr.in .flips, .js .scr.in .works, .js .scr.in .wa, .js .scr.in .links, .js .scr.in .cvs { opacity: 1; transform: none; }
 .scr.in .hd > :nth-child(2) { transition-delay: 70ms; }
 .scr.in .hd > :nth-child(3) { transition-delay: 140ms; }
 .scr.in .lead, .scr.in .cards, .scr.in .caps, .scr.in .works, .scr.in .wa { transition-delay: 200ms; }
@@ -310,7 +345,7 @@ main { position: relative; z-index: 10; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .orbit, .chips-track, .eq i { animation: none; }
-  .js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .works, .js .scr .wa, .js .scr .links, .js .scr .cvs { opacity: 1; transform: none; transition: none; }
+  .js .scr .eyebrow, .js .scr .hd > *, .js .scr .lead, .js .scr .ctas, .js .scr .cards, .js .scr .caps, .js .scr .flips, .js .scr .works, .js .scr .wa, .js .scr .links, .js .scr .cvs { opacity: 1; transform: none; transition: none; }
 }
 @media (prefers-reduced-transparency: reduce) {
   .rail a, .card, .works, .peek { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--bg-2); }
