@@ -80,7 +80,7 @@
   addEventListener("pointermove", function (e) { px = e.clientX; py = e.clientY; }, { passive: true });
 
   function loadShot(card) {
-    var tries = [card.dataset.shot, "https://s.wordpress.com/mshots/v1/" + encodeURIComponent("https://" + card.dataset.site) + "?w=760&h=475"];
+    var tries = [card.dataset.shot, "https://s.wordpress.com/mshots/v1/" + encodeURIComponent("https://" + card.dataset.site) + "?w=1200&h=900"];
     var i = 0;
     peek.classList.add("no-shot");
     peekImg.onload = function () { if (peekFor === card) peek.classList.remove("no-shot"); };

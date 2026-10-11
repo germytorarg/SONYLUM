@@ -236,29 +236,31 @@ main { position: relative; z-index: 10; }
 
 /* ---------- Vista previa del sitio ---------- */
 .peek {
-  position: fixed; left: 0; top: 0; z-index: 60; width: min(380px, calc(100vw - 32px));
+  position: fixed; left: 0; top: 0; z-index: 60; width: min(600px, calc(100vw - 24px));
   background: rgba(12,12,18,.7); border: 1px solid var(--line-2); border-radius: 18px; overflow: hidden;
   -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
   box-shadow: 0 40px 90px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(143,123,255,.12);
   pointer-events: none; transition: opacity 180ms ease, scale 260ms var(--ease);
 }
 @starting-style { .peek { opacity: 0; scale: .94; } }
-.peek.is-touch { pointer-events: auto; left: 50% !important; top: auto !important; bottom: calc(16px + env(safe-area-inset-bottom)); translate: -50% 0 !important; }
-.peek-bar { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); }
+.peek.is-touch { pointer-events: auto; left: 50% !important; top: 50% !important; translate: -50% -50% !important; width: min(720px, calc(100vw - 24px)); }
+.peek.is-touch .peek-shot { aspect-ratio: 4 / 3; }
+@media (max-width: 767px) { .peek.is-touch .peek-shot { aspect-ratio: 3 / 4; max-height: 62dvh; } }
+.peek-bar { display: flex; align-items: center; gap: 6px; height: 46px; padding: 0 6px 0 14px; border-bottom: 1px solid var(--line); }
 .peek-bar > i { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); }
 .peek-bar > i:first-child { background: var(--violet); }
-.peek-bar span { margin-left: 8px; flex: 1; font-size: 12px; letter-spacing: .1em; color: var(--fg-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.peek-bar button { display: none; width: 30px; height: 30px; font-size: 16px; }
+.peek-bar span { margin-left: 8px; flex: 1; font-size: 14px; letter-spacing: .1em; color: var(--fg-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.peek-bar button { display: none; width: 40px; height: 40px; font-size: 20px; }
 .is-touch .peek-bar button { display: inline-grid; place-items: center; }
 .peek-shot { position: relative; aspect-ratio: 16 / 10; background: var(--bg-2); overflow: hidden; }
 .peek-shot > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.peek-fb { position: absolute; inset: 0; display: none; align-content: end; gap: 4px; padding: 18px; isolation: isolate; }
+.peek-fb { position: absolute; inset: 0; display: none; align-content: end; gap: 6px; padding: 26px; isolation: isolate; }
 .peek-fb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(.5); z-index: -1; }
-.peek-fb b { font-weight: 800; font-size: 30px; letter-spacing: -0.04em; line-height: 1; }
-.peek-fb span { font-size: 12px; letter-spacing: .14em; color: var(--fg-2); }
+.peek-fb b { font-weight: 800; font-size: clamp(34px, 8vw, 54px); letter-spacing: -0.04em; line-height: 1; }
+.peek-fb span { font-size: 14px; letter-spacing: .14em; color: var(--fg-2); }
 .peek.no-shot .peek-fb { display: grid; }
 .peek.no-shot .peek-shot > img { display: none; }
-.peek-go { display: none; margin: 12px; height: 54px; justify-content: center; }
+.peek-go { display: none; margin: 14px; height: 60px; justify-content: center; }
 .is-touch .peek-go { display: flex; }
 
 /* ---------- Escritorio ---------- */
