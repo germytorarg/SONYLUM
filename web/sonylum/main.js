@@ -23,7 +23,9 @@
   var active = null;
   function activate(sec) {
     if (active === sec) return;
+    if (active) active.classList.remove("is-active");
     active = sec;
+    sec.classList.add("is-active");
     var id = "#" + sec.id;
     rail.forEach(function (a) {
       var on = a.getAttribute("href") === id;
@@ -49,6 +51,20 @@
   screens.forEach(function (s) { io.observe(s); });
   activate(screens[0]);
   requestAnimationFrame(function () { screens[0].classList.add("in"); });
+
+  /* ---------- vidrio: desfase del reflejo por tarjeta y luz que sigue al puntero ---------- */
+  [".cards .card", ".flips .flip-face", ".cvs .cv", ".works li"].forEach(function (sel) {
+    $$(sel).forEach(function (el, i) { el.style.setProperty("--i", sel === ".flips .flip-face" ? Math.floor(i / 2) : i); });
+  });
+  if (finePointer) {
+    $$(".card, .cv").forEach(function (el) {
+      el.addEventListener("pointermove", function (e) {
+        var r = el.getBoundingClientRect();
+        el.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        el.style.setProperty("--my", (e.clientY - r.top) + "px");
+      }, { passive: true });
+    });
+  }
 
   /* ---------- capacidades: la tarjeta se da vuelta al tocarla ---------- */
   $$(".flip").forEach(function (f) {

@@ -2,7 +2,6 @@
    Refracta con dispersión cromática una palabra gigante dibujada detrás;
    la palabra cambia con cada sección y el cubo responde al puntero y al scroll. */
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { mergeVertices, mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { ConvexGeometry } from "three/addons/geometries/ConvexGeometry.js";
 
@@ -163,7 +162,7 @@ if (renderer) {
   attach(facetedCube());
 
   // El modelo original de /stack reemplaza al cubo procedural cuando termina de cargar.
-  const loadModel = () => new GLTFLoader().load(MODEL_URL, (gltf) => {
+  const loadModel = () => import("three/addons/loaders/GLTFLoader.js").then(({ GLTFLoader }) => new GLTFLoader().load(MODEL_URL, (gltf) => {
     try {
       gltf.scene.updateMatrixWorld(true);
       const parts = [];
@@ -178,7 +177,7 @@ if (renderer) {
       const merged = parts.length && mergeGeometries(parts, false);
       if (merged) attach(merged);
     } catch (err) { /* el cubo procedural sigue activo */ }
-  }, undefined, () => {});
+  }, undefined, () => {})).catch(() => {});
   if ("requestIdleCallback" in window) requestIdleCallback(loadModel, { timeout: 900 }); else setTimeout(loadModel, 300);
 
   /* ---------- palabra de fondo con fundido ---------- */
@@ -188,7 +187,7 @@ if (renderer) {
   function placement() {
     const W = innerWidth, H = innerHeight;
     return DESKTOP || W >= 1024 ? { x: 0.72, y: 0.49, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.18, W * 0.09), maxW: W * 0.34 }
-                                : { x: 0.5, y: 0.27, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
+                                : { x: 0.5, y: 0.35, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;

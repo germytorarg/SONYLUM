@@ -397,20 +397,56 @@ main { position: relative; z-index: 10; }
   .works li:has(.work-open), .works li.work-more { padding: 0; }
 }
 
-/* ---------- Todo un 10% más chico (menos el cubo), menos aire entre secciones ---------- */
-.top, .rail, .clock { zoom: .9; }
-.scr-in { zoom: .9; padding-top: calc(var(--pad-top) / .9); }
-.scr-in::before { top: calc(var(--pad-top) / .9 - 26px); }
-.scr { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
-:root { --cy: 27%; }
-.scr-in { --pad-top: 45dvh; }
-#s2 .scr-in, #s3 .scr-in, #s4 .scr-in { --pad-top: 45dvh; }
+/* ---------- Escala: todo un 19% más chico (menos el cubo) y poco aire entre secciones ---------- */
+:root { --z: .81; --cy: 35%; }
+.top, .rail, .clock { zoom: var(--z); }
+.scr-in { zoom: var(--z); padding-top: calc(var(--pad-top) / var(--z)); --pad-top: 45dvh; }
+.scr-in::before { top: calc(var(--pad-top) / var(--z) - 26px); }
+.scr { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+/* la portada ocupa la pantalla; el resto se pega una tras otra */
+.scr:not(#s1) { min-height: 0; padding-bottom: 12px; }
+#s2 .scr-in, #s3 .scr-in, #s4 .scr-in, #s5 .scr-in, #s6 .scr-in { --pad-top: 9dvh; }
+#s6 { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 @media (min-width: 1024px) {
   :root { --cy: 49%; }
-  .scr { padding-bottom: 64px; }
+  .scr { padding-bottom: 40px; }
+  .scr:not(#s1) { padding-bottom: 12px; }
   .scr-in { --pad-top: 10vh; }
-  #s2 .scr-in, #s3 .scr-in, #s4 .scr-in { --pad-top: 10vh; }
-  .scr-in::before { top: calc(var(--pad-top) / .9 - 32px); }
+  #s2 .scr-in, #s3 .scr-in, #s4 .scr-in, #s5 .scr-in, #s6 .scr-in { --pad-top: 9vh; }
+  .scr-in::before { top: calc(var(--pad-top) / var(--z) - 32px); }
+  #s6 { padding-bottom: 18vh; }
+}
+
+/* ---------- Vidrio vivo: un reflejo cruza cada tarjeta, como la luz por el cubo ---------- */
+.card { background: rgba(8,8,12,.44); }
+.works { background: rgba(8,8,12,.42); }
+.card::after, .flip-face::after, .cv::after, .works li::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(105deg, transparent 38%, rgba(214,204,255,.10) 46%, rgba(255,255,255,.16) 50%, rgba(214,204,255,.08) 54%, transparent 62%);
+  transform: translateX(-110%); animation: glint 9s cubic-bezier(.45,0,.2,1) infinite; animation-delay: calc(var(--i, 0) * 1.1s + 1.2s);
+  animation-play-state: paused;
+}
+.works li { overflow: hidden; }
+.cv, .flip-face { overflow: hidden; }
+.scr.is-active .card::after, .scr.is-active .flip-face::after, .scr.is-active .cv::after, .scr.is-active .works li::after { animation-play-state: running; }
+@keyframes glint { 0% { transform: translateX(-110%); } 16%, 100% { transform: translateX(110%); } }
+/* el borde respira apenas mientras la sección está activa */
+.card, .cv, .flip-face { --edge: rgba(255,255,255,.14); }
+.scr.is-active .cards .card, .scr.is-active .cv { animation: edge 6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -1.5s); }
+@keyframes edge { 0%, 100% { border-color: rgba(255,255,255,.12); } 50% { border-color: rgba(185,166,255,.34); } }
+/* en desktop, una luz sigue al puntero dentro del vidrio */
+@media (hover: hover) and (pointer: fine) {
+  .card::before, .cv::before {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: inherit; opacity: 0;
+    background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgba(185,166,255,.14), transparent 70%);
+    transition: opacity 300ms ease;
+  }
+  .card:hover::before, .cv:hover::before { opacity: 1; }
+}
+.is-paused .card::after, .is-paused .flip-face::after, .is-paused .cv::after, .is-paused .works li::after, .is-paused .card, .is-paused .cv { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  .card::after, .flip-face::after, .cv::after, .works li::after { animation: none; display: none; }
+  .scr.is-active .cards .card, .scr.is-active .cv { animation: none; }
 }
 
 /* ---------- Preferencias ---------- */
