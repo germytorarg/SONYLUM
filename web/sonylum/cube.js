@@ -113,10 +113,10 @@ if (renderer) {
       spec+=0.6*specularTerm(n,eye,normalize(vec3(1.0,1.0,-1.0)),uShininess*0.6,uDiffuseness*0.5);
       color+=spec*(uBackside>0.5?0.35:1.0);
       float f=pow(1.0+dot(eye,n),uFresnelPower);
-      color=mix(color,vec3(0.86,0.8,1.0),f*(uBackside>0.5?0.2:0.42));
-      // vidrio violáceo y algo más oscuro, como el original
-      color*=vec3(0.78,0.7,0.98);
-      color+=vec3(0.035,0.012,0.07);
+      color=mix(color,vec3(1.0),f*(uBackside>0.5?0.25:0.55));
+      // vidrio transparente como el original de /stack, con un tono violáceo suave
+      color*=vec3(0.95,0.92,1.0);
+      color+=vec3(0.014,0.006,0.026);
       gl_FragColor=vec4(color,1.0);
       #include <colorspace_fragment>
     }`;
@@ -150,8 +150,9 @@ if (renderer) {
   }
   // Cubo facetado tipo gema: caras grandes, biseles planos en cada arista y un triángulo en cada esquina.
   // Es el respaldo; en el dominio real se reemplaza por el modelo original de /stack.
+  // Cubo bien cuadrado: caras planas grandes y un bisel fino y plano en cada arista y esquina.
   function facetedCube() {
-    const pts = [], v = [1, 0.9, 0.64];
+    const pts = [], v = [1, 0.955, 0.955];
     const perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
     for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) for (const p of perms) {
       pts.push(new THREE.Vector3(sx * v[p[0]], sy * v[p[1]], sz * v[p[2]]));
@@ -199,7 +200,7 @@ if (renderer) {
     bgCtx.textAlign = "center";
     bgCtx.textBaseline = "alphabetic";
     bgCtx.globalAlpha = alpha;
-    bgCtx.fillStyle = "#cfc9e3";
+    bgCtx.fillStyle = "#e9e9e9";
     const cx = W * P.x, cy = H * P.y, gap = fs * 0.92, cap = fs * 0.7;
     bgCtx.fillText(list[0], cx, cy + cap / 2 - gap / 2);
     if (list[1]) bgCtx.fillText(list[1], cx, cy + cap / 2 + gap / 2);
@@ -217,8 +218,8 @@ if (renderer) {
     drawWords(words, e, P, W, H);
     const cx = W * P.x, cy = H * P.y;
     const grad = bgCtx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.42);
-    grad.addColorStop(0, "rgba(124,92,255,0.12)");
-    grad.addColorStop(1, "rgba(124,92,255,0)");
+    grad.addColorStop(0, "rgba(104,66,255,0.08)");
+    grad.addColorStop(1, "rgba(104,66,255,0)");
     bgCtx.globalCompositeOperation = "screen";
     bgCtx.fillStyle = grad;
     bgCtx.fillRect(0, 0, W, H);
