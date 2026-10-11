@@ -113,8 +113,10 @@ if (renderer) {
       spec+=0.6*specularTerm(n,eye,normalize(vec3(1.0,1.0,-1.0)),uShininess*0.6,uDiffuseness*0.5);
       color+=spec*(uBackside>0.5?0.35:1.0);
       float f=pow(1.0+dot(eye,n),uFresnelPower);
-      color=mix(color,vec3(1.0),f*(uBackside>0.5?0.25:0.55));
-      color+=vec3(0.006);
+      color=mix(color,vec3(0.86,0.8,1.0),f*(uBackside>0.5?0.2:0.42));
+      // vidrio violáceo y algo más oscuro, como el original
+      color*=vec3(0.78,0.7,0.98);
+      color+=vec3(0.035,0.012,0.07);
       gl_FragColor=vec4(color,1.0);
       #include <colorspace_fragment>
     }`;
@@ -148,15 +150,16 @@ if (renderer) {
   }
   // Cubo facetado tipo gema: caras grandes, biseles planos en cada arista y un triángulo en cada esquina.
   // Es el respaldo; en el dominio real se reemplaza por el modelo original de /stack.
-  function facetedCube(c = 0.2) {
-    const pts = [], a = 1, b = 1 - c;
-    for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) {
-      pts.push(new THREE.Vector3(sx * b, sy * b, sz * a), new THREE.Vector3(sx * b, sy * a, sz * b), new THREE.Vector3(sx * a, sy * b, sz * b));
+  function facetedCube() {
+    const pts = [], v = [1, 0.9, 0.64];
+    const perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) for (const p of perms) {
+      pts.push(new THREE.Vector3(sx * v[p[0]], sy * v[p[1]], sz * v[p[2]]));
     }
     const g = new ConvexGeometry(pts);
     return g.index ? g.toNonIndexed() : g;
   }
-  attach(facetedCube(0.2));
+  attach(facetedCube());
 
   // El modelo original de /stack reemplaza al cubo procedural cuando termina de cargar.
   const loadModel = () => new GLTFLoader().load(MODEL_URL, (gltf) => {
@@ -183,8 +186,8 @@ if (renderer) {
 
   function placement() {
     const W = innerWidth, H = innerHeight;
-    return DESKTOP || W >= 1024 ? { x: 0.77, y: 0.45, size: Math.min(H * 0.36, W * 0.22), font: Math.min(H * 0.22, W * 0.11), maxW: W * 0.38 }
-                                : { x: 0.5, y: 0.25, size: Math.min(H * 0.27, W * 0.56), font: Math.min(H * 0.14, W * 0.23), maxW: W * 0.86 };
+    return DESKTOP || W >= 1024 ? { x: 0.72, y: 0.45, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.18, W * 0.09), maxW: W * 0.34 }
+                                : { x: 0.5, y: 0.24, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;
@@ -196,7 +199,7 @@ if (renderer) {
     bgCtx.textAlign = "center";
     bgCtx.textBaseline = "alphabetic";
     bgCtx.globalAlpha = alpha;
-    bgCtx.fillStyle = "#d9d9de";
+    bgCtx.fillStyle = "#cfc9e3";
     const cx = W * P.x, cy = H * P.y, gap = fs * 0.92, cap = fs * 0.7;
     bgCtx.fillText(list[0], cx, cy + cap / 2 - gap / 2);
     if (list[1]) bgCtx.fillText(list[1], cx, cy + cap / 2 + gap / 2);
@@ -214,8 +217,8 @@ if (renderer) {
     drawWords(words, e, P, W, H);
     const cx = W * P.x, cy = H * P.y;
     const grad = bgCtx.createRadialGradient(cx, cy, 0, cx, cy, Math.min(W, H) * 0.42);
-    grad.addColorStop(0, "rgba(255,255,255,0.05)");
-    grad.addColorStop(1, "rgba(255,255,255,0)");
+    grad.addColorStop(0, "rgba(124,92,255,0.12)");
+    grad.addColorStop(1, "rgba(124,92,255,0)");
     bgCtx.globalCompositeOperation = "screen";
     bgCtx.fillStyle = grad;
     bgCtx.fillRect(0, 0, W, H);
@@ -267,7 +270,7 @@ if (renderer) {
 
   // Tocar o arrastrar el cubo: gira loco. Solo se activa sobre el cubo, el resto de la página scrollea normal.
   function onCube(x, y, target) {
-    if (target && target.closest && target.closest("a,button,input,label,.card,.works,.caps,.peek,.vault,.rail,.top")) return false;
+    if (target && target.closest && target.closest("a,button,input,label,.card,.works,.caps,.cv,.peek,.rail,.top")) return false;
     const dx = x - innerWidth * pos.x, dy = y - innerHeight * pos.y;
     return Math.hypot(dx, dy) < pos.size * 0.85;
   }
@@ -297,7 +300,6 @@ if (renderer) {
     }
     velX = Math.max(-1.4, Math.min(1.4, velX)); velY = Math.max(-1.2, Math.min(1.2, velY));
     idleSince = performance.now();
-    dispatchEvent(new CustomEvent("sony:cubetap"));
     drag = null;
     document.documentElement.classList.remove("cube-grab");
   }

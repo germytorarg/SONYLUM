@@ -91,8 +91,8 @@
     peekFor = card;
     peekUrl.textContent = peekFbUrl.textContent = card.dataset.site;
     peekName.textContent = card.dataset.name;
-    peekFbImg.src = card.dataset.img || $("img", card).getAttribute("src");
-    peekGo.href = card.dataset.href || card.href;
+    peekFbImg.src = $("img", card).getAttribute("src");
+    peekGo.href = card.href;
     peek.classList.toggle("is-touch", !!touch);
     peek.hidden = false;
     loadShot(card);
@@ -123,19 +123,6 @@
       openPeek(card, true);
     });
   });
-  /* al tocar el cubo: lista de webs; cada una abre su vista previa */
-  var vault = $("#vault");
-  function closeVault() { vault.hidden = true; $$(".vault-item").forEach(function (b) { b.setAttribute("aria-pressed", "false"); }); }
-  addEventListener("sony:cubetap", function () { if (vault.hidden) vault.hidden = false; });
-  $("#vaultClose").addEventListener("click", function () { closeVault(); closePeek(); });
-  $$(".vault-item").forEach(function (item) {
-    item.addEventListener("click", function () {
-      var again = peekFor === item && !peek.hidden;
-      $$(".vault-item").forEach(function (b) { b.setAttribute("aria-pressed", String(b === item && !again)); });
-      if (again) { closePeek(); return; }
-      openPeek(item, true);
-    });
-  });
   $("#peekClose").addEventListener("click", closePeek);
-  addEventListener("keydown", function (e) { if (e.key === "Escape") { closePeek(); closeVault(); } });
+  addEventListener("keydown", function (e) { if (e.key === "Escape") closePeek(); });
 })();
