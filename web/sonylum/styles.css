@@ -494,6 +494,16 @@ main { position: relative; z-index: 10; }
 @media (hover: hover) and (pointer: fine) { .card:hover .card-logo { opacity: 1; } }
 @media (max-width: 767px) { .card-logo { height: calc(var(--lh) * 1.15); opacity: .8; } }
 
+/* ---------- Botón de música ---------- */
+.top-ctl { display: flex; align-items: center; gap: 14px; }
+.snd { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px 0 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--fg-2); font-size: calc(11px / var(--z)); font-weight: 500; letter-spacing: .18em; text-transform: uppercase; background: rgba(10, 8, 18, .35); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: color 200ms ease, border-color 200ms ease, background-color 200ms ease; }
+.snd .ph { font-size: 16px; }
+.snd::after { content: ""; position: absolute; inset: -6px -2px; }
+.snd.is-on { color: var(--fg); border-color: rgba(167,139,250,.55); background: rgba(124,92,255,.16); }
+.snd:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) { .snd:hover { color: var(--fg); border-color: rgba(255,255,255,.3); } }
+@media (max-width: 420px) { .snd span { display: none; } .snd { padding: 0 9px; } }
+
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {

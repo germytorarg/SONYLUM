@@ -338,6 +338,8 @@ if (renderer) {
 
   let last = performance.now(), presented = 0, paused = false;
   window.addEventListener("sony:motion", (e) => { paused = !e.detail; });
+  // con la música encendida, cada bombo le da un empujón al cubo
+  window.addEventListener("sony:beat", () => { if (!paused && !reduce && !drag) { velY += 0.014; velX += 0.004; } });
   function loop(now) {
     requestAnimationFrame(loop);
     if (document.hidden) return;

@@ -19,7 +19,10 @@
 
 <header class="top">
   <a class="logo" href="#s1" aria-label="Sonylum, inicio"><i class="logo-mark" aria-hidden="true"></i><b>SONYLUM</b><span>estudio</span></a>
-  <button class="eq" id="motionBtn" type="button" aria-pressed="true" aria-label="Pausar movimiento"><i></i><i></i><i></i></button>
+  <div class="top-ctl">
+    <button class="snd" id="soundBtn" type="button" aria-pressed="false" aria-label="Escuchar techno"><i class="ph ph-speaker-simple-slash" aria-hidden="true"></i><span>Techno</span></button>
+    <button class="eq" id="motionBtn" type="button" aria-pressed="true" aria-label="Pausar movimiento"><i></i><i></i><i></i></button>
+  </div>
 </header>
 
 <!-- El cubo de vidrio de sonylum.ar/stack, fijo detrás de todo -->
@@ -207,5 +210,6 @@
 
 <script src="main.js"></script>
 <script type="module" src="cube.js"></script>
+<script src="audio.js" defer></script>
 </body>
 </html>

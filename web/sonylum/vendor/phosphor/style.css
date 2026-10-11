@@ -49,3 +49,9 @@
 .ph.ph-x:before {
   content: "\e4f6";
 }
+.ph.ph-speaker-simple-high:before {
+  content: "\e450";
+}
+.ph.ph-speaker-simple-slash:before {
+  content: "\e456";
+}
