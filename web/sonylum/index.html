@@ -94,10 +94,10 @@
       <p class="eyebrow"><i></i><b>03</b>Capacidades · Sin cajitas</p>
       <h2 class="hd"><span>Pensamos el</span><span>sistema.</span><strong>Después lo <span class="nw">hacemos.<i class="pt" aria-hidden="true"></i></span></strong></h2>
       <ol class="caps">
-        <li><b>01</b><span class="cap-ico" aria-hidden="true"><i class="ph ph-code"></i></span><div><h3>Producto digital</h3><p>Arquitectura, UX/UI, desarrollo, performance y deploy.</p></div></li>
-        <li><b>02</b><span class="cap-ico" aria-hidden="true"><i class="ph ph-brain"></i></span><div><h3>Inteligencia artificial</h3><p>Prompts de precisión, agentes, automatizaciones y flujos creativos.</p></div></li>
-        <li><b>03</b><span class="cap-ico" aria-hidden="true"><i class="ph ph-film-slate"></i></span><div><h3>Dirección visual</h3><p>Concepto, cámara, narrativa, motion y producción de contenido 9:16.</p></div></li>
-        <li><b>04</b><span class="cap-ico" aria-hidden="true"><i class="ph ph-trend-up"></i></span><div><h3>Marca y crecimiento</h3><p>Identidad, mensajes, SEO/SEM y activación comercial.</p></div></li>
+        <li><b>01</b><div><h3>Producto digital</h3><p>Arquitectura, UX/UI, desarrollo, performance y deploy.</p></div></li>
+        <li><b>02</b><div><h3>Inteligencia artificial</h3><p>Prompts de precisión, agentes, automatizaciones y flujos creativos.</p></div></li>
+        <li><b>03</b><div><h3>Dirección visual</h3><p>Concepto, cámara, narrativa, motion y producción de contenido 9:16.</p></div></li>
+        <li><b>04</b><div><h3>Marca y crecimiento</h3><p>Identidad, mensajes, SEO/SEM y activación comercial.</p></div></li>
       </ol>
     </div>
   </section>
@@ -107,14 +107,14 @@
     <div class="scr-in">
       <p class="eyebrow"><i></i><b>04</b>Proyectos</p>
       <h2 class="hd"><span>Ideas que</span><span>salieron</span><strong>de la <span class="nw">pantalla.<i class="pt" aria-hidden="true"></i></span></strong></h2>
-      <div class="finder">
-        <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-        <label class="sr-only" for="q">Buscar proyecto</label>
-        <input id="q" type="search" placeholder="Buscar proyecto" autocomplete="off" enterkeyhint="search">
-        <span class="finder-count" id="qCount" aria-live="polite"></span>
-      </div>
-      <ol class="works" id="works"></ol>
-      <p class="works-empty" id="worksEmpty" hidden></p>
+      <ol class="works">
+        <li><small>Imp / Exp</small><b>TERRACOMEX</b><span>Plataforma e identidad digital.</span><em>01</em></li>
+        <li><small>Directorio</small><b>RADAR COMERCIAL</b><span>Producto, búsqueda y territorio.</span><em>02</em></li>
+        <li><small>Gastronomía</small><b>FILOMENA</b><span>Presencia web y conversión.</span><em>03</em></li>
+        <li><small>Restaurant</small><b>BARAKUS</b><span>Marca, menú y experiencia.</span><em>04</em></li>
+        <li><small>Turismo</small><b>CHECK-IN PATAGONIA</b><span>Rediseño premium y reservas.</span><em>05</em></li>
+        <li><small>Evento</small><b>LA INVITACIÓN</b><span>Una boda convertida en interfaz.</span><em>06</em></li>
+      </ol>
     </div>
   </section>
 
@@ -126,10 +126,10 @@
       <p class="lead">Fundador de SONYLUM. Estrategia, código, inteligencia artificial y cámara. Todo mi recorrido está acá.</p>
       <div class="cvs">
         <a class="cv" href="https://cvger.netlify.app" target="_blank" rel="noopener">
-          <img class="cv-face" src="assets/img/german.jpg" alt="" loading="lazy"><small>Currículum</small><b>CVGER</b><span>cvger.netlify.app</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+          <img class="cv-face" src="assets/img/german.jpg" alt="" loading="lazy"><small>CV / Stack</small><b>CVGER</b><span>cvger.netlify.app</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
         </a>
-        <a class="cv" href="https://ger.sonylum.ar" target="_blank" rel="noopener">
-          <img class="cv-face" src="assets/img/german.jpg" alt="" loading="lazy"><small>Stack técnico</small><b>Stack</b><span>ger.sonylum.ar</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
+        <a class="cv" href="https://german.sonylum.ar" target="_blank" rel="noopener">
+          <img class="cv-face" src="assets/img/german.jpg" alt="" loading="lazy"><small>Currículum</small><b>Germán Ferri</b><span>german.sonylum.ar</span><i class="ph ph-arrow-up-right" aria-hidden="true"></i>
         </a>
       </div>
     </div>
@@ -150,20 +150,6 @@
   </section>
 </main>
 
-<!-- modal de proyecto -->
-<dialog class="pm" id="pm" aria-labelledby="pmTitle">
-  <div class="pm-card">
-    <div class="pm-top"><small id="pmCat">Rubro</small><em id="pmNum">01</em><button type="button" class="pm-x" id="pmClose" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button></div>
-    <div class="pm-shot" id="pmShot"><img id="pmImg" alt=""><b id="pmPoster">Proyecto</b></div>
-    <h3 id="pmTitle">Proyecto</h3>
-    <p id="pmDesc"></p>
-    <div class="pm-actions">
-      <a class="pill pill-solid" id="pmGo" href="#" target="_blank" rel="noopener">Abrir sitio <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
-      <a class="pill" id="pmAsk" href="#" target="_blank" rel="noopener">Consultar <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
-    </div>
-  </div>
-</dialog>
-
 <!-- vista previa del sitio -->
 <div class="peek" id="peek" role="dialog" aria-label="Vista previa del sitio" hidden>
   <div class="peek-bar"><i></i><i></i><i></i><span id="peekUrl">sonylum.ar</span><button type="button" id="peekClose" aria-label="Cerrar vista previa"><i class="ph ph-x" aria-hidden="true"></i></button></div>
@@ -174,7 +160,6 @@
   <a class="pill pill-solid peek-go" id="peekGo" href="https://sonylum.ar" target="_blank" rel="noopener">Abrir sitio <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>
 </div>
 
-<script src="projects.js"></script>
 <script src="main.js"></script>
 <script type="module" src="cube.js"></script>
 </body>

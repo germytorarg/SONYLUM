@@ -271,8 +271,7 @@ if (renderer) {
 
   // Tocar o arrastrar el cubo: gira loco. Solo se activa sobre el cubo, el resto de la página scrollea normal.
   function onCube(x, y, target) {
-    if (target && target.closest && target.closest("a,button,input,label,.card,.works,.finder,.caps,.cv,.peek,.rail,.top")) return false;
-    if (document.querySelector("dialog[open]")) return false;
+    if (target && target.closest && target.closest("a,button,input,label,.card,.works,.caps,.cv,.peek,.rail,.top")) return false;
     const dx = x - innerWidth * pos.x, dy = y - innerHeight * pos.y;
     return Math.hypot(dx, dy) < pos.size * 0.85;
   }
