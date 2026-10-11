@@ -122,24 +122,36 @@
     peek.style.translate = x.toFixed(1) + "px " + y.toFixed(1) + "px";
     pRaf = requestAnimationFrame(follow);
   }
-  /* cada web del ecosistema se abre en vivo dentro de un modal */
+  $$(".card").forEach(function (card) {
+    card.addEventListener("mouseenter", function () { if (finePointer) openPeek(card, false); });
+    card.addEventListener("mouseleave", function () { if (finePointer) closePeek(); });
+    card.addEventListener("click", function (e) {
+      if (finePointer && lastPointer === "mouse") return;      // en desktop el click abre el sitio
+      if (peekFor === card && !peek.hidden) return;            // segundo toque: ir al sitio
+      e.preventDefault();
+      closePeek();
+      card.classList.add("is-lit");
+      openPeek(card, true);
+    });
+  });
+
+  /* proyectos: cada uno abre su sitio en vivo dentro de un modal */
   var sm = $("#sm"), smFrame = $("#smFrame"), smWait = $("#smWait");
-  function openSite(card) {
-    var logo = $(".card-logo", card);
-    $("#smLogo").src = logo ? logo.getAttribute("src") : "";
-    $("#smName").textContent = card.dataset.name;
-    $("#smUrl").textContent = card.dataset.site;
-    $("#smOpen").href = card.href;
+  function openSite(btn) {
+    var url = btn.dataset.url;
+    if (!url) return;
+    $("#smLogo").removeAttribute("src");
+    $("#smName").textContent = btn.dataset.name;
+    $("#smUrl").textContent = url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    $("#smOpen").href = url;
     smWait.hidden = false;
     smFrame.onload = function () { smWait.hidden = true; };
-    smFrame.src = card.href;
+    smFrame.src = url;
     if (typeof sm.showModal === "function") sm.showModal(); else sm.setAttribute("open", "");
   }
   function closeSite() { if (sm.open) sm.close(); }
   sm.addEventListener("close", function () { smFrame.src = "about:blank"; });
-  $$(".card[data-site]").forEach(function (card) {
-    card.addEventListener("click", function (e) { e.preventDefault(); openSite(card); });
-  });
+  $$(".work-open").forEach(function (b) { b.addEventListener("click", function () { openSite(b); }); });
   $("#smClose").addEventListener("click", closeSite);
   sm.addEventListener("click", function (e) { if (e.target === sm) closeSite(); });
 
