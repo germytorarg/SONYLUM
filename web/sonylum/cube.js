@@ -189,8 +189,8 @@ if (renderer) {
   function placement() {
     const W = innerWidth, H = innerHeight;
     if (window.sonyPlace) return window.sonyPlace(W, H);   // solo para generar la imagen OG
-    return DESKTOP || W >= 1024 ? { x: 0.75, y: 0.5, size: Math.min(H * 0.34, W * 0.2), font: Math.min(H * 0.13, W * 0.078), maxW: W * 0.46, below: H * 0.19 + 40 }
-                                : { x: 0.5, y: window.sonyHeroY || 0.25, size: Math.min(H * 0.25, W * 0.52), font: Math.min(H * 0.15, W * 0.24), maxW: W * 0.9 };
+    return DESKTOP || W >= 1024 ? { x: 0.75, y: 0.5, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.1, W * 0.06), maxW: W * 0.4, below: H * 0.17 + 40 }
+                                : { x: 0.5, y: window.sonyHeroY || 0.25, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
   }
   function drawWords(list, alpha, P, W, H) {
     if (!list || alpha <= 0) return;
