@@ -571,9 +571,9 @@ main { position: relative; z-index: 10; }
 .fallback-cube { top: 0; transform: translate(-50%, calc(var(--cy) - 50%)) rotateX(58deg) rotateZ(45deg); }
 @media (min-width: 1024px) {
   :root { --cy: 50dvh; }
-  .c1 { translate: 0 calc(var(--cy) - 17vh - 50%); }
-  .c2 { translate: 0 calc(var(--cy) + 17vh - 50%); }
-  .badge { translate: -50% calc(var(--cy) - 24vh); }
+  .c1 { translate: 0 calc(var(--cy) - 20vh - 50%); }
+  .c2 { translate: 0 calc(var(--cy) + 20vh - 50%); }
+  .badge { translate: -50% calc(var(--cy) - 27vh); }
 }
 
 /* títulos de tarjeta como h3 para buscadores, sin cambiar el dibujo */
