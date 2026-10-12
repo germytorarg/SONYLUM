@@ -1,3 +1,61 @@
+@font-face {
+  font-family: "Phosphor";
+  src: url("vendor/phosphor/Phosphor.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.ph {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "Phosphor" !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Enable Ligatures ================ */
+  letter-spacing: 0;
+  -webkit-font-feature-settings: "liga";
+  -moz-font-feature-settings: "liga=1";
+  -moz-font-feature-settings: "liga";
+  -ms-font-feature-settings: "liga" 1;
+  font-feature-settings: "liga";
+  -webkit-font-variant-ligatures: discretionary-ligatures;
+  font-variant-ligatures: discretionary-ligatures;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ph.ph-arrow-up-right:before {
+  content: "\e092";
+}
+.ph.ph-brain:before {
+  content: "\e74e";
+}
+.ph.ph-code:before {
+  content: "\e1bc";
+}
+.ph.ph-film-slate:before {
+  content: "\e8c2";
+}
+.ph.ph-trend-up:before {
+  content: "\e4ae";
+}
+.ph.ph-x:before {
+  content: "\e4f6";
+}
+.ph.ph-speaker-simple-high:before {
+  content: "\e450";
+}
+.ph.ph-speaker-simple-slash:before {
+  content: "\e456";
+}
+
 /* SONYLUM, sistema en línea. Negro profundo, tipografía fina con remate negro, un cuadrado de vidrio que orbita. */
 
 @font-face { font-family: "JetBrains Mono"; src: url("vendor/fonts/JetBrainsMono-var.woff2") format("woff2"); font-weight: 100 800; font-style: normal; font-display: swap; }
@@ -503,6 +561,23 @@ main { position: relative; z-index: 10; }
 .snd:active { transform: scale(.97); }
 @media (hover: hover) and (pointer: fine) { .snd:hover { color: var(--fg); border-color: rgba(255,255,255,.3); } }
 @media (max-width: 420px) { .snd span { display: none; } .snd { padding: 0 9px; } }
+
+/* ---------- Escenario del cubo: posición vertical con translate (moverlo no cuenta como corrimiento CLS) ---------- */
+:root { --cy: 25dvh; }
+.orbit { top: 0; translate: -50% calc(var(--cy) - 50%); }
+.c1 { top: 0; translate: 0 calc(var(--cy) - var(--spread, 12vh) - 50%); }
+.c2 { top: 0; translate: 0 calc(var(--cy) + var(--spread, 12vh) - 50%); }
+.badge { top: 0; translate: -50% calc(var(--cy) - 19vh); }
+.fallback-cube { top: 0; transform: translate(-50%, calc(var(--cy) - 50%)) rotateX(58deg) rotateZ(45deg); }
+@media (min-width: 1024px) {
+  :root { --cy: 50dvh; }
+  .c1 { translate: 0 calc(var(--cy) - 17vh - 50%); }
+  .c2 { translate: 0 calc(var(--cy) + 17vh - 50%); }
+  .badge { translate: -50% calc(var(--cy) - 24vh); }
+}
+
+/* títulos de tarjeta como h3 para buscadores, sin cambiar el dibujo */
+.ht { display: contents; margin: 0; font: inherit; }
 
 /* ---------- Preferencias ---------- */
 .is-paused .orbit, .is-paused .chips-track { animation-play-state: paused; }
