@@ -1,0 +1,34 @@
+# SONYLUM Estudio
+
+> Estudio digital de Germán Ferri en Villa Luro, Buenos Aires (Argentina). Estrategia, desarrollo web, inteligencia artificial, branding y producción audiovisual vertical.
+
+Sitio: https://soy.sonylum.ar/
+Sitio principal: https://sonylum.ar/
+Contacto: german@sonylum.ar · WhatsApp +54 9 11 5765-2200
+Redes: https://instagram.com/sonylumarg · https://tiktok.com/@sonylumarg · https://ar.linkedin.com/in/grferri
+
+## Capacidades
+- Producto digital: arquitectura, UX/UI, desarrollo, performance y deploy de sitios web.
+- Inteligencia artificial: prompts, agentes, automatizaciones y flujos creativos.
+- Dirección visual: concepto, cámara, narrativa, motion y contenido vertical 9:16.
+- Marca y crecimiento: identidad, mensajes, SEO/SEM y activación comercial.
+
+## Ecosistema
+- [SONYLUM](https://sonylum.ar): web, UX, branding, SEO, automatización e IA.
+- [Creando Contenidos](https://creandocontenidos.ar): producción vertical, campañas y piezas para redes.
+- [LocalBA](https://localba.ar): turismo receptivo y recorridos por Buenos Aires.
+- [Tefilmo](https://tefilmo.ar): bodas filmadas en vertical, invitaciones y recuerdos.
+
+## Proyectos
+- [Terracomex](https://terracomex.netlify.app/): importación y exportación. Plataforma e identidad digital.
+- [Radar Comercial](https://radarcomercial.com.ar/): directorio. Producto, búsqueda y territorio.
+- [Filomena](https://filomenabar.netlify.app/): gastronomía. Presencia web y conversión.
+- [Barakus](https://barakus.ar/): restaurante. Marca, menú y experiencia.
+- [Check-in Patagonia](https://checkinpatagonia.netlify.app/): turismo. Rediseño premium y reservas.
+- [La Invitación](https://lainvitacion.sonylum.ar/): evento. Una boda convertida en interfaz.
+- [Todos los proyectos (56)](https://sonylum.ar/#proyectos)
+
+## Germán Ferri
+- Fundador de SONYLUM.
+- Currículum: https://cvger.netlify.app
+- Stack técnico: https://ger.sonylum.ar
