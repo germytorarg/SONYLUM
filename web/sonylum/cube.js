@@ -188,6 +188,7 @@ if (renderer) {
 
   function placement() {
     const W = innerWidth, H = innerHeight;
+    if (window.sonyPlace) return window.sonyPlace(W, H);   // solo para generar la imagen OG
     return DESKTOP || W >= 1024 ? { x: 0.75, y: 0.5, size: Math.min(H * 0.27, W * 0.16), font: Math.min(H * 0.1, W * 0.06), maxW: W * 0.4, below: H * 0.17 + 40 }
                                 : { x: 0.5, y: window.sonyHeroY || 0.25, size: Math.min(H * 0.2, W * 0.42), font: Math.min(H * 0.12, W * 0.19), maxW: W * 0.76 };
   }
