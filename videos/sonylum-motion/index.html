@@ -28,244 +28,758 @@
         --display: "Archivo Black", sans-serif;
         --serif: "Cormorant Garamond", serif;
       }
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      html,
-      body {
-        width: 1080px;
-        height: 1920px;
-        overflow: hidden;
-        background: var(--ink);
-      }
-      #root {
-        position: relative;
-        width: 1080px;
-        height: 1920px;
-        overflow: hidden;
-        background: var(--ink);
-      }
-      .clip {
-        position: absolute;
-        inset: 0;
-        overflow: hidden;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); }
+      .clip { position: absolute; inset: 0; overflow: hidden; }
+      .fx-svg { position: absolute; left: 0; top: 0; overflow: visible; }
+      .layer { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      .cmp { position: absolute; width: 28px; height: 28px; background: var(--bordo-hi); display: block; }
       .scene-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        padding: 160px 80px;
-        gap: 24px;
+        position: relative;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        width: 100%; height: 100%; padding: 160px 80px; gap: 24px;
       }
       .slam {
-        font-family: var(--display);
-        color: var(--bone);
-        line-height: 0.9;
-        text-transform: uppercase;
-        letter-spacing: -0.02em;
-        display: block;
+        font-family: var(--display); color: var(--bone); line-height: 0.9;
+        text-transform: uppercase; letter-spacing: -0.03em; display: block; white-space: nowrap;
       }
 
       /* A — scroll infinito */
-      #scene-scroll {
-        background: var(--ink);
-      }
-      #scroll-stack {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .scroll-word {
-        font-family: var(--display);
-        font-size: 230px;
-        line-height: 1;
-        letter-spacing: -0.02em;
-        color: var(--bone);
-        opacity: 0.9;
-      }
-      .scroll-word.outline {
-        color: var(--ink);
-        -webkit-text-stroke: 3px var(--gold);
-        opacity: 1;
-      }
+      #scroll-stack { position: absolute; left: 0; top: 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
+      .scroll-word { font-family: var(--display); font-size: 236px; line-height: 1; letter-spacing: -0.03em; color: var(--bone); }
+      .scroll-word.outline { color: var(--ink); -webkit-text-stroke: 4px var(--gold); }
+      #scroll-geo { position: absolute; inset: 0; }
 
       /* B — FRENÁ. */
-      #scene-frena {
-        background: var(--bordo);
-      }
-      #frena-text {
-        font-size: 230px;
-        white-space: nowrap;
-      }
+      #scene-frena { background: var(--bordo); }
+      #frena-sq { position: absolute; left: 190px; top: 610px; width: 700px; height: 700px; background: var(--bordo-hi); }
+      #frena-sq2 { position: absolute; left: 90px; top: 510px; width: 900px; height: 900px; border: 8px solid var(--gold); }
+      #frena-text { font-size: 236px; }
 
       /* C — ESTO / NO SE */
-      #scene-esto {
-        background: var(--ink);
+      #scene-esto .scene-content { align-items: stretch; gap: 40px; }
+      #esto-text { font-size: 280px; align-self: flex-start; }
+      #nose-text { font-size: 280px; align-self: flex-end; color: var(--gold); }
+      #hazard {
+        position: absolute; left: -200px; top: 1290px; width: 1500px; height: 130px;
+        background: repeating-linear-gradient(-45deg, var(--gold) 0 34px, var(--ink) 34px 68px);
+        transform: rotate(-7deg);
       }
-      #scene-esto .scene-content {
-        align-items: stretch;
-        gap: 40px;
+      #hazard2 {
+        position: absolute; left: -200px; top: 470px; width: 1500px; height: 40px;
+        background: var(--bordo-hi); transform: rotate(-7deg);
       }
-      #esto-text {
-        font-size: 270px;
-        white-space: nowrap;
-        align-self: flex-start;
-      }
-      #nose-text {
-        font-size: 270px;
-        white-space: nowrap;
-        align-self: flex-end;
-        color: var(--gold);
+      .pop-dot { position: absolute; right: 60px; width: 26px; height: 26px; border-radius: 50%; background: var(--gold); display: block; }
+      #ghost-s {
+        position: absolute; left: -260px; top: 220px; font-family: var(--display); font-size: 1500px; line-height: 1;
+        color: var(--ink); -webkit-text-stroke: 4px var(--gold);
       }
 
-      /* D — SCROLLEA. */
-      #scene-scrollea {
-        background: var(--ink);
-      }
+      /* D — scrollea. */
       #scrollea-text {
-        font-family: var(--serif);
-        font-style: italic;
-        font-weight: 600;
-        font-size: 290px;
-        line-height: 1;
-        white-space: nowrap;
-        color: var(--gold-hi);
-        letter-spacing: -0.02em;
-        display: block;
+        font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 300px; line-height: 1;
+        white-space: nowrap; color: var(--gold-hi); letter-spacing: -0.02em; display: block;
       }
-      #scrollea-bar {
-        display: block;
-        width: 880px;
-        height: 26px;
-        background: var(--bordo-hi);
-        transform-origin: left center;
-      }
+      #scrollea-bar { display: block; width: 900px; height: 30px; background: var(--bordo-hi); transform-origin: left center; }
 
-      /* Transición — barras */
-      #scene-bars {
-        pointer-events: none;
-      }
-      #bars {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100%;
-      }
+      /* Transición — barras con letras */
+      #bars { display: flex; flex-direction: column; width: 100%; height: 100%; }
       .bar {
-        display: block;
-        width: 100%;
-        flex: 1;
-        background: var(--bordo);
+        display: flex; align-items: center; justify-content: center; width: 100%; flex: 1;
+        background: var(--bordo); overflow: hidden;
       }
-      .bar.gold {
-        background: var(--gold);
-      }
+      .bar b { font-family: var(--display); font-size: 250px; line-height: 1; color: var(--bone); display: block; }
+      .bar.gold { background: var(--gold); }
+      .bar.gold b { color: var(--ink); }
 
       /* E — logo */
-      #scene-logo {
-        background: radial-gradient(ellipse at 50% 46%, #1b1210 0%, var(--ink) 62%);
+      #scene-logo { background: radial-gradient(ellipse at 50% 50%, #22140f 0%, var(--ink) 60%); }
+      .ghost {
+        position: absolute; font-family: var(--display); line-height: 1; display: block;
+        color: var(--ink); -webkit-text-stroke: 3px var(--gold);
       }
-      #logo-push,
-      #logo-shake {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 36px;
-      }
+      #logo-push, #logo-shake { display: flex; flex-direction: column; align-items: center; gap: 34px; }
       #logo-word {
-        display: flex;
-        font-family: var(--serif);
-        font-weight: 700;
-        font-size: 190px;
-        line-height: 1;
-        color: var(--gold);
-        letter-spacing: 0.01em;
+        display: flex; font-family: var(--serif); font-weight: 700; font-size: 200px; line-height: 1;
+        color: var(--gold-hi); letter-spacing: -0.01em;
       }
-      #logo-word span {
-        display: inline-block;
-      }
-      #logo-rule {
-        display: block;
-        width: 640px;
-        height: 4px;
-        background: var(--gold);
-      }
+      #logo-word span { display: inline-block; }
+      #logo-rule { display: block; width: 700px; height: 8px; background: var(--gold); }
       #logo-tag {
-        font-family: var(--display);
-        font-size: 30px;
-        letter-spacing: 0.32em;
-        color: var(--bone);
-        opacity: 0.85;
-        text-transform: uppercase;
-        padding-left: 0.32em;
+        font-family: var(--display); font-size: 27px; letter-spacing: 0.26em; padding-left: 0.26em; white-space: nowrap;
+        color: var(--bone); text-transform: uppercase;
       }
 
-      /* capas */
-      #flash {
-        background: var(--gold-hi);
-        opacity: 0;
-        pointer-events: none;
+      /* capas globales */
+      #fx-dots svg { fill: var(--gold); }
+      #dots-wrap { position: absolute; inset: 0; opacity: 0.22; }
+      #frame-marks { pointer-events: none; }
+      .edge { position: absolute; background: var(--gold); display: block; }
+      .edge.h { left: 48px; right: 48px; height: 3px; }
+      .edge.v { top: 48px; bottom: 48px; width: 3px; }
+      .mark-label {
+        position: absolute; font-family: var(--display); font-size: 22px; letter-spacing: 0.25em;
+        color: var(--gold-hi); background: var(--ink); padding: 6px 12px;
       }
-      #vignette {
-        pointer-events: none;
-        background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
-      }
+      .speed { position: absolute; left: 0; background: var(--gold-hi); display: block; }
+      #flash { background: var(--gold-hi); opacity: 0; }
+      #vignette { background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,0.6) 100%); }
     </style>
   </head>
   <body>
-    <div
-      id="root"
-      data-composition-id="main"
-      data-start="0"
-      data-duration="7"
-      data-width="1080"
-      data-height="1920"
-    >
+    <div id="root" data-composition-id="main" data-start="0" data-duration="7" data-width="1080" data-height="1920">
+
+      <!-- Grilla de puntos global -->
+      <div id="fx-dots" class="clip" data-start="0" data-duration="7" data-track-index="4">
+        <div id="dots-wrap">
+          <svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="30" cy="0" r="3.2" />
+<circle cx="90" cy="0" r="3.2" />
+<circle cx="150" cy="0" r="3.2" />
+<circle cx="210" cy="0" r="3.2" />
+<circle cx="270" cy="0" r="3.2" />
+<circle cx="330" cy="0" r="3.2" />
+<circle cx="390" cy="0" r="3.2" />
+<circle cx="450" cy="0" r="3.2" />
+<circle cx="510" cy="0" r="3.2" />
+<circle cx="570" cy="0" r="3.2" />
+<circle cx="630" cy="0" r="3.2" />
+<circle cx="690" cy="0" r="3.2" />
+<circle cx="750" cy="0" r="3.2" />
+<circle cx="810" cy="0" r="3.2" />
+<circle cx="870" cy="0" r="3.2" />
+<circle cx="930" cy="0" r="3.2" />
+<circle cx="990" cy="0" r="3.2" />
+<circle cx="1050" cy="0" r="3.2" />
+<circle cx="1110" cy="0" r="3.2" />
+<circle cx="30" cy="60" r="3.2" />
+<circle cx="90" cy="60" r="3.2" />
+<circle cx="150" cy="60" r="3.2" />
+<circle cx="210" cy="60" r="3.2" />
+<circle cx="270" cy="60" r="3.2" />
+<circle cx="330" cy="60" r="3.2" />
+<circle cx="390" cy="60" r="3.2" />
+<circle cx="450" cy="60" r="3.2" />
+<circle cx="510" cy="60" r="3.2" />
+<circle cx="570" cy="60" r="3.2" />
+<circle cx="630" cy="60" r="3.2" />
+<circle cx="690" cy="60" r="3.2" />
+<circle cx="750" cy="60" r="3.2" />
+<circle cx="810" cy="60" r="3.2" />
+<circle cx="870" cy="60" r="3.2" />
+<circle cx="930" cy="60" r="3.2" />
+<circle cx="990" cy="60" r="3.2" />
+<circle cx="1050" cy="60" r="3.2" />
+<circle cx="1110" cy="60" r="3.2" />
+<circle cx="30" cy="120" r="3.2" />
+<circle cx="90" cy="120" r="3.2" />
+<circle cx="150" cy="120" r="3.2" />
+<circle cx="210" cy="120" r="3.2" />
+<circle cx="270" cy="120" r="3.2" />
+<circle cx="330" cy="120" r="3.2" />
+<circle cx="390" cy="120" r="3.2" />
+<circle cx="450" cy="120" r="3.2" />
+<circle cx="510" cy="120" r="3.2" />
+<circle cx="570" cy="120" r="3.2" />
+<circle cx="630" cy="120" r="3.2" />
+<circle cx="690" cy="120" r="3.2" />
+<circle cx="750" cy="120" r="3.2" />
+<circle cx="810" cy="120" r="3.2" />
+<circle cx="870" cy="120" r="3.2" />
+<circle cx="930" cy="120" r="3.2" />
+<circle cx="990" cy="120" r="3.2" />
+<circle cx="1050" cy="120" r="3.2" />
+<circle cx="1110" cy="120" r="3.2" />
+<circle cx="30" cy="180" r="3.2" />
+<circle cx="90" cy="180" r="3.2" />
+<circle cx="150" cy="180" r="3.2" />
+<circle cx="210" cy="180" r="3.2" />
+<circle cx="270" cy="180" r="3.2" />
+<circle cx="330" cy="180" r="3.2" />
+<circle cx="390" cy="180" r="3.2" />
+<circle cx="450" cy="180" r="3.2" />
+<circle cx="510" cy="180" r="3.2" />
+<circle cx="570" cy="180" r="3.2" />
+<circle cx="630" cy="180" r="3.2" />
+<circle cx="690" cy="180" r="3.2" />
+<circle cx="750" cy="180" r="3.2" />
+<circle cx="810" cy="180" r="3.2" />
+<circle cx="870" cy="180" r="3.2" />
+<circle cx="930" cy="180" r="3.2" />
+<circle cx="990" cy="180" r="3.2" />
+<circle cx="1050" cy="180" r="3.2" />
+<circle cx="1110" cy="180" r="3.2" />
+<circle cx="30" cy="240" r="3.2" />
+<circle cx="90" cy="240" r="3.2" />
+<circle cx="150" cy="240" r="3.2" />
+<circle cx="210" cy="240" r="3.2" />
+<circle cx="270" cy="240" r="3.2" />
+<circle cx="330" cy="240" r="3.2" />
+<circle cx="390" cy="240" r="3.2" />
+<circle cx="450" cy="240" r="3.2" />
+<circle cx="510" cy="240" r="3.2" />
+<circle cx="570" cy="240" r="3.2" />
+<circle cx="630" cy="240" r="3.2" />
+<circle cx="690" cy="240" r="3.2" />
+<circle cx="750" cy="240" r="3.2" />
+<circle cx="810" cy="240" r="3.2" />
+<circle cx="870" cy="240" r="3.2" />
+<circle cx="930" cy="240" r="3.2" />
+<circle cx="990" cy="240" r="3.2" />
+<circle cx="1050" cy="240" r="3.2" />
+<circle cx="1110" cy="240" r="3.2" />
+<circle cx="30" cy="300" r="3.2" />
+<circle cx="90" cy="300" r="3.2" />
+<circle cx="150" cy="300" r="3.2" />
+<circle cx="210" cy="300" r="3.2" />
+<circle cx="270" cy="300" r="3.2" />
+<circle cx="330" cy="300" r="3.2" />
+<circle cx="390" cy="300" r="3.2" />
+<circle cx="450" cy="300" r="3.2" />
+<circle cx="510" cy="300" r="3.2" />
+<circle cx="570" cy="300" r="3.2" />
+<circle cx="630" cy="300" r="3.2" />
+<circle cx="690" cy="300" r="3.2" />
+<circle cx="750" cy="300" r="3.2" />
+<circle cx="810" cy="300" r="3.2" />
+<circle cx="870" cy="300" r="3.2" />
+<circle cx="930" cy="300" r="3.2" />
+<circle cx="990" cy="300" r="3.2" />
+<circle cx="1050" cy="300" r="3.2" />
+<circle cx="1110" cy="300" r="3.2" />
+<circle cx="30" cy="360" r="3.2" />
+<circle cx="90" cy="360" r="3.2" />
+<circle cx="150" cy="360" r="3.2" />
+<circle cx="210" cy="360" r="3.2" />
+<circle cx="270" cy="360" r="3.2" />
+<circle cx="330" cy="360" r="3.2" />
+<circle cx="390" cy="360" r="3.2" />
+<circle cx="450" cy="360" r="3.2" />
+<circle cx="510" cy="360" r="3.2" />
+<circle cx="570" cy="360" r="3.2" />
+<circle cx="630" cy="360" r="3.2" />
+<circle cx="690" cy="360" r="3.2" />
+<circle cx="750" cy="360" r="3.2" />
+<circle cx="810" cy="360" r="3.2" />
+<circle cx="870" cy="360" r="3.2" />
+<circle cx="930" cy="360" r="3.2" />
+<circle cx="990" cy="360" r="3.2" />
+<circle cx="1050" cy="360" r="3.2" />
+<circle cx="1110" cy="360" r="3.2" />
+<circle cx="30" cy="420" r="3.2" />
+<circle cx="90" cy="420" r="3.2" />
+<circle cx="150" cy="420" r="3.2" />
+<circle cx="210" cy="420" r="3.2" />
+<circle cx="270" cy="420" r="3.2" />
+<circle cx="330" cy="420" r="3.2" />
+<circle cx="390" cy="420" r="3.2" />
+<circle cx="450" cy="420" r="3.2" />
+<circle cx="510" cy="420" r="3.2" />
+<circle cx="570" cy="420" r="3.2" />
+<circle cx="630" cy="420" r="3.2" />
+<circle cx="690" cy="420" r="3.2" />
+<circle cx="750" cy="420" r="3.2" />
+<circle cx="810" cy="420" r="3.2" />
+<circle cx="870" cy="420" r="3.2" />
+<circle cx="930" cy="420" r="3.2" />
+<circle cx="990" cy="420" r="3.2" />
+<circle cx="1050" cy="420" r="3.2" />
+<circle cx="1110" cy="420" r="3.2" />
+<circle cx="30" cy="480" r="3.2" />
+<circle cx="90" cy="480" r="3.2" />
+<circle cx="150" cy="480" r="3.2" />
+<circle cx="210" cy="480" r="3.2" />
+<circle cx="270" cy="480" r="3.2" />
+<circle cx="330" cy="480" r="3.2" />
+<circle cx="390" cy="480" r="3.2" />
+<circle cx="450" cy="480" r="3.2" />
+<circle cx="510" cy="480" r="3.2" />
+<circle cx="570" cy="480" r="3.2" />
+<circle cx="630" cy="480" r="3.2" />
+<circle cx="690" cy="480" r="3.2" />
+<circle cx="750" cy="480" r="3.2" />
+<circle cx="810" cy="480" r="3.2" />
+<circle cx="870" cy="480" r="3.2" />
+<circle cx="930" cy="480" r="3.2" />
+<circle cx="990" cy="480" r="3.2" />
+<circle cx="1050" cy="480" r="3.2" />
+<circle cx="1110" cy="480" r="3.2" />
+<circle cx="30" cy="540" r="3.2" />
+<circle cx="90" cy="540" r="3.2" />
+<circle cx="150" cy="540" r="3.2" />
+<circle cx="210" cy="540" r="3.2" />
+<circle cx="270" cy="540" r="3.2" />
+<circle cx="330" cy="540" r="3.2" />
+<circle cx="390" cy="540" r="3.2" />
+<circle cx="450" cy="540" r="3.2" />
+<circle cx="510" cy="540" r="3.2" />
+<circle cx="570" cy="540" r="3.2" />
+<circle cx="630" cy="540" r="3.2" />
+<circle cx="690" cy="540" r="3.2" />
+<circle cx="750" cy="540" r="3.2" />
+<circle cx="810" cy="540" r="3.2" />
+<circle cx="870" cy="540" r="3.2" />
+<circle cx="930" cy="540" r="3.2" />
+<circle cx="990" cy="540" r="3.2" />
+<circle cx="1050" cy="540" r="3.2" />
+<circle cx="1110" cy="540" r="3.2" />
+<circle cx="30" cy="600" r="3.2" />
+<circle cx="90" cy="600" r="3.2" />
+<circle cx="150" cy="600" r="3.2" />
+<circle cx="210" cy="600" r="3.2" />
+<circle cx="270" cy="600" r="3.2" />
+<circle cx="330" cy="600" r="3.2" />
+<circle cx="390" cy="600" r="3.2" />
+<circle cx="450" cy="600" r="3.2" />
+<circle cx="510" cy="600" r="3.2" />
+<circle cx="570" cy="600" r="3.2" />
+<circle cx="630" cy="600" r="3.2" />
+<circle cx="690" cy="600" r="3.2" />
+<circle cx="750" cy="600" r="3.2" />
+<circle cx="810" cy="600" r="3.2" />
+<circle cx="870" cy="600" r="3.2" />
+<circle cx="930" cy="600" r="3.2" />
+<circle cx="990" cy="600" r="3.2" />
+<circle cx="1050" cy="600" r="3.2" />
+<circle cx="1110" cy="600" r="3.2" />
+<circle cx="30" cy="660" r="3.2" />
+<circle cx="90" cy="660" r="3.2" />
+<circle cx="150" cy="660" r="3.2" />
+<circle cx="210" cy="660" r="3.2" />
+<circle cx="270" cy="660" r="3.2" />
+<circle cx="330" cy="660" r="3.2" />
+<circle cx="390" cy="660" r="3.2" />
+<circle cx="450" cy="660" r="3.2" />
+<circle cx="510" cy="660" r="3.2" />
+<circle cx="570" cy="660" r="3.2" />
+<circle cx="630" cy="660" r="3.2" />
+<circle cx="690" cy="660" r="3.2" />
+<circle cx="750" cy="660" r="3.2" />
+<circle cx="810" cy="660" r="3.2" />
+<circle cx="870" cy="660" r="3.2" />
+<circle cx="930" cy="660" r="3.2" />
+<circle cx="990" cy="660" r="3.2" />
+<circle cx="1050" cy="660" r="3.2" />
+<circle cx="1110" cy="660" r="3.2" />
+<circle cx="30" cy="720" r="3.2" />
+<circle cx="90" cy="720" r="3.2" />
+<circle cx="150" cy="720" r="3.2" />
+<circle cx="210" cy="720" r="3.2" />
+<circle cx="270" cy="720" r="3.2" />
+<circle cx="330" cy="720" r="3.2" />
+<circle cx="390" cy="720" r="3.2" />
+<circle cx="450" cy="720" r="3.2" />
+<circle cx="510" cy="720" r="3.2" />
+<circle cx="570" cy="720" r="3.2" />
+<circle cx="630" cy="720" r="3.2" />
+<circle cx="690" cy="720" r="3.2" />
+<circle cx="750" cy="720" r="3.2" />
+<circle cx="810" cy="720" r="3.2" />
+<circle cx="870" cy="720" r="3.2" />
+<circle cx="930" cy="720" r="3.2" />
+<circle cx="990" cy="720" r="3.2" />
+<circle cx="1050" cy="720" r="3.2" />
+<circle cx="1110" cy="720" r="3.2" />
+<circle cx="30" cy="780" r="3.2" />
+<circle cx="90" cy="780" r="3.2" />
+<circle cx="150" cy="780" r="3.2" />
+<circle cx="210" cy="780" r="3.2" />
+<circle cx="270" cy="780" r="3.2" />
+<circle cx="330" cy="780" r="3.2" />
+<circle cx="390" cy="780" r="3.2" />
+<circle cx="450" cy="780" r="3.2" />
+<circle cx="510" cy="780" r="3.2" />
+<circle cx="570" cy="780" r="3.2" />
+<circle cx="630" cy="780" r="3.2" />
+<circle cx="690" cy="780" r="3.2" />
+<circle cx="750" cy="780" r="3.2" />
+<circle cx="810" cy="780" r="3.2" />
+<circle cx="870" cy="780" r="3.2" />
+<circle cx="930" cy="780" r="3.2" />
+<circle cx="990" cy="780" r="3.2" />
+<circle cx="1050" cy="780" r="3.2" />
+<circle cx="1110" cy="780" r="3.2" />
+<circle cx="30" cy="840" r="3.2" />
+<circle cx="90" cy="840" r="3.2" />
+<circle cx="150" cy="840" r="3.2" />
+<circle cx="210" cy="840" r="3.2" />
+<circle cx="270" cy="840" r="3.2" />
+<circle cx="330" cy="840" r="3.2" />
+<circle cx="390" cy="840" r="3.2" />
+<circle cx="450" cy="840" r="3.2" />
+<circle cx="510" cy="840" r="3.2" />
+<circle cx="570" cy="840" r="3.2" />
+<circle cx="630" cy="840" r="3.2" />
+<circle cx="690" cy="840" r="3.2" />
+<circle cx="750" cy="840" r="3.2" />
+<circle cx="810" cy="840" r="3.2" />
+<circle cx="870" cy="840" r="3.2" />
+<circle cx="930" cy="840" r="3.2" />
+<circle cx="990" cy="840" r="3.2" />
+<circle cx="1050" cy="840" r="3.2" />
+<circle cx="1110" cy="840" r="3.2" />
+<circle cx="30" cy="900" r="3.2" />
+<circle cx="90" cy="900" r="3.2" />
+<circle cx="150" cy="900" r="3.2" />
+<circle cx="210" cy="900" r="3.2" />
+<circle cx="270" cy="900" r="3.2" />
+<circle cx="330" cy="900" r="3.2" />
+<circle cx="390" cy="900" r="3.2" />
+<circle cx="450" cy="900" r="3.2" />
+<circle cx="510" cy="900" r="3.2" />
+<circle cx="570" cy="900" r="3.2" />
+<circle cx="630" cy="900" r="3.2" />
+<circle cx="690" cy="900" r="3.2" />
+<circle cx="750" cy="900" r="3.2" />
+<circle cx="810" cy="900" r="3.2" />
+<circle cx="870" cy="900" r="3.2" />
+<circle cx="930" cy="900" r="3.2" />
+<circle cx="990" cy="900" r="3.2" />
+<circle cx="1050" cy="900" r="3.2" />
+<circle cx="1110" cy="900" r="3.2" />
+<circle cx="30" cy="960" r="3.2" />
+<circle cx="90" cy="960" r="3.2" />
+<circle cx="150" cy="960" r="3.2" />
+<circle cx="210" cy="960" r="3.2" />
+<circle cx="270" cy="960" r="3.2" />
+<circle cx="330" cy="960" r="3.2" />
+<circle cx="390" cy="960" r="3.2" />
+<circle cx="450" cy="960" r="3.2" />
+<circle cx="510" cy="960" r="3.2" />
+<circle cx="570" cy="960" r="3.2" />
+<circle cx="630" cy="960" r="3.2" />
+<circle cx="690" cy="960" r="3.2" />
+<circle cx="750" cy="960" r="3.2" />
+<circle cx="810" cy="960" r="3.2" />
+<circle cx="870" cy="960" r="3.2" />
+<circle cx="930" cy="960" r="3.2" />
+<circle cx="990" cy="960" r="3.2" />
+<circle cx="1050" cy="960" r="3.2" />
+<circle cx="1110" cy="960" r="3.2" />
+<circle cx="30" cy="1020" r="3.2" />
+<circle cx="90" cy="1020" r="3.2" />
+<circle cx="150" cy="1020" r="3.2" />
+<circle cx="210" cy="1020" r="3.2" />
+<circle cx="270" cy="1020" r="3.2" />
+<circle cx="330" cy="1020" r="3.2" />
+<circle cx="390" cy="1020" r="3.2" />
+<circle cx="450" cy="1020" r="3.2" />
+<circle cx="510" cy="1020" r="3.2" />
+<circle cx="570" cy="1020" r="3.2" />
+<circle cx="630" cy="1020" r="3.2" />
+<circle cx="690" cy="1020" r="3.2" />
+<circle cx="750" cy="1020" r="3.2" />
+<circle cx="810" cy="1020" r="3.2" />
+<circle cx="870" cy="1020" r="3.2" />
+<circle cx="930" cy="1020" r="3.2" />
+<circle cx="990" cy="1020" r="3.2" />
+<circle cx="1050" cy="1020" r="3.2" />
+<circle cx="1110" cy="1020" r="3.2" />
+<circle cx="30" cy="1080" r="3.2" />
+<circle cx="90" cy="1080" r="3.2" />
+<circle cx="150" cy="1080" r="3.2" />
+<circle cx="210" cy="1080" r="3.2" />
+<circle cx="270" cy="1080" r="3.2" />
+<circle cx="330" cy="1080" r="3.2" />
+<circle cx="390" cy="1080" r="3.2" />
+<circle cx="450" cy="1080" r="3.2" />
+<circle cx="510" cy="1080" r="3.2" />
+<circle cx="570" cy="1080" r="3.2" />
+<circle cx="630" cy="1080" r="3.2" />
+<circle cx="690" cy="1080" r="3.2" />
+<circle cx="750" cy="1080" r="3.2" />
+<circle cx="810" cy="1080" r="3.2" />
+<circle cx="870" cy="1080" r="3.2" />
+<circle cx="930" cy="1080" r="3.2" />
+<circle cx="990" cy="1080" r="3.2" />
+<circle cx="1050" cy="1080" r="3.2" />
+<circle cx="1110" cy="1080" r="3.2" />
+<circle cx="30" cy="1140" r="3.2" />
+<circle cx="90" cy="1140" r="3.2" />
+<circle cx="150" cy="1140" r="3.2" />
+<circle cx="210" cy="1140" r="3.2" />
+<circle cx="270" cy="1140" r="3.2" />
+<circle cx="330" cy="1140" r="3.2" />
+<circle cx="390" cy="1140" r="3.2" />
+<circle cx="450" cy="1140" r="3.2" />
+<circle cx="510" cy="1140" r="3.2" />
+<circle cx="570" cy="1140" r="3.2" />
+<circle cx="630" cy="1140" r="3.2" />
+<circle cx="690" cy="1140" r="3.2" />
+<circle cx="750" cy="1140" r="3.2" />
+<circle cx="810" cy="1140" r="3.2" />
+<circle cx="870" cy="1140" r="3.2" />
+<circle cx="930" cy="1140" r="3.2" />
+<circle cx="990" cy="1140" r="3.2" />
+<circle cx="1050" cy="1140" r="3.2" />
+<circle cx="1110" cy="1140" r="3.2" />
+<circle cx="30" cy="1200" r="3.2" />
+<circle cx="90" cy="1200" r="3.2" />
+<circle cx="150" cy="1200" r="3.2" />
+<circle cx="210" cy="1200" r="3.2" />
+<circle cx="270" cy="1200" r="3.2" />
+<circle cx="330" cy="1200" r="3.2" />
+<circle cx="390" cy="1200" r="3.2" />
+<circle cx="450" cy="1200" r="3.2" />
+<circle cx="510" cy="1200" r="3.2" />
+<circle cx="570" cy="1200" r="3.2" />
+<circle cx="630" cy="1200" r="3.2" />
+<circle cx="690" cy="1200" r="3.2" />
+<circle cx="750" cy="1200" r="3.2" />
+<circle cx="810" cy="1200" r="3.2" />
+<circle cx="870" cy="1200" r="3.2" />
+<circle cx="930" cy="1200" r="3.2" />
+<circle cx="990" cy="1200" r="3.2" />
+<circle cx="1050" cy="1200" r="3.2" />
+<circle cx="1110" cy="1200" r="3.2" />
+<circle cx="30" cy="1260" r="3.2" />
+<circle cx="90" cy="1260" r="3.2" />
+<circle cx="150" cy="1260" r="3.2" />
+<circle cx="210" cy="1260" r="3.2" />
+<circle cx="270" cy="1260" r="3.2" />
+<circle cx="330" cy="1260" r="3.2" />
+<circle cx="390" cy="1260" r="3.2" />
+<circle cx="450" cy="1260" r="3.2" />
+<circle cx="510" cy="1260" r="3.2" />
+<circle cx="570" cy="1260" r="3.2" />
+<circle cx="630" cy="1260" r="3.2" />
+<circle cx="690" cy="1260" r="3.2" />
+<circle cx="750" cy="1260" r="3.2" />
+<circle cx="810" cy="1260" r="3.2" />
+<circle cx="870" cy="1260" r="3.2" />
+<circle cx="930" cy="1260" r="3.2" />
+<circle cx="990" cy="1260" r="3.2" />
+<circle cx="1050" cy="1260" r="3.2" />
+<circle cx="1110" cy="1260" r="3.2" />
+<circle cx="30" cy="1320" r="3.2" />
+<circle cx="90" cy="1320" r="3.2" />
+<circle cx="150" cy="1320" r="3.2" />
+<circle cx="210" cy="1320" r="3.2" />
+<circle cx="270" cy="1320" r="3.2" />
+<circle cx="330" cy="1320" r="3.2" />
+<circle cx="390" cy="1320" r="3.2" />
+<circle cx="450" cy="1320" r="3.2" />
+<circle cx="510" cy="1320" r="3.2" />
+<circle cx="570" cy="1320" r="3.2" />
+<circle cx="630" cy="1320" r="3.2" />
+<circle cx="690" cy="1320" r="3.2" />
+<circle cx="750" cy="1320" r="3.2" />
+<circle cx="810" cy="1320" r="3.2" />
+<circle cx="870" cy="1320" r="3.2" />
+<circle cx="930" cy="1320" r="3.2" />
+<circle cx="990" cy="1320" r="3.2" />
+<circle cx="1050" cy="1320" r="3.2" />
+<circle cx="1110" cy="1320" r="3.2" />
+<circle cx="30" cy="1380" r="3.2" />
+<circle cx="90" cy="1380" r="3.2" />
+<circle cx="150" cy="1380" r="3.2" />
+<circle cx="210" cy="1380" r="3.2" />
+<circle cx="270" cy="1380" r="3.2" />
+<circle cx="330" cy="1380" r="3.2" />
+<circle cx="390" cy="1380" r="3.2" />
+<circle cx="450" cy="1380" r="3.2" />
+<circle cx="510" cy="1380" r="3.2" />
+<circle cx="570" cy="1380" r="3.2" />
+<circle cx="630" cy="1380" r="3.2" />
+<circle cx="690" cy="1380" r="3.2" />
+<circle cx="750" cy="1380" r="3.2" />
+<circle cx="810" cy="1380" r="3.2" />
+<circle cx="870" cy="1380" r="3.2" />
+<circle cx="930" cy="1380" r="3.2" />
+<circle cx="990" cy="1380" r="3.2" />
+<circle cx="1050" cy="1380" r="3.2" />
+<circle cx="1110" cy="1380" r="3.2" />
+<circle cx="30" cy="1440" r="3.2" />
+<circle cx="90" cy="1440" r="3.2" />
+<circle cx="150" cy="1440" r="3.2" />
+<circle cx="210" cy="1440" r="3.2" />
+<circle cx="270" cy="1440" r="3.2" />
+<circle cx="330" cy="1440" r="3.2" />
+<circle cx="390" cy="1440" r="3.2" />
+<circle cx="450" cy="1440" r="3.2" />
+<circle cx="510" cy="1440" r="3.2" />
+<circle cx="570" cy="1440" r="3.2" />
+<circle cx="630" cy="1440" r="3.2" />
+<circle cx="690" cy="1440" r="3.2" />
+<circle cx="750" cy="1440" r="3.2" />
+<circle cx="810" cy="1440" r="3.2" />
+<circle cx="870" cy="1440" r="3.2" />
+<circle cx="930" cy="1440" r="3.2" />
+<circle cx="990" cy="1440" r="3.2" />
+<circle cx="1050" cy="1440" r="3.2" />
+<circle cx="1110" cy="1440" r="3.2" />
+<circle cx="30" cy="1500" r="3.2" />
+<circle cx="90" cy="1500" r="3.2" />
+<circle cx="150" cy="1500" r="3.2" />
+<circle cx="210" cy="1500" r="3.2" />
+<circle cx="270" cy="1500" r="3.2" />
+<circle cx="330" cy="1500" r="3.2" />
+<circle cx="390" cy="1500" r="3.2" />
+<circle cx="450" cy="1500" r="3.2" />
+<circle cx="510" cy="1500" r="3.2" />
+<circle cx="570" cy="1500" r="3.2" />
+<circle cx="630" cy="1500" r="3.2" />
+<circle cx="690" cy="1500" r="3.2" />
+<circle cx="750" cy="1500" r="3.2" />
+<circle cx="810" cy="1500" r="3.2" />
+<circle cx="870" cy="1500" r="3.2" />
+<circle cx="930" cy="1500" r="3.2" />
+<circle cx="990" cy="1500" r="3.2" />
+<circle cx="1050" cy="1500" r="3.2" />
+<circle cx="1110" cy="1500" r="3.2" />
+<circle cx="30" cy="1560" r="3.2" />
+<circle cx="90" cy="1560" r="3.2" />
+<circle cx="150" cy="1560" r="3.2" />
+<circle cx="210" cy="1560" r="3.2" />
+<circle cx="270" cy="1560" r="3.2" />
+<circle cx="330" cy="1560" r="3.2" />
+<circle cx="390" cy="1560" r="3.2" />
+<circle cx="450" cy="1560" r="3.2" />
+<circle cx="510" cy="1560" r="3.2" />
+<circle cx="570" cy="1560" r="3.2" />
+<circle cx="630" cy="1560" r="3.2" />
+<circle cx="690" cy="1560" r="3.2" />
+<circle cx="750" cy="1560" r="3.2" />
+<circle cx="810" cy="1560" r="3.2" />
+<circle cx="870" cy="1560" r="3.2" />
+<circle cx="930" cy="1560" r="3.2" />
+<circle cx="990" cy="1560" r="3.2" />
+<circle cx="1050" cy="1560" r="3.2" />
+<circle cx="1110" cy="1560" r="3.2" />
+<circle cx="30" cy="1620" r="3.2" />
+<circle cx="90" cy="1620" r="3.2" />
+<circle cx="150" cy="1620" r="3.2" />
+<circle cx="210" cy="1620" r="3.2" />
+<circle cx="270" cy="1620" r="3.2" />
+<circle cx="330" cy="1620" r="3.2" />
+<circle cx="390" cy="1620" r="3.2" />
+<circle cx="450" cy="1620" r="3.2" />
+<circle cx="510" cy="1620" r="3.2" />
+<circle cx="570" cy="1620" r="3.2" />
+<circle cx="630" cy="1620" r="3.2" />
+<circle cx="690" cy="1620" r="3.2" />
+<circle cx="750" cy="1620" r="3.2" />
+<circle cx="810" cy="1620" r="3.2" />
+<circle cx="870" cy="1620" r="3.2" />
+<circle cx="930" cy="1620" r="3.2" />
+<circle cx="990" cy="1620" r="3.2" />
+<circle cx="1050" cy="1620" r="3.2" />
+<circle cx="1110" cy="1620" r="3.2" />
+<circle cx="30" cy="1680" r="3.2" />
+<circle cx="90" cy="1680" r="3.2" />
+<circle cx="150" cy="1680" r="3.2" />
+<circle cx="210" cy="1680" r="3.2" />
+<circle cx="270" cy="1680" r="3.2" />
+<circle cx="330" cy="1680" r="3.2" />
+<circle cx="390" cy="1680" r="3.2" />
+<circle cx="450" cy="1680" r="3.2" />
+<circle cx="510" cy="1680" r="3.2" />
+<circle cx="570" cy="1680" r="3.2" />
+<circle cx="630" cy="1680" r="3.2" />
+<circle cx="690" cy="1680" r="3.2" />
+<circle cx="750" cy="1680" r="3.2" />
+<circle cx="810" cy="1680" r="3.2" />
+<circle cx="870" cy="1680" r="3.2" />
+<circle cx="930" cy="1680" r="3.2" />
+<circle cx="990" cy="1680" r="3.2" />
+<circle cx="1050" cy="1680" r="3.2" />
+<circle cx="1110" cy="1680" r="3.2" />
+<circle cx="30" cy="1740" r="3.2" />
+<circle cx="90" cy="1740" r="3.2" />
+<circle cx="150" cy="1740" r="3.2" />
+<circle cx="210" cy="1740" r="3.2" />
+<circle cx="270" cy="1740" r="3.2" />
+<circle cx="330" cy="1740" r="3.2" />
+<circle cx="390" cy="1740" r="3.2" />
+<circle cx="450" cy="1740" r="3.2" />
+<circle cx="510" cy="1740" r="3.2" />
+<circle cx="570" cy="1740" r="3.2" />
+<circle cx="630" cy="1740" r="3.2" />
+<circle cx="690" cy="1740" r="3.2" />
+<circle cx="750" cy="1740" r="3.2" />
+<circle cx="810" cy="1740" r="3.2" />
+<circle cx="870" cy="1740" r="3.2" />
+<circle cx="930" cy="1740" r="3.2" />
+<circle cx="990" cy="1740" r="3.2" />
+<circle cx="1050" cy="1740" r="3.2" />
+<circle cx="1110" cy="1740" r="3.2" />
+<circle cx="30" cy="1800" r="3.2" />
+<circle cx="90" cy="1800" r="3.2" />
+<circle cx="150" cy="1800" r="3.2" />
+<circle cx="210" cy="1800" r="3.2" />
+<circle cx="270" cy="1800" r="3.2" />
+<circle cx="330" cy="1800" r="3.2" />
+<circle cx="390" cy="1800" r="3.2" />
+<circle cx="450" cy="1800" r="3.2" />
+<circle cx="510" cy="1800" r="3.2" />
+<circle cx="570" cy="1800" r="3.2" />
+<circle cx="630" cy="1800" r="3.2" />
+<circle cx="690" cy="1800" r="3.2" />
+<circle cx="750" cy="1800" r="3.2" />
+<circle cx="810" cy="1800" r="3.2" />
+<circle cx="870" cy="1800" r="3.2" />
+<circle cx="930" cy="1800" r="3.2" />
+<circle cx="990" cy="1800" r="3.2" />
+<circle cx="1050" cy="1800" r="3.2" />
+<circle cx="1110" cy="1800" r="3.2" />
+<circle cx="30" cy="1860" r="3.2" />
+<circle cx="90" cy="1860" r="3.2" />
+<circle cx="150" cy="1860" r="3.2" />
+<circle cx="210" cy="1860" r="3.2" />
+<circle cx="270" cy="1860" r="3.2" />
+<circle cx="330" cy="1860" r="3.2" />
+<circle cx="390" cy="1860" r="3.2" />
+<circle cx="450" cy="1860" r="3.2" />
+<circle cx="510" cy="1860" r="3.2" />
+<circle cx="570" cy="1860" r="3.2" />
+<circle cx="630" cy="1860" r="3.2" />
+<circle cx="690" cy="1860" r="3.2" />
+<circle cx="750" cy="1860" r="3.2" />
+<circle cx="810" cy="1860" r="3.2" />
+<circle cx="870" cy="1860" r="3.2" />
+<circle cx="930" cy="1860" r="3.2" />
+<circle cx="990" cy="1860" r="3.2" />
+<circle cx="1050" cy="1860" r="3.2" />
+<circle cx="1110" cy="1860" r="3.2" />
+<circle cx="30" cy="1920" r="3.2" />
+<circle cx="90" cy="1920" r="3.2" />
+<circle cx="150" cy="1920" r="3.2" />
+<circle cx="210" cy="1920" r="3.2" />
+<circle cx="270" cy="1920" r="3.2" />
+<circle cx="330" cy="1920" r="3.2" />
+<circle cx="390" cy="1920" r="3.2" />
+<circle cx="450" cy="1920" r="3.2" />
+<circle cx="510" cy="1920" r="3.2" />
+<circle cx="570" cy="1920" r="3.2" />
+<circle cx="630" cy="1920" r="3.2" />
+<circle cx="690" cy="1920" r="3.2" />
+<circle cx="750" cy="1920" r="3.2" />
+<circle cx="810" cy="1920" r="3.2" />
+<circle cx="870" cy="1920" r="3.2" />
+<circle cx="930" cy="1920" r="3.2" />
+<circle cx="990" cy="1920" r="3.2" />
+<circle cx="1050" cy="1920" r="3.2" />
+<circle cx="1110" cy="1920" r="3.2" /></svg>
+        </div>
+      </div>
+
       <!-- A: scroll infinito -->
       <section id="scene-scroll" class="clip" data-start="0" data-duration="1.3" data-track-index="0">
-        <div id="scroll-stack">
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
-          <div class="scroll-word">SCROLL</div>
-          <div class="scroll-word outline">SCROLL</div>
+        <div id="scroll-stack" data-layout-ignore>
+          <div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div><div class="scroll-word">SCROLL</div><div class="scroll-word outline">SCROLL</div>
         </div>
+        <svg id="scroll-geo" class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line id="rail-l" x1="70" y1="0" x2="70" y2="1920" stroke="var(--bordo-hi)" stroke-width="16" stroke-dasharray="60 40" />
+          <line id="rail-r" x1="1010" y1="0" x2="1010" y2="1920" stroke="var(--bordo-hi)" stroke-width="16" stroke-dasharray="60 40" />
+          <line id="scan" x1="0" y1="960" x2="1080" y2="960" stroke="var(--bordo-hi)" stroke-width="22" />
+        </svg>
+        <div id="scroll-ring" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="420" fill="none" stroke="var(--gold-hi)" stroke-width="10" stroke-dasharray="40 26" /></svg></div>
       </section>
 
       <!-- B: FRENÁ. -->
       <section id="scene-frena" class="clip" data-start="1.3" data-duration="0.45" data-track-index="0">
+        <span id="frena-sq2"></span>
+        <span id="frena-sq"></span>
         <div class="scene-content">
           <div id="frena-shake"><span id="frena-text" class="slam">FRENÁ.</span></div>
         </div>
@@ -273,14 +787,35 @@
 
       <!-- C: ESTO / NO SE -->
       <section id="scene-esto" class="clip" data-start="1.75" data-duration="0.8" data-track-index="0">
+        <span id="ghost-s" data-layout-ignore>S</span>
+        <span id="hazard2"></span>
+        <span id="hazard"></span>
+        <span class="pop-dot" style="top:300px"></span>
+<span class="pop-dot" style="top:395px"></span>
+<span class="pop-dot" style="top:490px"></span>
+<span class="pop-dot" style="top:585px"></span>
+<span class="pop-dot" style="top:680px"></span>
+<span class="pop-dot" style="top:775px"></span>
+<span class="pop-dot" style="top:870px"></span>
+<span class="pop-dot" style="top:965px"></span>
+<span class="pop-dot" style="top:1060px"></span>
+<span class="pop-dot" style="top:1155px"></span>
+<span class="pop-dot" style="top:1250px"></span>
+<span class="pop-dot" style="top:1345px"></span>
+<span class="pop-dot" style="top:1440px"></span>
+<span class="pop-dot" style="top:1535px"></span>
         <div class="scene-content" id="esto-shake">
           <span id="esto-text" class="slam">ESTO</span>
           <span id="nose-text" class="slam">NO SE</span>
         </div>
       </section>
 
-      <!-- D: SCROLLEA. -->
+      <!-- D: scrollea. -->
       <section id="scene-scrollea" class="clip" data-start="2.55" data-duration="0.9" data-track-index="0">
+        <div id="cross-h" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><line x1="0" y1="960" x2="1080" y2="960" stroke="var(--gold)" stroke-width="4" /></svg></div>
+        <div id="cross-v" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><line x1="540" y1="0" x2="540" y2="1920" stroke="var(--gold)" stroke-width="4" /></svg></div>
+        <div id="sc-ring" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle id="sc-ring-c" cx="540" cy="960" r="430" fill="none" stroke="var(--bordo-hi)" stroke-width="18" stroke-dasharray="2702" /></svg></div>
+        <div id="orbit" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="530" r="30" fill="var(--gold-hi)" /><circle cx="540" cy="1390" r="16" fill="var(--bone)" /></svg></div>
         <div class="scene-content">
           <span id="scrollea-text">scrollea.</span>
           <span id="scrollea-bar"></span>
@@ -289,12 +824,81 @@
 
       <!-- E: SONYLUM -->
       <section id="scene-logo" class="clip" data-start="3.45" data-duration="3.55" data-track-index="0">
+        <div id="ghosts"><span class="ghost" data-layout-ignore style="left:-120px;top:-40px;font-size:760px">S</span>
+<span class="ghost" data-layout-ignore style="left:640px;top:-120px;font-size:700px">Y</span>
+<span class="ghost" data-layout-ignore style="left:-60px;top:1180px;font-size:720px">L</span>
+<span class="ghost" data-layout-ignore style="left:520px;top:1260px;font-size:720px">M</span></div>
+        <div id="diag-a" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><line x1="0" y1="0" x2="1080" y2="1920" stroke="var(--bordo-hi)" stroke-width="6" /></svg></div>
+        <div id="diag-b" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><line x1="1080" y1="0" x2="0" y2="1920" stroke="var(--bordo-hi)" stroke-width="6" /></svg></div>
+        <div id="logo-ring" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle id="logo-ring-c" cx="540" cy="960" r="470" fill="none" stroke="var(--gold)" stroke-width="10" stroke-dasharray="2953" /></svg></div>
+        <div id="logo-ticks" class="layer"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><line class="tick" x1="1040.0" y1="960.0" x2="1068.0" y2="960.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="1037.3" y1="1012.3" x2="1065.1" y2="1015.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="1029.1" y1="1064.0" x2="1056.5" y2="1069.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="1015.5" y1="1114.5" x2="1042.2" y2="1123.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="996.8" y1="1163.4" x2="1022.4" y2="1174.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="973.0" y1="1210.0" x2="997.3" y2="1224.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="944.5" y1="1253.9" x2="967.2" y2="1270.4" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="911.6" y1="1294.6" x2="932.4" y2="1313.3" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="874.6" y1="1331.6" x2="893.3" y2="1352.4" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="833.9" y1="1364.5" x2="850.4" y2="1387.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="790.0" y1="1393.0" x2="804.0" y2="1417.3" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="743.4" y1="1416.8" x2="754.8" y2="1442.4" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="694.5" y1="1435.5" x2="703.2" y2="1462.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="644.0" y1="1449.1" x2="649.8" y2="1476.5" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="592.3" y1="1457.3" x2="595.2" y2="1485.1" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="540.0" y1="1460.0" x2="540.0" y2="1488.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="487.7" y1="1457.3" x2="484.8" y2="1485.1" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="436.0" y1="1449.1" x2="430.2" y2="1476.5" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="385.5" y1="1435.5" x2="376.8" y2="1462.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="336.6" y1="1416.8" x2="325.2" y2="1442.4" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="290.0" y1="1393.0" x2="276.0" y2="1417.3" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="246.1" y1="1364.5" x2="229.6" y2="1387.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="205.4" y1="1331.6" x2="186.7" y2="1352.4" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="168.4" y1="1294.6" x2="147.6" y2="1313.3" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="135.5" y1="1253.9" x2="112.8" y2="1270.4" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="107.0" y1="1210.0" x2="82.7" y2="1224.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="83.2" y1="1163.4" x2="57.6" y2="1174.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="64.5" y1="1114.5" x2="37.8" y2="1123.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="50.9" y1="1064.0" x2="23.5" y2="1069.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="42.7" y1="1012.3" x2="14.9" y2="1015.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="40.0" y1="960.0" x2="12.0" y2="960.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="42.7" y1="907.7" x2="14.9" y2="904.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="50.9" y1="856.0" x2="23.5" y2="850.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="64.5" y1="805.5" x2="37.8" y2="796.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="83.2" y1="756.6" x2="57.6" y2="745.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="107.0" y1="710.0" x2="82.7" y2="696.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="135.5" y1="666.1" x2="112.8" y2="649.6" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="168.4" y1="625.4" x2="147.6" y2="606.7" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="205.4" y1="588.4" x2="186.7" y2="567.6" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="246.1" y1="555.5" x2="229.6" y2="532.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="290.0" y1="527.0" x2="276.0" y2="502.7" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="336.6" y1="503.2" x2="325.2" y2="477.6" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="385.5" y1="484.5" x2="376.8" y2="457.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="436.0" y1="470.9" x2="430.2" y2="443.5" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="487.7" y1="462.7" x2="484.8" y2="434.9" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="540.0" y1="460.0" x2="540.0" y2="432.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="592.3" y1="462.7" x2="595.2" y2="434.9" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="644.0" y1="470.9" x2="649.8" y2="443.5" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="694.5" y1="484.5" x2="703.2" y2="457.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="743.4" y1="503.2" x2="754.8" y2="477.6" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="790.0" y1="527.0" x2="804.0" y2="502.7" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="833.9" y1="555.5" x2="850.4" y2="532.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="874.6" y1="588.4" x2="893.3" y2="567.6" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="911.6" y1="625.4" x2="932.4" y2="606.7" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="944.5" y1="666.1" x2="967.2" y2="649.6" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="973.0" y1="710.0" x2="997.3" y2="696.0" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="996.8" y1="756.6" x2="1022.4" y2="745.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="1015.5" y1="805.5" x2="1042.2" y2="796.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="1029.1" y1="856.0" x2="1056.5" y2="850.2" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" />
+<line class="tick" x1="1037.3" y1="907.7" x2="1065.1" y2="904.8" stroke="var(--gold)" stroke-width="3" stroke-linecap="square" /></svg></div>
+        <span class="cmp" style="left:996.0px;top:946.0px"></span>
+<span class="cmp" style="left:526.0px;top:1416.0px"></span>
+<span class="cmp" style="left:56.0px;top:946.0px"></span>
+<span class="cmp" style="left:526.0px;top:476.0px"></span>
         <div class="scene-content">
           <div id="logo-push">
             <div id="logo-shake">
-              <div id="logo-word">
-                <span>S</span><span>O</span><span>N</span><span>Y</span><span>L</span><span>U</span><span>M</span>
-              </div>
+              <div id="logo-word"><span>S</span><span>O</span><span>N</span><span>Y</span><span>L</span><span>U</span><span>M</span></div>
               <span id="logo-rule"></span>
               <div id="logo-tag">Estudio digital · Villa Luro, BA</div>
             </div>
@@ -302,107 +906,329 @@
         </div>
       </section>
 
-      <!-- Transición: barras -->
+      <!-- Transición: barras SONYLUM -->
       <section id="scene-bars" class="clip" data-start="3.3" data-duration="0.42" data-track-index="1">
-        <div id="bars">
-          <span class="bar"></span>
-          <span class="bar gold"></span>
-          <span class="bar"></span>
-          <span class="bar gold"></span>
-          <span class="bar"></span>
-          <span class="bar gold"></span>
-          <span class="bar"></span>
-        </div>
+        <div id="bars"><span class="bar"><b>S</b></span>
+<span class="bar gold"><b>O</b></span>
+<span class="bar"><b>N</b></span>
+<span class="bar gold"><b>Y</b></span>
+<span class="bar"><b>L</b></span>
+<span class="bar gold"><b>U</b></span>
+<span class="bar"><b>M</b></span></div>
       </section>
 
-      <!-- Flash de impacto -->
-      <div id="flash" class="clip" data-start="0" data-duration="7" data-track-index="2"></div>
+      <!-- Ráfagas de impacto -->
+      
+      <div id="hit-0" class="clip fx-hit" data-start="1.3" data-duration="0.55" data-track-index="5">
+        <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="1060.0" x2="1622.5" y2="1585.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="1101.4" x2="1423.9" y2="1843.9" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="1133.2" x2="1165.0" y2="2042.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="1153.2" x2="863.5" y2="2167.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="1160.0" x2="540.0" y2="2210.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="1153.2" x2="216.5" y2="2167.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="1133.2" x2="-85.0" y2="2042.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="1101.4" x2="-343.9" y2="1843.9" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="1060.0" x2="-542.5" y2="1585.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="1011.8" x2="-667.4" y2="1283.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="340.0" y1="960.0" x2="-710.0" y2="960.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="908.2" x2="-667.4" y2="636.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="860.0" x2="-542.5" y2="335.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="818.6" x2="-343.9" y2="76.1" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="786.8" x2="-85.0" y2="-122.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="766.8" x2="216.5" y2="-247.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="760.0" x2="540.0" y2="-290.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="766.8" x2="863.5" y2="-247.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="786.8" x2="1165.0" y2="-122.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="818.6" x2="1423.9" y2="76.1" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="860.0" x2="1622.5" y2="335.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="908.2" x2="1747.4" y2="636.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+        </svg>
+        <div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--bone)" stroke-width="14" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--bone)" stroke-width="10" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--bone)" stroke-width="6" /></svg></div>
+        <span class="speed" style="top:180px;width:420px;height:6px"></span>
+<span class="speed" style="top:330px;width:557px;height:11px"></span>
+<span class="speed" style="top:520px;width:694px;height:16px"></span>
+<span class="speed" style="top:1380px;width:451px;height:7px"></span>
+<span class="speed" style="top:1560px;width:588px;height:12px"></span>
+<span class="speed" style="top:1740px;width:725px;height:17px"></span>
+      </div>
+      <div id="hit-1" class="clip fx-hit" data-start="1.75" data-duration="0.55" data-track-index="5">
+        <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="1060.0" x2="1622.5" y2="1585.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="1101.4" x2="1423.9" y2="1843.9" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="1133.2" x2="1165.0" y2="2042.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="1153.2" x2="863.5" y2="2167.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="1160.0" x2="540.0" y2="2210.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="1153.2" x2="216.5" y2="2167.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="1133.2" x2="-85.0" y2="2042.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="1101.4" x2="-343.9" y2="1843.9" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="1060.0" x2="-542.5" y2="1585.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="1011.8" x2="-667.4" y2="1283.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="340.0" y1="960.0" x2="-710.0" y2="960.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="908.2" x2="-667.4" y2="636.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="860.0" x2="-542.5" y2="335.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="818.6" x2="-343.9" y2="76.1" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="786.8" x2="-85.0" y2="-122.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="766.8" x2="216.5" y2="-247.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="760.0" x2="540.0" y2="-290.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="766.8" x2="863.5" y2="-247.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="786.8" x2="1165.0" y2="-122.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="818.6" x2="1423.9" y2="76.1" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="860.0" x2="1622.5" y2="335.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="908.2" x2="1747.4" y2="636.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+        </svg>
+        <div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="14" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="10" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="6" /></svg></div>
+        <span class="speed" style="top:180px;width:420px;height:6px"></span>
+<span class="speed" style="top:330px;width:557px;height:11px"></span>
+<span class="speed" style="top:520px;width:694px;height:16px"></span>
+<span class="speed" style="top:1380px;width:451px;height:7px"></span>
+<span class="speed" style="top:1560px;width:588px;height:12px"></span>
+<span class="speed" style="top:1740px;width:725px;height:17px"></span>
+      </div>
+      <div id="hit-2" class="clip fx-hit" data-start="2.15" data-duration="0.55" data-track-index="5">
+        <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="1060.0" x2="1622.5" y2="1585.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="1101.4" x2="1423.9" y2="1843.9" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="1133.2" x2="1165.0" y2="2042.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="1153.2" x2="863.5" y2="2167.4" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="1160.0" x2="540.0" y2="2210.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="1153.2" x2="216.5" y2="2167.4" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="1133.2" x2="-85.0" y2="2042.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="1101.4" x2="-343.9" y2="1843.9" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="1060.0" x2="-542.5" y2="1585.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="1011.8" x2="-667.4" y2="1283.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="340.0" y1="960.0" x2="-710.0" y2="960.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="908.2" x2="-667.4" y2="636.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="860.0" x2="-542.5" y2="335.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="818.6" x2="-343.9" y2="76.1" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="786.8" x2="-85.0" y2="-122.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="766.8" x2="216.5" y2="-247.4" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="760.0" x2="540.0" y2="-290.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="766.8" x2="863.5" y2="-247.4" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="786.8" x2="1165.0" y2="-122.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="818.6" x2="1423.9" y2="76.1" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="860.0" x2="1622.5" y2="335.0" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="908.2" x2="1747.4" y2="636.5" stroke="var(--gold)" stroke-width="5" stroke-linecap="square" />
+        </svg>
+        <div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--bordo-hi)" stroke-width="14" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--bordo-hi)" stroke-width="10" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--bordo-hi)" stroke-width="6" /></svg></div>
+        <span class="speed" style="top:180px;width:420px;height:6px"></span>
+<span class="speed" style="top:330px;width:557px;height:11px"></span>
+<span class="speed" style="top:520px;width:694px;height:16px"></span>
+<span class="speed" style="top:1380px;width:451px;height:7px"></span>
+<span class="speed" style="top:1560px;width:588px;height:12px"></span>
+<span class="speed" style="top:1740px;width:725px;height:17px"></span>
+      </div>
+      <div id="hit-3" class="clip fx-hit" data-start="2.55" data-duration="0.55" data-track-index="5">
+        <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="1060.0" x2="1622.5" y2="1585.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="1101.4" x2="1423.9" y2="1843.9" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="1133.2" x2="1165.0" y2="2042.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="1153.2" x2="863.5" y2="2167.4" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="1160.0" x2="540.0" y2="2210.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="1153.2" x2="216.5" y2="2167.4" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="1133.2" x2="-85.0" y2="2042.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="1101.4" x2="-343.9" y2="1843.9" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="1060.0" x2="-542.5" y2="1585.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="1011.8" x2="-667.4" y2="1283.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="340.0" y1="960.0" x2="-710.0" y2="960.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="908.2" x2="-667.4" y2="636.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="860.0" x2="-542.5" y2="335.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="818.6" x2="-343.9" y2="76.1" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="786.8" x2="-85.0" y2="-122.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="766.8" x2="216.5" y2="-247.4" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="760.0" x2="540.0" y2="-290.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="766.8" x2="863.5" y2="-247.4" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="786.8" x2="1165.0" y2="-122.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="818.6" x2="1423.9" y2="76.1" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="860.0" x2="1622.5" y2="335.0" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="908.2" x2="1747.4" y2="636.5" stroke="var(--bordo-hi)" stroke-width="5" stroke-linecap="square" />
+        </svg>
+        <div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold-hi)" stroke-width="14" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold-hi)" stroke-width="10" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold-hi)" stroke-width="6" /></svg></div>
+        <span class="speed" style="top:180px;width:420px;height:6px"></span>
+<span class="speed" style="top:330px;width:557px;height:11px"></span>
+<span class="speed" style="top:520px;width:694px;height:16px"></span>
+<span class="speed" style="top:1380px;width:451px;height:7px"></span>
+<span class="speed" style="top:1560px;width:588px;height:12px"></span>
+<span class="speed" style="top:1740px;width:725px;height:17px"></span>
+      </div>
+      <div id="hit-4" class="clip fx-hit" data-start="3.9" data-duration="0.55" data-track-index="5">
+        <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="1060.0" x2="1622.5" y2="1585.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="1101.4" x2="1423.9" y2="1843.9" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="1133.2" x2="1165.0" y2="2042.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="1153.2" x2="863.5" y2="2167.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="1160.0" x2="540.0" y2="2210.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="1153.2" x2="216.5" y2="2167.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="1133.2" x2="-85.0" y2="2042.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="1101.4" x2="-343.9" y2="1843.9" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="1060.0" x2="-542.5" y2="1585.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="1011.8" x2="-667.4" y2="1283.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="340.0" y1="960.0" x2="-710.0" y2="960.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="908.2" x2="-667.4" y2="636.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="860.0" x2="-542.5" y2="335.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="818.6" x2="-343.9" y2="76.1" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="786.8" x2="-85.0" y2="-122.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="766.8" x2="216.5" y2="-247.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="760.0" x2="540.0" y2="-290.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="766.8" x2="863.5" y2="-247.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="786.8" x2="1165.0" y2="-122.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="818.6" x2="1423.9" y2="76.1" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="860.0" x2="1622.5" y2="335.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="908.2" x2="1747.4" y2="636.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+        </svg>
+        <div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="14" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="10" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="6" /></svg></div>
+        <span class="speed" style="top:180px;width:420px;height:6px"></span>
+<span class="speed" style="top:330px;width:557px;height:11px"></span>
+<span class="speed" style="top:520px;width:694px;height:16px"></span>
+<span class="speed" style="top:1380px;width:451px;height:7px"></span>
+<span class="speed" style="top:1560px;width:588px;height:12px"></span>
+<span class="speed" style="top:1740px;width:725px;height:17px"></span>
+      </div>
 
-      <!-- Viñeta cinematográfica -->
+      <div id="flash" class="clip" data-start="0" data-duration="7" data-track-index="2"></div>
       <div id="vignette" class="clip" data-start="0" data-duration="7" data-track-index="3"></div>
+      <!-- Marcas de cuadro -->
+      <div id="frame-marks" class="clip" data-start="0" data-duration="7" data-track-index="6">
+        <span class="edge h" id="edge-t" style="top:48px"></span>
+        <span class="edge h" id="edge-b" style="bottom:48px"></span>
+        <span class="edge v" id="edge-l" style="left:48px"></span>
+        <span class="edge v" id="edge-r" style="right:48px"></span>
+        <span class="mark-label" id="lbl-1" style="left:72px;top:30px">SNY — 001</span>
+        <span class="mark-label" id="lbl-2" style="right:72px;bottom:30px">BA · AR</span>
+      </div>
+
     </div>
 
     <script>
       const tl = gsap.timeline({ paused: true });
 
-      // Temblor de impacto determinístico
       const shake = (target, at, amp, first = true) => {
-        tl.fromTo(
-          target,
-          { x: 0, y: 0 },
-          {
-            keyframes: [
-              { x: -amp, y: amp * 0.6, duration: 0.03 },
-              { x: amp * 0.8, y: -amp * 0.5, duration: 0.03 },
-              { x: -amp * 0.5, y: amp * 0.3, duration: 0.03 },
-              { x: amp * 0.3, y: -amp * 0.2, duration: 0.03 },
-              { x: 0, y: 0, duration: 0.04 },
-            ],
-            ease: "none",
-            immediateRender: first,
-          },
-          at,
-        );
+        tl.fromTo(target, { x: 0, y: 0 }, {
+          keyframes: [
+            { x: -amp, y: amp * 0.6, duration: 0.03 },
+            { x: amp * 0.8, y: -amp * 0.5, duration: 0.03 },
+            { x: -amp * 0.5, y: amp * 0.3, duration: 0.03 },
+            { x: amp * 0.3, y: -amp * 0.2, duration: 0.03 },
+            { x: 0, y: 0, duration: 0.04 },
+          ],
+          ease: "none",
+          immediateRender: first,
+        }, at);
       };
-      const flash = (at, peak, len) => {
-        tl.fromTo("#flash", { opacity: peak }, { opacity: 0, duration: len, ease: "power2.out", immediateRender: false }, at);
+      const flash = (at, peak, len, first = false) => {
+        tl.fromTo("#flash", { opacity: 0 }, {
+          keyframes: [{ opacity: peak, duration: 0.01 }, { opacity: 0, duration: len, ease: "power2.out" }],
+          immediateRender: first,
+        }, at);
       };
 
-      // A — scroll que acelera hasta volverse borroso
-      tl.fromTo(
-        "#scroll-stack",
-        { y: 0, filter: "blur(0px)" },
-        { y: -4600, filter: "blur(10px)", duration: 1.3, ease: "power3.in" },
-        0,
-      );
-      tl.fromTo("#scroll-stack", { scaleY: 1 }, { scaleY: 1.25, duration: 0.5, ease: "power2.in" }, 0.8);
-
-      // B — FRENÁ.
-      flash(1.3, 1, 0.14);
-      tl.fromTo("#frena-text", { scale: 2.6 }, { scale: 1, duration: 0.16, ease: "expo.out" }, 1.3);
-      shake("#frena-shake", 1.42, 22);
-
-      // C — ESTO / NO SE
-      tl.fromTo("#esto-text", { x: -1200, skewX: -14 }, { x: 0, skewX: 0, duration: 0.14, ease: "power4.out" }, 1.75);
-      shake("#esto-shake", 1.86, 16);
-      tl.fromTo("#nose-text", { x: 1200, skewX: 14, autoAlpha: 0 }, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.14, ease: "power4.out" }, 2.15);
-      shake("#esto-shake", 2.26, 18, false);
-
-      // D — scrollea. (interrupción: serif dorada)
-      flash(2.55, 0.55, 0.12);
-      tl.fromTo(
-        "#scrollea-text",
-        { clipPath: "inset(0% 100% 0% 0%)", scale: 1.18 },
-        { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: 0.2, ease: "expo.out" },
-        2.55,
-      );
-      tl.fromTo("#scrollea-bar", { scaleX: 0 }, { scaleX: 1, duration: 0.16, ease: "power4.out" }, 2.68);
-      tl.to("#scrollea-text", { scale: 1.07, duration: 0.08, ease: "power2.out" }, 2.95);
-      tl.to("#scrollea-text", { scale: 1, duration: 0.18, ease: "power2.inOut" }, 3.03);
-
-      // Transición — barras barren alternando dirección
-      gsap.utils.toArray(".bar").forEach((bar, i) => {
-        const dir = i % 2 === 0 ? -1 : 1;
-        tl.fromTo(
-          bar,
-          { xPercent: dir * 105 },
-          { keyframes: [{ xPercent: 0, duration: 0.14, ease: "power4.out" }, { xPercent: -dir * 105, duration: 0.16, ease: "power4.in" }] },
-          3.3 + i * 0.012,
-        );
+      // Capas globales: marco que se dibuja + grilla que late en cada golpe
+      tl.fromTo(["#edge-t", "#edge-b"], { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "expo.out" }, 0);
+      tl.fromTo(["#edge-l", "#edge-r"], { scaleY: 0 }, { scaleY: 1, duration: 0.35, ease: "expo.out" }, 0.05);
+      tl.fromTo(["#lbl-1", "#lbl-2"], { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.2, ease: "expo.out", stagger: 0.06 }, 0.1);
+      tl.fromTo("#dots-wrap", { scale: 1, opacity: 0.22 }, { scale: 1, opacity: 0.22, duration: 0.01 }, 0);
+      [1.3,1.75,2.15,2.55,3.9].forEach((t) => {
+        tl.to("#dots-wrap", { scale: 1.12, opacity: 0.6, duration: 0.05, ease: "power4.out" }, t);
+        tl.to("#dots-wrap", { scale: 1, opacity: 0.22, duration: 0.3, ease: "power2.out" }, t + 0.05);
       });
 
-      // E — SONYLUM cae letra por letra
-      tl.fromTo(
-        "#logo-word span",
-        { yPercent: -140, scale: 2.4, autoAlpha: 0 },
-        { yPercent: 0, scale: 1, autoAlpha: 1, duration: 0.2, ease: "expo.out", stagger: 0.04 },
-        3.62,
-      );
-      flash(3.9, 0.45, 0.14);
-      shake("#logo-shake", 3.9, 20);
+      // A — scroll que acelera + rieles + anillo + scanline
+      tl.fromTo("#scroll-stack", { y: 0, filter: "blur(0px)" }, { y: -4600, filter: "blur(10px)", duration: 1.3, ease: "power3.in" }, 0);
+      tl.fromTo("#scroll-stack", { scaleY: 1 }, { scaleY: 1.25, duration: 0.5, ease: "power2.in" }, 0.8);
+      tl.fromTo(["#rail-l", "#rail-r"], { strokeDashoffset: 0 }, { strokeDashoffset: 3000, duration: 1.3, ease: "power3.in" }, 0);
+      tl.fromTo("#scroll-ring", { rotation: 0, scale: 0.4 }, { rotation: 540, scale: 1.3, duration: 1.3, ease: "power3.in", transformOrigin: "540px 960px" }, 0);
+      tl.fromTo("#scan", { y: -960 }, { y: 960, duration: 0.42, ease: "none", repeat: 2 }, 0);
+
+      // B — FRENÁ.
+      flash(1.3, 1, 0.14, true);
+      tl.fromTo("#frena-sq", { rotation: 0, scale: 0 }, { rotation: 135, scale: 1, duration: 0.3, ease: "expo.out" }, 1.3);
+      tl.fromTo("#frena-sq2", { rotation: -30, scale: 1.6 }, { rotation: 20, scale: 1, duration: 0.35, ease: "expo.out" }, 1.3);
+      tl.fromTo("#frena-text", { scale: 2.6 }, { scale: 1, duration: 0.16, ease: "expo.out" }, 1.3);
+      shake("#frena-shake", 1.42, 24);
+
+      // C — ESTO / NO SE
+      tl.fromTo("#ghost-s", { x: -300, rotation: -12 }, { x: 60, rotation: 4, duration: 0.8, ease: "power2.out" }, 1.75);
+      tl.fromTo(".pop-dot", { scale: 0 }, { scale: 1, duration: 0.12, ease: "back.out(3)", stagger: 0.02 }, 1.75);
+      tl.fromTo("#hazard2", { xPercent: -110 }, { xPercent: 0, duration: 0.16, ease: "power4.out" }, 1.75);
+      tl.fromTo("#esto-text", { x: -1200, skewX: -14 }, { x: 0, skewX: 0, duration: 0.14, ease: "power4.out" }, 1.75);
+      shake("#esto-shake", 1.86, 18);
+      tl.fromTo("#hazard", { xPercent: 110 }, { xPercent: 0, duration: 0.16, ease: "power4.out" }, 2.15);
+      tl.fromTo("#nose-text", { x: 1200, skewX: 14, autoAlpha: 0 }, { x: 0, skewX: 0, autoAlpha: 1, duration: 0.14, ease: "power4.out" }, 2.15);
+      shake("#esto-shake", 2.26, 22, false);
+
+      // D — scrollea. con mira, anillo que se dibuja y órbita
+      flash(2.55, 0.55, 0.12);
+      tl.fromTo("#cross-h", { scaleX: 0 }, { scaleX: 1, duration: 0.2, ease: "expo.out", transformOrigin: "540px 960px" }, 2.55);
+      tl.fromTo("#cross-v", { scaleY: 0 }, { scaleY: 1, duration: 0.2, ease: "expo.out", transformOrigin: "540px 960px" }, 2.58);
+      tl.fromTo("#sc-ring-c", { strokeDashoffset: 2702 }, { strokeDashoffset: 0, duration: 0.45, ease: "expo.out" }, 2.55);
+      tl.fromTo("#sc-ring", { rotation: -90 }, { rotation: 90, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 2.55);
+      tl.fromTo("#orbit", { rotation: 0 }, { rotation: 520, duration: 0.9, ease: "power2.out", transformOrigin: "540px 960px" }, 2.55);
+      tl.fromTo("#scrollea-text", { clipPath: "inset(0% 100% 0% 0%)", scale: 1.2 }, { clipPath: "inset(0% 0% 0% 0%)", scale: 1, duration: 0.2, ease: "expo.out" }, 2.55);
+      tl.fromTo("#scrollea-bar", { scaleX: 0 }, { scaleX: 1, duration: 0.16, ease: "power4.out" }, 2.68);
+      tl.to("#scrollea-text", { scale: 1.08, duration: 0.08, ease: "power2.out" }, 2.95);
+      tl.to("#scrollea-text", { scale: 1, duration: 0.18, ease: "power2.inOut" }, 3.03);
+
+      // Transición — barras con las letras SONYLUM
+      gsap.utils.toArray(".bar").forEach((bar, i) => {
+        const dir = i % 2 === 0 ? -1 : 1;
+        tl.fromTo(bar, { xPercent: dir * 105 }, {
+          keyframes: [{ xPercent: 0, duration: 0.14, ease: "power4.out" }, { xPercent: -dir * 105, duration: 0.16, ease: "power4.in" }],
+        }, 3.3 + i * 0.012);
+      });
+
+      // E — SONYLUM con construcción geométrica
+      tl.fromTo(".ghost", { scale: 1.4, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.3, ease: "expo.out", stagger: 0.05 }, 3.55);
+      tl.fromTo(".ghost", { y: 0 }, { y: (i) => (i % 2 ? -70 : 70), duration: 3.2, ease: "sine.inOut", immediateRender: false }, 3.8);
+      tl.fromTo("#diag-a", { scale: 0 }, { scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }, 3.6);
+      tl.fromTo("#diag-b", { scale: 0 }, { scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }, 3.66);
+      tl.fromTo("#logo-word span", { yPercent: -140, scale: 2.4, autoAlpha: 0 }, { yPercent: 0, scale: 1, autoAlpha: 1, duration: 0.2, ease: "expo.out", stagger: 0.04 }, 3.62);
+      flash(3.9, 0.5, 0.14);
+      shake("#logo-shake", 3.9, 22);
+      tl.fromTo("#logo-ring-c", { strokeDashoffset: 2953 }, { strokeDashoffset: 0, duration: 0.6, ease: "expo.out" }, 3.9);
+      tl.fromTo("#logo-ring", { rotation: -90 }, { rotation: 0, duration: 0.6, ease: "expo.out", transformOrigin: "540px 960px" }, 3.9);
+      tl.fromTo("#logo-ticks", { rotation: -40, autoAlpha: 0 }, { rotation: 40, autoAlpha: 1, duration: 3.1, ease: "sine.out", transformOrigin: "540px 960px" }, 3.9);
+      tl.fromTo(".cmp", { scale: 0, rotation: 0 }, { scale: 1, rotation: 45, duration: 0.25, ease: "back.out(3)", stagger: 0.05 }, 4.0);
       tl.fromTo("#logo-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 4.05);
-      tl.fromTo("#logo-tag", { autoAlpha: 0, y: 30 }, { autoAlpha: 0.85, y: 0, duration: 0.4, ease: "expo.out" }, 4.2);
+      tl.fromTo("#logo-tag", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "expo.out" }, 4.2);
       tl.fromTo("#logo-push", { scale: 1 }, { scale: 1.06, duration: 2.8, ease: "sine.inOut" }, 4.2);
+
+      // Ráfagas: anillos, rayos y líneas de velocidad en cada golpe
+      
+      tl.fromTo("#hit-0 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 1.3);
+      tl.fromTo("#hit-0 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 1.3);
+      tl.fromTo("#hit-0 .speed", { x: -1400 }, { x: 1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 1.3);
+      tl.fromTo("#hit-1 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 1.75);
+      tl.fromTo("#hit-1 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 1.75);
+      tl.fromTo("#hit-1 .speed", { x: 1400 }, { x: -1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 1.75);
+      tl.fromTo("#hit-2 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 2.15);
+      tl.fromTo("#hit-2 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 2.15);
+      tl.fromTo("#hit-2 .speed", { x: -1400 }, { x: 1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 2.15);
+      tl.fromTo("#hit-3 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 2.55);
+      tl.fromTo("#hit-3 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 2.55);
+      tl.fromTo("#hit-3 .speed", { x: 1400 }, { x: -1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 2.55);
+      tl.fromTo("#hit-4 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 3.9);
+      tl.fromTo("#hit-4 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 3.9);
+      tl.fromTo("#hit-4 .speed", { x: -1400 }, { x: 1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 3.9);
 
       window.__timelines["main"] = tl;
       tl.seek(0);
