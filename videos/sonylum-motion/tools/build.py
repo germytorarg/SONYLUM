@@ -7,7 +7,9 @@ HITS = [  # (time, ring color var, ray color var)
     (1.75, "--gold", "--bone"),
     (2.15, "--bordo-hi", "--gold"),
     (2.55, "--gold-hi", "--bordo-hi"),
-    (3.90, "--gold", "--gold-hi"),
+    (3.60, "--gold-hi", "--bone"),
+    (3.98, "--gold", "--gold-hi"),
+    (4.68, "--gold", "--gold-hi"),
 ]
 
 def rays(n, r1, r2, color, width, cls):
@@ -58,6 +60,15 @@ dots_svg = "\n".join(dots)
 # ---------- scene A side rails ----------
 # ---------- dot column scene C ----------
 dot_col = "\n".join(f'<span class="pop-dot" style="top:{300 + k*95}px"></span>' for k in range(14))
+
+# ---------- logo real: símbolo + letras del wordmark ----------
+LOGO_K = 500 / 567  # símbolo 567px de ancho -> 500px en pantalla
+WM_SEGS = [(1, 68), (88, 178), (200, 273), (291, 367), (385, 439), (458, 529), (553, 638)]
+WM_W, WM_H = round(638 * LOGO_K), round(89 * LOGO_K)
+wm_html = "".join(
+    f'<img class="wm" src="assets/wm-{i}.png" alt="" style="left:{a*LOGO_K:.1f}px;width:{(b-a)*LOGO_K:.1f}px;height:{WM_H}px" />'
+    for i, (a, b) in enumerate(WM_SEGS)
+)
 
 # ---------- logo ghost letters ----------
 ghosts = [  # letter, left, top, size
@@ -176,20 +187,30 @@ html = f'''<!doctype html>
       .bar.gold b {{ color: var(--ink); }}
 
       /* E — logo */
+      #diag-a, #diag-b {{ opacity: 0.45; }}
       #scene-logo {{ background: radial-gradient(ellipse at 50% 50%, #22140f 0%, var(--ink) 60%); }}
       .ghost {{
         position: absolute; font-family: var(--display); line-height: 1; display: block;
         color: var(--ink); -webkit-text-stroke: 3px var(--gold);
       }}
-      #logo-push, #logo-shake {{ display: flex; flex-direction: column; align-items: center; gap: 34px; }}
+      #logo-push, #logo-shake {{ display: flex; flex-direction: column; align-items: center; gap: 26px; }}
+      #logo-symbol {{ display: block; width: 500px; height: auto; }}
+      #logo-wm {{ position: relative; width: {WM_W}px; height: {WM_H}px; }}
+      .wm {{ position: absolute; top: 0; display: block; }}
+      #scene-cc {{ background: var(--ink); }}
+      #cc-band {{ position: absolute; left: 0; top: 560px; width: 1080px; height: 800px; background: var(--bordo); display: block; }}
+      #cc-logo {{ display: block; width: 900px; height: auto; }}
+      #scene-lb {{ background: var(--bordo); }}
+      #lb-logo {{ display: block; width: 880px; height: auto; }}
+      #lb-bar {{ display: block; width: 880px; height: 22px; background: var(--gold); transform-origin: left center; }}
       #logo-word {{
         display: flex; font-family: var(--serif); font-weight: 700; font-size: 200px; line-height: 1;
         color: var(--gold-hi); letter-spacing: -0.01em;
       }}
       #logo-word span {{ display: inline-block; }}
-      #logo-rule {{ display: block; width: 700px; height: 8px; background: var(--gold); }}
+      #logo-rule {{ display: block; width: 440px; height: 6px; background: var(--gold); }}
       #logo-tag {{
-        font-family: var(--display); font-size: 27px; letter-spacing: 0.26em; padding-left: 0.26em; white-space: nowrap;
+        font-family: var(--display); font-size: 22px; letter-spacing: 0.24em; padding-left: 0.24em; white-space: nowrap;
         color: var(--bone); text-transform: uppercase;
       }}
 
@@ -210,10 +231,10 @@ html = f'''<!doctype html>
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="7" data-width="1080" data-height="1920">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="7.9" data-width="1080" data-height="1920">
 
       <!-- Grilla de puntos global -->
-      <div id="fx-dots" class="clip" data-start="0" data-duration="7" data-track-index="4">
+      <div id="fx-dots" class="clip" data-start="0" data-duration="7.9" data-track-index="4">
         <div id="dots-wrap">
           <svg class="fx-svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">{dots_svg}</svg>
         </div>
@@ -265,8 +286,24 @@ html = f'''<!doctype html>
         </div>
       </section>
 
+      <!-- Marcas: Creando Contenidos -->
+      <section id="scene-cc" class="clip" data-start="3.6" data-duration="0.38" data-track-index="0">
+        <span id="cc-band"></span>
+        <div class="scene-content">
+          <div id="cc-shake"><img id="cc-logo" src="assets/creando-contenidos.png" alt="Creando Contenidos" /></div>
+        </div>
+      </section>
+
+      <!-- Marcas: LocalBA -->
+      <section id="scene-lb" class="clip" data-start="3.98" data-duration="0.38" data-track-index="0">
+        <div class="scene-content" id="lb-shake">
+          <img id="lb-logo" src="assets/localba.png" alt="LocalBA" />
+          <span id="lb-bar"></span>
+        </div>
+      </section>
+
       <!-- E: SONYLUM -->
-      <section id="scene-logo" class="clip" data-start="3.45" data-duration="3.55" data-track-index="0">
+      <section id="scene-logo" class="clip" data-start="4.36" data-duration="3.54" data-track-index="0">
         <div id="ghosts">{ghost_html}</div>
         <div id="diag-a" class="layer"><svg class="fx-svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}"><line x1="0" y1="0" x2="{W}" y2="{H}" stroke="var(--bordo-hi)" stroke-width="6" /></svg></div>
         <div id="diag-b" class="layer"><svg class="fx-svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}"><line x1="{W}" y1="0" x2="0" y2="{H}" stroke="var(--bordo-hi)" stroke-width="6" /></svg></div>
@@ -276,7 +313,8 @@ html = f'''<!doctype html>
         <div class="scene-content">
           <div id="logo-push">
             <div id="logo-shake">
-              <div id="logo-word">{"".join(f"<span>{c}</span>" for c in "SONYLUM")}</div>
+              <img id="logo-symbol" src="assets/sonylum-symbol.png" alt="Sonylum" />
+              <div id="logo-wm">{wm_html}</div>
               <span id="logo-rule"></span>
               <div id="logo-tag">Estudio digital · Villa Luro, BA</div>
             </div>
@@ -292,10 +330,10 @@ html = f'''<!doctype html>
       <!-- Ráfagas de impacto -->
       {"".join(hit_html)}
 
-      <div id="flash" class="clip" data-start="0" data-duration="7" data-track-index="2"></div>
-      <div id="vignette" class="clip" data-start="0" data-duration="7" data-track-index="3"></div>
+      <div id="flash" class="clip" data-start="0" data-duration="7.9" data-track-index="2"></div>
+      <div id="vignette" class="clip" data-start="0" data-duration="7.9" data-track-index="3"></div>
       <!-- Marcas de cuadro -->
-      <div id="frame-marks" class="clip" data-start="0" data-duration="7" data-track-index="6">
+      <div id="frame-marks" class="clip" data-start="0" data-duration="7.9" data-track-index="6">
         <span class="edge h" id="edge-t" style="top:48px"></span>
         <span class="edge h" id="edge-b" style="bottom:48px"></span>
         <span class="edge v" id="edge-l" style="left:48px"></span>
@@ -383,21 +421,30 @@ html = f'''<!doctype html>
         }}, 3.3 + i * 0.012);
       }});
 
-      // E — SONYLUM con construcción geométrica
-      tl.fromTo(".ghost", {{ scale: 1.4, autoAlpha: 0 }}, {{ scale: 1, autoAlpha: 1, duration: 0.3, ease: "expo.out", stagger: 0.05 }}, 3.55);
-      tl.fromTo(".ghost", {{ y: 0 }}, {{ y: (i) => (i % 2 ? -70 : 70), duration: 3.2, ease: "sine.inOut", immediateRender: false }}, 3.8);
-      tl.fromTo("#diag-a", {{ scale: 0 }}, {{ scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }}, 3.6);
-      tl.fromTo("#diag-b", {{ scale: 0 }}, {{ scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }}, 3.66);
-      tl.fromTo("#logo-word span", {{ yPercent: -140, scale: 2.4, autoAlpha: 0 }}, {{ yPercent: 0, scale: 1, autoAlpha: 1, duration: 0.2, ease: "expo.out", stagger: 0.04 }}, 3.62);
-      flash(3.9, 0.5, 0.14);
-      shake("#logo-shake", 3.9, 22);
-      tl.fromTo("#logo-ring-c", {{ strokeDashoffset: 2953 }}, {{ strokeDashoffset: 0, duration: 0.6, ease: "expo.out" }}, 3.9);
-      tl.fromTo("#logo-ring", {{ rotation: -90 }}, {{ rotation: 0, duration: 0.6, ease: "expo.out", transformOrigin: "540px 960px" }}, 3.9);
-      tl.fromTo("#logo-ticks", {{ rotation: -40, autoAlpha: 0 }}, {{ rotation: 40, autoAlpha: 1, duration: 3.1, ease: "sine.out", transformOrigin: "540px 960px" }}, 3.9);
-      tl.fromTo(".cmp", {{ scale: 0, rotation: 0 }}, {{ scale: 1, rotation: 45, duration: 0.25, ease: "back.out(3)", stagger: 0.05 }}, 4.0);
-      tl.fromTo("#logo-rule", {{ scaleX: 0 }}, {{ scaleX: 1, duration: 0.3, ease: "expo.out" }}, 4.05);
-      tl.fromTo("#logo-tag", {{ autoAlpha: 0, y: 30 }}, {{ autoAlpha: 1, y: 0, duration: 0.4, ease: "expo.out" }}, 4.2);
-      tl.fromTo("#logo-push", {{ scale: 1 }}, {{ scale: 1.06, duration: 2.8, ease: "sine.inOut" }}, 4.2);
+      // Marcas — Creando Contenidos y LocalBA, cortes secos
+      tl.fromTo("#cc-band", {{ scaleY: 0 }}, {{ scaleY: 1, duration: 0.14, ease: "power4.out" }}, 3.6);
+      tl.fromTo("#cc-logo", {{ scale: 1.9 }}, {{ scale: 1, duration: 0.16, ease: "expo.out" }}, 3.6);
+      shake("#cc-shake", 3.72, 20);
+      tl.fromTo("#lb-logo", {{ x: 1200, skewX: -16 }}, {{ x: 0, skewX: 0, duration: 0.14, ease: "power4.out" }}, 3.98);
+      tl.fromTo("#lb-bar", {{ scaleX: 0 }}, {{ scaleX: 1, duration: 0.16, ease: "power4.out" }}, 4.06);
+      shake("#lb-shake", 4.1, 20);
+
+      // E — SONYLUM: símbolo que gira y se clava, letras que caen, construcción geométrica
+      tl.fromTo(".ghost", {{ scale: 1.4, autoAlpha: 0 }}, {{ scale: 1, autoAlpha: 1, duration: 0.3, ease: "expo.out", stagger: 0.05 }}, 4.4);
+      tl.fromTo(".ghost", {{ y: 0 }}, {{ y: (i) => (i % 2 ? -70 : 70), duration: 3.2, ease: "sine.inOut", immediateRender: false }}, 4.65);
+      tl.fromTo("#diag-a", {{ scale: 0 }}, {{ scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }}, 4.38);
+      tl.fromTo("#diag-b", {{ scale: 0 }}, {{ scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }}, 4.44);
+      tl.fromTo("#logo-symbol", {{ scale: 3.2, rotation: 180, autoAlpha: 0 }}, {{ scale: 1, rotation: 0, autoAlpha: 1, duration: 0.3, ease: "expo.out" }}, 4.38);
+      tl.fromTo(".wm", {{ yPercent: -260, scale: 2.4, autoAlpha: 0 }}, {{ yPercent: 0, scale: 1, autoAlpha: 1, duration: 0.2, ease: "expo.out", stagger: 0.035 }}, 4.46);
+      flash(4.68, 0.5, 0.14);
+      shake("#logo-shake", 4.68, 22);
+      tl.fromTo("#logo-ring-c", {{ strokeDashoffset: 2953 }}, {{ strokeDashoffset: 0, duration: 0.6, ease: "expo.out" }}, 4.68);
+      tl.fromTo("#logo-ring", {{ rotation: -90 }}, {{ rotation: 0, duration: 0.6, ease: "expo.out", transformOrigin: "540px 960px" }}, 4.68);
+      tl.fromTo("#logo-ticks", {{ rotation: -40, autoAlpha: 0 }}, {{ rotation: 40, autoAlpha: 1, duration: 3.2, ease: "sine.out", transformOrigin: "540px 960px" }}, 4.68);
+      tl.fromTo(".cmp", {{ scale: 0, rotation: 0 }}, {{ scale: 1, rotation: 45, duration: 0.25, ease: "back.out(3)", stagger: 0.05 }}, 4.78);
+      tl.fromTo("#logo-rule", {{ scaleX: 0 }}, {{ scaleX: 1, duration: 0.3, ease: "expo.out" }}, 4.83);
+      tl.fromTo("#logo-tag", {{ autoAlpha: 0, y: 30 }}, {{ autoAlpha: 1, y: 0, duration: 0.4, ease: "expo.out" }}, 4.98);
+      tl.fromTo("#logo-push", {{ scale: 1 }}, {{ scale: 1.03, duration: 2.9, ease: "sine.inOut" }}, 4.98);
 
       // Ráfagas: anillos, rayos y líneas de velocidad en cada golpe
       {"".join(hit_js)}

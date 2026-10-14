@@ -4,7 +4,7 @@ flow: automation
 storyboard: no
 message: "Sonylum hace contenido que no se scrollea"
 aspect: "9:16"
-length: 7s
+length: 7.9s
 language: es-AR
 ---
 

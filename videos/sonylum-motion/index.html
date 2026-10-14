@@ -94,20 +94,30 @@
       .bar.gold b { color: var(--ink); }
 
       /* E — logo */
+      #diag-a, #diag-b { opacity: 0.45; }
       #scene-logo { background: radial-gradient(ellipse at 50% 50%, #22140f 0%, var(--ink) 60%); }
       .ghost {
         position: absolute; font-family: var(--display); line-height: 1; display: block;
         color: var(--ink); -webkit-text-stroke: 3px var(--gold);
       }
-      #logo-push, #logo-shake { display: flex; flex-direction: column; align-items: center; gap: 34px; }
+      #logo-push, #logo-shake { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+      #logo-symbol { display: block; width: 500px; height: auto; }
+      #logo-wm { position: relative; width: 563px; height: 78px; }
+      .wm { position: absolute; top: 0; display: block; }
+      #scene-cc { background: var(--ink); }
+      #cc-band { position: absolute; left: 0; top: 560px; width: 1080px; height: 800px; background: var(--bordo); display: block; }
+      #cc-logo { display: block; width: 900px; height: auto; }
+      #scene-lb { background: var(--bordo); }
+      #lb-logo { display: block; width: 880px; height: auto; }
+      #lb-bar { display: block; width: 880px; height: 22px; background: var(--gold); transform-origin: left center; }
       #logo-word {
         display: flex; font-family: var(--serif); font-weight: 700; font-size: 200px; line-height: 1;
         color: var(--gold-hi); letter-spacing: -0.01em;
       }
       #logo-word span { display: inline-block; }
-      #logo-rule { display: block; width: 700px; height: 8px; background: var(--gold); }
+      #logo-rule { display: block; width: 440px; height: 6px; background: var(--gold); }
       #logo-tag {
-        font-family: var(--display); font-size: 27px; letter-spacing: 0.26em; padding-left: 0.26em; white-space: nowrap;
+        font-family: var(--display); font-size: 22px; letter-spacing: 0.24em; padding-left: 0.24em; white-space: nowrap;
         color: var(--bone); text-transform: uppercase;
       }
 
@@ -128,10 +138,10 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="7" data-width="1080" data-height="1920">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="7.9" data-width="1080" data-height="1920">
 
       <!-- Grilla de puntos global -->
-      <div id="fx-dots" class="clip" data-start="0" data-duration="7" data-track-index="4">
+      <div id="fx-dots" class="clip" data-start="0" data-duration="7.9" data-track-index="4">
         <div id="dots-wrap">
           <svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="30" cy="0" r="3.2" />
 <circle cx="90" cy="0" r="3.2" />
@@ -822,8 +832,24 @@
         </div>
       </section>
 
+      <!-- Marcas: Creando Contenidos -->
+      <section id="scene-cc" class="clip" data-start="3.6" data-duration="0.38" data-track-index="0">
+        <span id="cc-band"></span>
+        <div class="scene-content">
+          <div id="cc-shake"><img id="cc-logo" src="assets/creando-contenidos.png" alt="Creando Contenidos" /></div>
+        </div>
+      </section>
+
+      <!-- Marcas: LocalBA -->
+      <section id="scene-lb" class="clip" data-start="3.98" data-duration="0.38" data-track-index="0">
+        <div class="scene-content" id="lb-shake">
+          <img id="lb-logo" src="assets/localba.png" alt="LocalBA" />
+          <span id="lb-bar"></span>
+        </div>
+      </section>
+
       <!-- E: SONYLUM -->
-      <section id="scene-logo" class="clip" data-start="3.45" data-duration="3.55" data-track-index="0">
+      <section id="scene-logo" class="clip" data-start="4.36" data-duration="3.54" data-track-index="0">
         <div id="ghosts"><span class="ghost" data-layout-ignore style="left:-120px;top:-40px;font-size:760px">S</span>
 <span class="ghost" data-layout-ignore style="left:640px;top:-120px;font-size:700px">Y</span>
 <span class="ghost" data-layout-ignore style="left:-60px;top:1180px;font-size:720px">L</span>
@@ -898,7 +924,8 @@
         <div class="scene-content">
           <div id="logo-push">
             <div id="logo-shake">
-              <div id="logo-word"><span>S</span><span>O</span><span>N</span><span>Y</span><span>L</span><span>U</span><span>M</span></div>
+              <img id="logo-symbol" src="assets/sonylum-symbol.png" alt="Sonylum" />
+              <div id="logo-wm"><img class="wm" src="assets/wm-0.png" alt="" style="left:0.9px;width:59.1px;height:78px" /><img class="wm" src="assets/wm-1.png" alt="" style="left:77.6px;width:79.4px;height:78px" /><img class="wm" src="assets/wm-2.png" alt="" style="left:176.4px;width:64.4px;height:78px" /><img class="wm" src="assets/wm-3.png" alt="" style="left:256.6px;width:67.0px;height:78px" /><img class="wm" src="assets/wm-4.png" alt="" style="left:339.5px;width:47.6px;height:78px" /><img class="wm" src="assets/wm-5.png" alt="" style="left:403.9px;width:62.6px;height:78px" /><img class="wm" src="assets/wm-6.png" alt="" style="left:487.7px;width:75.0px;height:78px" /></div>
               <span id="logo-rule"></span>
               <div id="logo-tag">Estudio digital · Villa Luro, BA</div>
             </div>
@@ -1067,7 +1094,81 @@
 <span class="speed" style="top:1560px;width:588px;height:12px"></span>
 <span class="speed" style="top:1740px;width:725px;height:17px"></span>
       </div>
-      <div id="hit-4" class="clip fx-hit" data-start="3.9" data-duration="0.55" data-track-index="5">
+      <div id="hit-4" class="clip fx-hit" data-start="3.6" data-duration="0.55" data-track-index="5">
+        <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="1060.0" x2="1622.5" y2="1585.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="1101.4" x2="1423.9" y2="1843.9" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="1133.2" x2="1165.0" y2="2042.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="1153.2" x2="863.5" y2="2167.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="1160.0" x2="540.0" y2="2210.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="1153.2" x2="216.5" y2="2167.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="1133.2" x2="-85.0" y2="2042.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="1101.4" x2="-343.9" y2="1843.9" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="1060.0" x2="-542.5" y2="1585.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="1011.8" x2="-667.4" y2="1283.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="340.0" y1="960.0" x2="-710.0" y2="960.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="908.2" x2="-667.4" y2="636.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="860.0" x2="-542.5" y2="335.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="818.6" x2="-343.9" y2="76.1" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="786.8" x2="-85.0" y2="-122.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="766.8" x2="216.5" y2="-247.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="760.0" x2="540.0" y2="-290.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="766.8" x2="863.5" y2="-247.4" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="786.8" x2="1165.0" y2="-122.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="818.6" x2="1423.9" y2="76.1" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="860.0" x2="1622.5" y2="335.0" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="908.2" x2="1747.4" y2="636.5" stroke="var(--bone)" stroke-width="5" stroke-linecap="square" />
+        </svg>
+        <div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold-hi)" stroke-width="14" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold-hi)" stroke-width="10" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold-hi)" stroke-width="6" /></svg></div>
+        <span class="speed" style="top:180px;width:420px;height:6px"></span>
+<span class="speed" style="top:330px;width:557px;height:11px"></span>
+<span class="speed" style="top:520px;width:694px;height:16px"></span>
+<span class="speed" style="top:1380px;width:451px;height:7px"></span>
+<span class="speed" style="top:1560px;width:588px;height:12px"></span>
+<span class="speed" style="top:1740px;width:725px;height:17px"></span>
+      </div>
+      <div id="hit-5" class="clip fx-hit" data-start="3.98" data-duration="0.55" data-track-index="5">
+        <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
+          <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="1060.0" x2="1622.5" y2="1585.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="1101.4" x2="1423.9" y2="1843.9" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="1133.2" x2="1165.0" y2="2042.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="1153.2" x2="863.5" y2="2167.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="1160.0" x2="540.0" y2="2210.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="1153.2" x2="216.5" y2="2167.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="1133.2" x2="-85.0" y2="2042.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="1101.4" x2="-343.9" y2="1843.9" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="1060.0" x2="-542.5" y2="1585.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="1011.8" x2="-667.4" y2="1283.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="340.0" y1="960.0" x2="-710.0" y2="960.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="346.8" y1="908.2" x2="-667.4" y2="636.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="366.8" y1="860.0" x2="-542.5" y2="335.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="398.6" y1="818.6" x2="-343.9" y2="76.1" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="440.0" y1="786.8" x2="-85.0" y2="-122.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="488.2" y1="766.8" x2="216.5" y2="-247.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="540.0" y1="760.0" x2="540.0" y2="-290.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="591.8" y1="766.8" x2="863.5" y2="-247.4" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="640.0" y1="786.8" x2="1165.0" y2="-122.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="681.4" y1="818.6" x2="1423.9" y2="76.1" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="713.2" y1="860.0" x2="1622.5" y2="335.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+<line class="ray" x1="733.2" y1="908.2" x2="1747.4" y2="636.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
+        </svg>
+        <div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="14" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="10" /></svg></div>
+<div class="layer ring"><svg class="fx-svg" viewBox="0 0 1080 1920" width="1080" height="1920"><circle cx="540" cy="960" r="150" fill="none" stroke="var(--gold)" stroke-width="6" /></svg></div>
+        <span class="speed" style="top:180px;width:420px;height:6px"></span>
+<span class="speed" style="top:330px;width:557px;height:11px"></span>
+<span class="speed" style="top:520px;width:694px;height:16px"></span>
+<span class="speed" style="top:1380px;width:451px;height:7px"></span>
+<span class="speed" style="top:1560px;width:588px;height:12px"></span>
+<span class="speed" style="top:1740px;width:725px;height:17px"></span>
+      </div>
+      <div id="hit-6" class="clip fx-hit" data-start="4.68" data-duration="0.55" data-track-index="5">
         <svg class="fx-svg rays" viewBox="0 0 1080 1920" width="1080" height="1920">
           <line class="ray" x1="740.0" y1="960.0" x2="1790.0" y2="960.0" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
 <line class="ray" x1="733.2" y1="1011.8" x2="1747.4" y2="1283.5" stroke="var(--gold-hi)" stroke-width="5" stroke-linecap="square" />
@@ -1105,10 +1206,10 @@
 <span class="speed" style="top:1740px;width:725px;height:17px"></span>
       </div>
 
-      <div id="flash" class="clip" data-start="0" data-duration="7" data-track-index="2"></div>
-      <div id="vignette" class="clip" data-start="0" data-duration="7" data-track-index="3"></div>
+      <div id="flash" class="clip" data-start="0" data-duration="7.9" data-track-index="2"></div>
+      <div id="vignette" class="clip" data-start="0" data-duration="7.9" data-track-index="3"></div>
       <!-- Marcas de cuadro -->
-      <div id="frame-marks" class="clip" data-start="0" data-duration="7" data-track-index="6">
+      <div id="frame-marks" class="clip" data-start="0" data-duration="7.9" data-track-index="6">
         <span class="edge h" id="edge-t" style="top:48px"></span>
         <span class="edge h" id="edge-b" style="bottom:48px"></span>
         <span class="edge v" id="edge-l" style="left:48px"></span>
@@ -1147,7 +1248,7 @@
       tl.fromTo(["#edge-l", "#edge-r"], { scaleY: 0 }, { scaleY: 1, duration: 0.35, ease: "expo.out" }, 0.05);
       tl.fromTo(["#lbl-1", "#lbl-2"], { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.2, ease: "expo.out", stagger: 0.06 }, 0.1);
       tl.fromTo("#dots-wrap", { scale: 1, opacity: 0.22 }, { scale: 1, opacity: 0.22, duration: 0.01 }, 0);
-      [1.3,1.75,2.15,2.55,3.9].forEach((t) => {
+      [1.3,1.75,2.15,2.55,3.6,3.98,4.68].forEach((t) => {
         tl.to("#dots-wrap", { scale: 1.12, opacity: 0.6, duration: 0.05, ease: "power4.out" }, t);
         tl.to("#dots-wrap", { scale: 1, opacity: 0.22, duration: 0.3, ease: "power2.out" }, t + 0.05);
       });
@@ -1196,21 +1297,30 @@
         }, 3.3 + i * 0.012);
       });
 
-      // E — SONYLUM con construcción geométrica
-      tl.fromTo(".ghost", { scale: 1.4, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.3, ease: "expo.out", stagger: 0.05 }, 3.55);
-      tl.fromTo(".ghost", { y: 0 }, { y: (i) => (i % 2 ? -70 : 70), duration: 3.2, ease: "sine.inOut", immediateRender: false }, 3.8);
-      tl.fromTo("#diag-a", { scale: 0 }, { scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }, 3.6);
-      tl.fromTo("#diag-b", { scale: 0 }, { scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }, 3.66);
-      tl.fromTo("#logo-word span", { yPercent: -140, scale: 2.4, autoAlpha: 0 }, { yPercent: 0, scale: 1, autoAlpha: 1, duration: 0.2, ease: "expo.out", stagger: 0.04 }, 3.62);
-      flash(3.9, 0.5, 0.14);
-      shake("#logo-shake", 3.9, 22);
-      tl.fromTo("#logo-ring-c", { strokeDashoffset: 2953 }, { strokeDashoffset: 0, duration: 0.6, ease: "expo.out" }, 3.9);
-      tl.fromTo("#logo-ring", { rotation: -90 }, { rotation: 0, duration: 0.6, ease: "expo.out", transformOrigin: "540px 960px" }, 3.9);
-      tl.fromTo("#logo-ticks", { rotation: -40, autoAlpha: 0 }, { rotation: 40, autoAlpha: 1, duration: 3.1, ease: "sine.out", transformOrigin: "540px 960px" }, 3.9);
-      tl.fromTo(".cmp", { scale: 0, rotation: 0 }, { scale: 1, rotation: 45, duration: 0.25, ease: "back.out(3)", stagger: 0.05 }, 4.0);
-      tl.fromTo("#logo-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 4.05);
-      tl.fromTo("#logo-tag", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "expo.out" }, 4.2);
-      tl.fromTo("#logo-push", { scale: 1 }, { scale: 1.06, duration: 2.8, ease: "sine.inOut" }, 4.2);
+      // Marcas — Creando Contenidos y LocalBA, cortes secos
+      tl.fromTo("#cc-band", { scaleY: 0 }, { scaleY: 1, duration: 0.14, ease: "power4.out" }, 3.6);
+      tl.fromTo("#cc-logo", { scale: 1.9 }, { scale: 1, duration: 0.16, ease: "expo.out" }, 3.6);
+      shake("#cc-shake", 3.72, 20);
+      tl.fromTo("#lb-logo", { x: 1200, skewX: -16 }, { x: 0, skewX: 0, duration: 0.14, ease: "power4.out" }, 3.98);
+      tl.fromTo("#lb-bar", { scaleX: 0 }, { scaleX: 1, duration: 0.16, ease: "power4.out" }, 4.06);
+      shake("#lb-shake", 4.1, 20);
+
+      // E — SONYLUM: símbolo que gira y se clava, letras que caen, construcción geométrica
+      tl.fromTo(".ghost", { scale: 1.4, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.3, ease: "expo.out", stagger: 0.05 }, 4.4);
+      tl.fromTo(".ghost", { y: 0 }, { y: (i) => (i % 2 ? -70 : 70), duration: 3.2, ease: "sine.inOut", immediateRender: false }, 4.65);
+      tl.fromTo("#diag-a", { scale: 0 }, { scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }, 4.38);
+      tl.fromTo("#diag-b", { scale: 0 }, { scale: 1, duration: 0.35, ease: "expo.out", transformOrigin: "540px 960px" }, 4.44);
+      tl.fromTo("#logo-symbol", { scale: 3.2, rotation: 180, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 0.3, ease: "expo.out" }, 4.38);
+      tl.fromTo(".wm", { yPercent: -260, scale: 2.4, autoAlpha: 0 }, { yPercent: 0, scale: 1, autoAlpha: 1, duration: 0.2, ease: "expo.out", stagger: 0.035 }, 4.46);
+      flash(4.68, 0.5, 0.14);
+      shake("#logo-shake", 4.68, 22);
+      tl.fromTo("#logo-ring-c", { strokeDashoffset: 2953 }, { strokeDashoffset: 0, duration: 0.6, ease: "expo.out" }, 4.68);
+      tl.fromTo("#logo-ring", { rotation: -90 }, { rotation: 0, duration: 0.6, ease: "expo.out", transformOrigin: "540px 960px" }, 4.68);
+      tl.fromTo("#logo-ticks", { rotation: -40, autoAlpha: 0 }, { rotation: 40, autoAlpha: 1, duration: 3.2, ease: "sine.out", transformOrigin: "540px 960px" }, 4.68);
+      tl.fromTo(".cmp", { scale: 0, rotation: 0 }, { scale: 1, rotation: 45, duration: 0.25, ease: "back.out(3)", stagger: 0.05 }, 4.78);
+      tl.fromTo("#logo-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.3, ease: "expo.out" }, 4.83);
+      tl.fromTo("#logo-tag", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "expo.out" }, 4.98);
+      tl.fromTo("#logo-push", { scale: 1 }, { scale: 1.03, duration: 2.9, ease: "sine.inOut" }, 4.98);
 
       // Ráfagas: anillos, rayos y líneas de velocidad en cada golpe
       
@@ -1226,9 +1336,15 @@
       tl.fromTo("#hit-3 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 2.55);
       tl.fromTo("#hit-3 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 2.55);
       tl.fromTo("#hit-3 .speed", { x: 1400 }, { x: -1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 2.55);
-      tl.fromTo("#hit-4 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 3.9);
-      tl.fromTo("#hit-4 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 3.9);
-      tl.fromTo("#hit-4 .speed", { x: -1400 }, { x: 1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 3.9);
+      tl.fromTo("#hit-4 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 3.6);
+      tl.fromTo("#hit-4 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 3.6);
+      tl.fromTo("#hit-4 .speed", { x: -1400 }, { x: 1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 3.6);
+      tl.fromTo("#hit-5 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 3.98);
+      tl.fromTo("#hit-5 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 3.98);
+      tl.fromTo("#hit-5 .speed", { x: 1400 }, { x: -1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 3.98);
+      tl.fromTo("#hit-6 .rays", { scale: 0.35, opacity: 1 }, { scale: 1.2, opacity: 0, duration: 0.45, ease: "expo.out", transformOrigin: "540px 960px" }, 4.68);
+      tl.fromTo("#hit-6 .ring", { scale: 0.2, opacity: 1 }, { scale: (k) => 2.4 + k * 1.3, opacity: 0, duration: 0.5, ease: "expo.out", transformOrigin: "540px 960px", stagger: 0.03 }, 4.68);
+      tl.fromTo("#hit-6 .speed", { x: -1400 }, { x: 1500, duration: 0.32, ease: "power4.inOut", stagger: 0.015 }, 4.68);
 
       window.__timelines["main"] = tl;
       tl.seek(0);
