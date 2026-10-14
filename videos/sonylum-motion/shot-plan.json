@@ -1,0 +1,28 @@
+{
+  "category": "kinetic-type",
+  "duration_s": 7,
+  "fps": 30,
+  "canvas": { "width": 1080, "height": 1920 },
+  "style": "editorial-cinematográfico, agresivo, cortes duros",
+  "palette": {
+    "ink": "#0B0908",
+    "gold": "#C9A45C",
+    "goldHi": "#E8C987",
+    "bordo": "#6E1423",
+    "bordoHi": "#9B1B30",
+    "bone": "#EDE6D8"
+  },
+  "font": { "display": "Archivo Black", "serif": "Cormorant Garamond" },
+  "export": "mp4",
+  "asset_needs": [],
+  "brief": "Un scroll infinito de la palabra SCROLL acelera hasta volverse borroso y se clava en seco con un flash dorado. Golpes de texto en cortes de 0.4s: FRENÁ. / ESTO / NO SE / SCROLLEA. — el último en serif itálica dorada como interrupción de patrón. Barras bordó/doradas barren la pantalla y la marca SONYLUM cae letra por letra con temblor de impacto, regla dorada y bajada. Motivo único: impacto seco (slam + shake).",
+  "beats": [
+    { "t": 0.0, "scene": "hook", "motion": "scroll stack acelerando + blur" },
+    { "t": 1.3, "scene": "FRENÁ.", "motion": "slam 2.6x→1 + shake, fondo bordó" },
+    { "t": 1.75, "scene": "ESTO", "motion": "slam lateral izquierda" },
+    { "t": 2.15, "scene": "NO SE", "motion": "slam lateral derecha" },
+    { "t": 2.55, "scene": "SCROLLEA.", "motion": "wipe + scale, serif dorada, pulso" },
+    { "t": 3.38, "scene": "transición", "motion": "barras bordó/doradas barren" },
+    { "t": 3.6, "scene": "SONYLUM", "motion": "letras caen escalonadas + shake, regla, bajada, push lento" }
+  ]
+}
