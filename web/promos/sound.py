@@ -6,6 +6,7 @@ cards, every key press of the WhatsApp message, send, double tick, notification,
 transitions and the closing card. Under it runs a dark, minimal music bed.
 
 Usage: python3 sound.py events.json            -> sound-sonylum.wav, sound-creando.wav
+       python3 sound.py events.json --sfx-only -> sfx-sonylum.wav, sfx-creando.wav (no music bed)
 """
 import json
 import sys
@@ -210,7 +211,7 @@ def reverb(x, seconds=1.4, wet=0.22):
     return x + out * wet
 
 
-def design(ev, brand):
+def design(ev, brand, music_bed=True):
     total = ev["DURATION"]
     sfx = np.zeros((int(total * SR) + SR, 2))
 
@@ -275,8 +276,9 @@ def design(ev, brand):
     place(sfx, notification() * 0.6, ev["E"] + 1.35, 0.3)
 
     sfx = reverb(sfx, 1.3, 0.25)
-    bed = music(len(sfx) / SR, ev["OUT"] + 0.3)
-    mix = sfx * 0.9 + bed[: len(sfx)]
+    mix = sfx * 0.9
+    if music_bed:
+        mix = mix + music(len(sfx) / SR, ev["OUT"] + 0.3)[: len(sfx)]
     mix = mix[: int(total * SR)]
     mix = np.tanh(mix * 1.1) / np.tanh(1.1)               # gentle limiter
     mix *= 0.89 / np.max(np.abs(mix))                    # peak at -1 dBFS
@@ -296,6 +298,8 @@ def write_wav(path, x):
 if __name__ == "__main__":
     events = json.loads(Path(sys.argv[1]).read_text())
     here = Path(__file__).parent
+    sfx_only = "--sfx-only" in sys.argv
     for brand, ev in events.items():
-        write_wav(here / f"sound-{brand}.wav", design(ev, brand))
-        print("wrote", here / f"sound-{brand}.wav")
+        out = here / f"{'sfx' if sfx_only else 'sound'}-{brand}.wav"
+        write_wav(out, design(ev, brand, music_bed=not sfx_only))
+        print("wrote", out)
