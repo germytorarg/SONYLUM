@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<title>Device promo</title>
+<!-- 1080x1920 vertical promo. ?brand=sonylum | creando. One paused GSAP timeline;
+     render.mjs seeks it frame by frame, so nothing here depends on wall-clock time.
+     Phone screens show real page recordings as pre-extracted frame sequences (frames/<brand>/). -->
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
+<style>
+:root {
+  --black: #050308;
+  --violet: #7c4dff;
+  --lilac: #c9b6ff;
+  --paper: #f3eefb;
+  --iri: linear-gradient(115deg, #6d3cff 0%, #b84dff 18%, #ff6bd5 32%, #ffd1f1 42%, #7fe8ff 54%, #6b7cff 68%, #a04dff 82%, #6d3cff 100%);
+  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: "Poppins", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--black); }
+body { font-family: var(--sans); color: var(--paper); -webkit-font-smoothing: antialiased; }
+#stage { position: absolute; inset: 0; overflow: hidden; perspective: 2400px; }
+.layer3d { position: absolute; inset: 0; transform-style: preserve-3d; }
+
+/* Backdrop: black with slow iridescent light pools */
+.pool { position: absolute; border-radius: 50%; filter: blur(110px); mix-blend-mode: screen; }
+.pool-a { width: 1000px; height: 1000px; left: -380px; top: 80px; background: radial-gradient(circle, #6a2cff, transparent 65%); }
+.pool-b { width: 900px; height: 900px; right: -360px; top: 900px; background: radial-gradient(circle, #c13cff, transparent 65%); }
+.pool-c { width: 700px; height: 700px; left: 200px; top: 1300px; background: radial-gradient(circle, #2fb8ff, transparent 65%); opacity: .35; }
+.grid { position: absolute; inset: -20%; opacity: .07;
+  background: linear-gradient(rgba(201,182,255,.9) 1px, transparent 1px) 0 0 / 90px 90px, linear-gradient(90deg, rgba(201,182,255,.9) 1px, transparent 1px) 0 0 / 90px 90px;
+  -webkit-mask: radial-gradient(60% 45% at 50% 50%, #000, transparent); mask: radial-gradient(60% 45% at 50% 50%, #000, transparent); }
+#particles { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; }
+.vignette { position: absolute; inset: 0; z-index: 40; pointer-events: none; background: radial-gradient(80% 62% at 50% 46%, transparent 52%, rgba(2,1,4,.9)); }
+#grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .06; mix-blend-mode: overlay; z-index: 41; }
+.flash { position: absolute; inset: 0; z-index: 38; background: radial-gradient(60% 40% at 50% 45%, rgba(220,190,255,.9), rgba(120,60,255,.25) 50%, transparent 75%); opacity: 0; mix-blend-mode: screen; }
+.sweep { position: absolute; top: -40%; left: -70%; width: 46%; height: 180%; transform: rotate(16deg); z-index: 36; opacity: 0; mix-blend-mode: screen; filter: blur(18px);
+  background: linear-gradient(90deg, transparent, rgba(124,77,255,.35), rgba(255,107,213,.4), rgba(127,232,255,.35), transparent); }
+
+/* Glass: frosted panel + iridescent hairline + top highlight */
+.glass { position: relative; border-radius: 40px; overflow: hidden;
+  background: linear-gradient(140deg, rgba(255,255,255,.16), rgba(255,255,255,.04) 45%, rgba(160,110,255,.08));
+  backdrop-filter: blur(26px) saturate(150%); -webkit-backdrop-filter: blur(26px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 40px 80px -30px rgba(0,0,0,.8); }
+.glass::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; pointer-events: none;
+  background: var(--iri); background-size: 300% 100%; background-position: var(--flow, 0%) 0; opacity: .75;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.glass::after { content: ""; position: absolute; left: -30%; top: -60%; width: 60%; height: 220%; transform: rotate(20deg); pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent); translate: var(--glint, -100%) 0; }
+
+/* Glass orbs drifting in front of everything */
+.orb { position: absolute; border-radius: 50%; z-index: 30; pointer-events: none;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.6), rgba(255,255,255,.1) 20%, rgba(190,150,255,.06) 50%, rgba(127,232,255,.22) 78%, rgba(255,107,213,.38)); opacity: .8; mix-blend-mode: screen;
+  backdrop-filter: blur(6px) saturate(160%); -webkit-backdrop-filter: blur(6px) saturate(160%);
+  box-shadow: inset 0 0 40px rgba(255,255,255,.12), 0 30px 60px -20px rgba(0,0,0,.6); }
+.orb-1 { width: 200px; height: 200px; left: 900px; top: 160px; }
+.orb-2 { width: 130px; height: 130px; left: -30px; top: 1560px; }
+.orb-3 { width: 80px; height: 80px; left: 40px; top: 300px; }
+
+/* ---------- Logo built from pieces: each piece is the PNG as mask, clipped to its part ---------- */
+.logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.logo .pc, .logo .glow, .logo .shine { position: absolute; inset: 0; -webkit-mask: var(--src) center / 100% 100% no-repeat; mask: var(--src) center / 100% 100% no-repeat; }
+.logo .pc { background: var(--iri); background-size: 300% 300%; background-position: var(--flow, 0%) 50%; }
+.logo .glow { background: var(--iri); background-size: 300% 300%; background-position: var(--flow, 0%) 50%; filter: blur(30px); opacity: 0; }
+.logo .shine { background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.95) 50%, transparent 60%); background-size: 300% 100%; background-position: var(--shine, 120%) 0; }
+.logo-plate { position: absolute; left: 50%; top: 50%; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%;
+  border: 2px solid rgba(201,182,255,.25); opacity: 0; }
+.logo-plate.two { width: 1200px; height: 1200px; margin: -600px 0 0 -600px; border-color: rgba(127,232,255,.15); }
+
+/* ---------- Phones ---------- */
+.phone-wrap { position: absolute; left: 50%; top: 50%; width: 680px; height: 1300px; margin: -650px 0 0 -340px; transform-style: preserve-3d; }
+.phone { position: absolute; inset: 0; border-radius: 104px; padding: 20px;
+  background: linear-gradient(150deg, #2b2338, #0a070e 35%, #1d1628 60%, #07050a);
+  box-shadow: 0 90px 180px -50px rgba(0,0,0,.95), 0 0 140px -10px rgba(124,77,255,.35); }
+.phone::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 4px;
+  background: conic-gradient(from var(--rim, 0deg), #6d3cff, #ff6bd5, #7fe8ff, #b38bff, #6d3cff);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: .9; }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 86px; overflow: hidden; background: #000; }
+.screen img.page { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, left top); }
+.screen::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 20; pointer-events: none;
+  background: linear-gradient(118deg, rgba(255,255,255,.14) 0%, transparent 26%, transparent 72%, rgba(200,170,255,.08)); }
+.island { position: absolute; top: 22px; left: 50%; width: 176px; height: 50px; margin-left: -88px; border-radius: 30px; background: #000; z-index: 21; }
+.side-btn { position: absolute; right: -6px; top: 300px; width: 8px; height: 130px; border-radius: 4px; background: linear-gradient(#5a4a72, #241a33); }
+
+/* Floating glass chips and tags */
+.chip { position: absolute; padding: 22px 36px; border-radius: 999px; font-size: 38px; font-weight: 500; white-space: nowrap; display: flex; align-items: center; gap: 16px; opacity: 0; z-index: 25; }
+.chip .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--iri); background-size: 400% 100%; background-position: var(--flow, 0%) 0; box-shadow: 0 0 18px rgba(201,150,255,.9); }
+.tag { position: absolute; padding: 18px 28px; border-radius: 26px; font-size: 30px; font-weight: 500; white-space: nowrap; opacity: 0; z-index: 26; }
+.tag small { display: block; font-size: 20px; letter-spacing: 4px; color: var(--lilac); text-transform: uppercase; margin-bottom: 4px; font-weight: 400; }
+
+/* ---------- "Qué hacemos" ---------- */
+.services { position: absolute; inset: 0; z-index: 22; }
+.svc-bg { position: absolute; left: 50%; top: 50%; width: 680px; height: 1300px; margin: -650px 0 0 -340px; opacity: 0; filter: blur(10px) saturate(130%); }
+.kicker { position: absolute; left: 110px; top: 250px; font-size: 26px; letter-spacing: 9px; color: var(--lilac); display: flex; align-items: center; gap: 22px; opacity: 0; }
+.kicker::before { content: ""; width: 70px; height: 2px; background: var(--iri); }
+.headline { position: absolute; left: 100px; right: 80px; top: 310px; font-family: var(--serif); font-weight: 400; font-size: 118px; line-height: .88; letter-spacing: -2px; }
+.headline .l { display: block; overflow: hidden; padding: 4px 10px 14px; }
+.headline .l > span { display: inline-block; }
+.headline b { font-family: var(--sans); font-weight: 600; font-size: 90px; letter-spacing: -4px;
+  background: var(--iri); background-size: 300% 100%; background-position: var(--flow, 0%) 0; -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cards { position: absolute; left: 100px; right: 100px; top: 880px; display: grid; gap: 22px; perspective: 1800px; }
+.card { display: grid; grid-template-columns: 110px 1fr; align-items: center; padding: 30px 40px; min-height: 172px; opacity: 0; }
+.card.glass { background: linear-gradient(140deg, rgba(255,255,255,.13), rgba(18,10,30,.55) 55%, rgba(120,70,220,.18)); }
+.card .n { font-family: var(--serif); font-style: italic; font-size: 76px; line-height: 1; color: var(--lilac); }
+.card h4 { font-size: 44px; font-weight: 600; letter-spacing: -.5px; margin-bottom: 6px; }
+.card p { font-size: 28px; line-height: 1.35; color: rgba(243,238,251,.72); }
+
+/* WhatsApp (dark) */
+.wa { position: absolute; inset: 0; display: flex; flex-direction: column; background: #0b141a; color: #e9edef; font-family: var(--sans); }
+.wa-top { padding: 96px 28px 22px; background: #1f2c34; display: flex; align-items: center; gap: 18px; }
+.wa-top .back { font-size: 40px; color: #aebac1; }
+.wa-av { width: 78px; height: 78px; flex: none; border-radius: 50%; background: #111; display: grid; place-items: center; overflow: hidden; border: 2px solid rgba(201,182,255,.4); }
+.wa-av span { width: 60px; display: block; -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat; background: var(--iri); background-size: 200% 200%; }
+.wa-top b { font-size: 31px; font-weight: 500; display: block; }
+.wa-top small { font-size: 23px; color: #8696a0; }
+.wa-body { flex: 1; padding: 36px 26px; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px;
+  background: radial-gradient(rgba(255,255,255,.035) 2px, transparent 2px) 0 0 / 34px 34px, #0b141a; }
+.day { align-self: center; font-size: 22px; color: #8696a0; background: #1f2c34; padding: 8px 20px; border-radius: 14px; margin-bottom: 10px; }
+.bubble { max-width: 82%; padding: 18px 22px 34px; border-radius: 24px; font-size: 31px; line-height: 1.32; position: relative; }
+.bubble.out { align-self: flex-end; background: #005c4b; border-top-right-radius: 6px; }
+.bubble .meta { position: absolute; right: 16px; bottom: 8px; font-size: 19px; color: rgba(233,237,239,.6); display: flex; gap: 6px; align-items: center; }
+.ticks { font-size: 22px; letter-spacing: -6px; color: #8696a0; }
+.typing { align-self: flex-start; background: #1f2c34; border-radius: 24px; border-top-left-radius: 6px; padding: 24px 28px; display: flex; gap: 10px; }
+.typing i { width: 14px; height: 14px; border-radius: 50%; background: #8696a0; display: block; }
+.wa-input { display: flex; gap: 14px; padding: 16px 20px 24px; align-items: flex-end; background: #0b141a; }
+.wa-field { flex: 1; min-height: 84px; border-radius: 42px; background: #1f2c34; padding: 22px 30px; font-size: 31px; line-height: 1.3; color: #e9edef; }
+.wa-field .ph { color: #8696a0; }
+.caret { display: inline-block; width: 3px; height: 36px; background: #00a884; vertical-align: -6px; margin-left: 2px; }
+.wa-send { width: 84px; height: 84px; flex: none; border-radius: 50%; background: #00a884; display: grid; place-items: center; }
+.wa-send svg { width: 40px; height: 40px; fill: #0b141a; margin-left: 6px; }
+.kb { background: #1a1f24; padding: 14px 8px 40px; display: grid; gap: 12px; }
+.kb-row { display: flex; justify-content: center; gap: 8px; }
+.key { width: 54px; height: 76px; border-radius: 10px; background: #3a4046; color: #e9edef; font-size: 30px; display: grid; place-items: center; }
+.key.wide { width: 320px; }
+.key.on { background: #a98bff; color: #0b0712; transform: scale(1.12); }
+
+/* ---------- End card ---------- */
+.end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 20; visibility: hidden; }
+.end .logo { position: relative; left: auto; top: auto; transform: none; }
+.end-line { margin-top: 60px; font-family: var(--serif); font-weight: 500; font-style: italic; font-size: 100px; line-height: 1; letter-spacing: -1px; }
+.end-line .l { display: block; overflow: hidden; padding: 6px 30px 16px; }
+.end-line .l > span { display: inline-block; }
+.end-line em { background: var(--iri); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; background-position: var(--flow, 0%) 0; }
+.contact { margin-top: 60px; padding: 40px 50px; border-radius: 48px; display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.wa-pill { display: inline-flex; align-items: center; gap: 22px; font-size: 50px; font-weight: 500; letter-spacing: .5px; }
+.wa-pill .ico { width: 84px; height: 84px; border-radius: 50%; background: #25d366; display: grid; place-items: center; box-shadow: 0 0 40px rgba(37,211,102,.45); }
+.wa-pill .ico svg { width: 50px; height: 50px; fill: #fff; }
+.contact .sub { font-size: 26px; letter-spacing: 6px; color: var(--lilac); text-transform: uppercase; }
+.handles { margin-top: 40px; display: flex; gap: 30px; font-size: 32px; color: var(--lilac); letter-spacing: 1px; }
+.handles span + span::before { content: "·"; margin-right: 30px; opacity: .6; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="pool pool-a" data-pool></div>
+  <div class="pool pool-b" data-pool></div>
+  <div class="pool pool-c" data-pool></div>
+  <div class="grid" data-grid></div>
+  <canvas id="particles" width="1080" height="1920"></canvas>
+
+  <div class="logo-plate" data-plate></div><div class="logo-plate two" data-plate></div>
+  <div class="logo" data-intro-logo></div>
+
+  <div class="layer3d" data-phones></div>
+
+  <div class="services" data-services>
+    <div class="kicker" data-kicker>QUÉ HACEMOS</div>
+    <div class="headline" data-headline></div>
+    <div class="cards" data-cards></div>
+  </div>
+
+  <div class="end" data-end>
+    <div class="logo" data-end-logo></div>
+    <div class="end-line" data-end-line></div>
+    <div class="contact glass" data-contact>
+      <div class="wa-pill">
+        <span class="ico"><svg viewBox="0 0 32 32"><path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.3-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.9 1 3.9.8a3.4 3.4 0 0 0 2.2-1.6 2.8 2.8 0 0 0 .2-1.6c-.1-.1-.3-.2-.6-.3z"/></svg></span>
+        <span data-wa-number></span>
+      </div>
+      <div class="sub">Escribile a Germán</div>
+    </div>
+    <div class="handles" data-handles></div>
+  </div>
+
+  <span class="orb orb-1" data-orb></span><span class="orb orb-2" data-orb></span><span class="orb orb-3" data-orb></span>
+  <div class="sweep" data-sweep></div>
+  <div class="flash" data-flash></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div class="vignette"></div>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script>
+/* Logo piece maps are in the PNG's own pixel space (measured from its alpha channel). */
+const BRANDS = {
+  sonylum: {
+    logo: "assets/logo-sonylum.png", size: [794, 607], logoW: 640, endLogoW: 440,
+    frames: "frames/sonylum", clipLen: 15.5,
+    pieces: [
+      { poly: [[0, 0], [394, 0], [394, 470], [0, 470]], from: { x: -320, rotate: -28, opacity: 0 }, at: 0.2 },
+      { poly: [[394, 0], [794, 0], [794, 470], [394, 470]], from: { x: 320, rotate: 28, opacity: 0 }, at: 0.2 },
+      ...[[76, 143], [163, 253], [275, 348], [366, 441], [461, 514], [533, 604], [629, 712]].map(([a, b], i) => (
+        { poly: [[a - 6, 478], [b + 6, 478], [b + 6, 600], [a - 6, 600]], from: { y: 90, opacity: 0, filter: "blur(10px)" }, at: 1.0 + i * 0.06 })),
+    ],
+    contact: "Germán · Sonylum",
+    message: "Hola Germán, quiero una web que no parezca una plantilla",
+    endLines: ["Hagamos algo que", "<em>no parezca una plantilla.</em>"],
+    handles: ["@sonylumarg", "soy.sonylum.ar"],
+    chips: ["Web & UX", "Branding", "IA", "SEO", "Motion"],
+    headline: ["Pensamos", "el sistema.", "<b>Después lo</b>", "<b>hacemos.</b>"],
+    cards: [
+      ["Producto digital", "Arquitectura, UX/UI, desarrollo y deploy."],
+      ["Inteligencia artificial", "Agentes, automatizaciones y flujos creativos."],
+      ["Dirección visual", "Cámara, narrativa, motion y contenido 9:16."],
+      ["Marca y crecimiento", "Identidad, SEO/SEM y activación comercial."],
+    ],
+    tags: [["Ecosistema", "Cuatro miradas"], ["Capacidades", "Sin cajitas"], ["Proyectos", "En pantalla"]],
+    clips: { hero: 0, svc: 4.5, center: 1.8, left: 6.6, right: 10.4 },
+  },
+  creando: {
+    logo: "assets/logo-creando.png", size: [996, 664], logoW: 780, endLogoW: 560,
+    frames: "frames/creando", clipLen: 19.3,
+    pieces: [
+      // camera-viewfinder corners close in from outside
+      { poly: [[50, 50], [215, 50], [215, 110], [110, 110], [110, 215], [50, 215]], from: { x: -200, y: -200, opacity: 0 }, at: 0.15 },
+      { poly: [[781, 50], [966, 50], [966, 215], [906, 215], [906, 110], [781, 110]], from: { x: 200, y: -200, opacity: 0 }, at: 0.22 },
+      { poly: [[50, 455], [110, 455], [110, 575], [215, 575], [215, 640], [50, 640]], from: { x: -200, y: 200, opacity: 0 }, at: 0.29 },
+      { poly: [[906, 455], [966, 455], [966, 640], [781, 640], [781, 575], [906, 575]], from: { x: 200, y: 200, opacity: 0 }, at: 0.36 },
+      ...[220, 300, 386, 462, 548, 636, 724, 806].reduce((a, x, i, arr) => (i ? [...a, [arr[i - 1], x]] : a), []).map(([a, b], i) => (
+        { poly: [[a, 168], [b, 168], [b, 332], [a, 332]], from: { y: 110, opacity: 0, filter: "blur(12px)" }, at: 0.75 + i * 0.05 })),
+      ...[118, 206, 288, 373, 450, 522, 606, 654, 738, 822, 905].reduce((a, x, i, arr) => (i ? [...a, [arr[i - 1], x]] : a), []).map(([a, b], i) => (
+        { poly: [[a, 334], [b, 334], [b, 500], [a, 500]], from: { y: 110, opacity: 0, filter: "blur(12px)" }, at: 1.05 + i * 0.045 })),
+    ],
+    contact: "Germán · Creando Contenidos",
+    message: "Hola Germán, quiero contenido que se mire",
+    endLines: ["Hagamos algo", "<em>que se mire.</em>"],
+    handles: ["@creandocontenidos.ar", "creandocontenidos.ar"],
+    chips: ["Reels 9:16", "Campañas", "Eventos", "Artistas", "Producto"],
+    headline: ["Contenido", "vertical.", "<b>Sin relleno.</b>"],
+    cards: [
+      ["Concepto", "La idea y el guion antes de prender la cámara."],
+      ["Dirección de arte", "Encuadre, luz y estética con criterio."],
+      ["Filmación", "Rodaje nativo 9:16, pensado para cada plataforma."],
+      ["Edición y entrega", "Montaje y piezas listas para publicar."],
+    ],
+    tags: [["Marcas", "Brand"], ["Film", "Vertical 9:16"], ["Formatos", "Reels · Ads · UGC"]],
+    clips: { hero: 0, svc: 9.5, center: 3.0, left: 7.0, right: 12.0 },
+  },
+};
+const params = new URLSearchParams(location.search);
+const B = BRANDS[params.get("brand")] || BRANDS.sonylum;
+const WA_NUMBER = "11 5765-2300";
+const FPS = 30;
+const [LW, LH] = B.size;
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+document.documentElement.style.setProperty("--src", `url(${B.logo})`);
+
+/* ---------- Logo construction ---------- */
+function buildLogo(el, w) {
+  el.style.width = w + "px"; el.style.height = Math.round(w * LH / LW) + "px";
+  el.innerHTML = `<div class="glow"></div>` +
+    B.pieces.map((p) => `<div class="pc" style="clip-path: polygon(${p.poly.map(([x, y]) => `${(x / LW * 100).toFixed(2)}% ${(y / LH * 100).toFixed(2)}%`).join(",")})"></div>`).join("") +
+    `<div class="shine"></div>`;
+  return el;
+}
+const IL = buildLogo($("[data-intro-logo]"), B.logoW);
+const EL = buildLogo($("[data-end-logo]"), B.endLogoW);
+$("[data-end-line]").innerHTML = B.endLines.map((l) => `<span class="l"><span>${l}</span></span>`).join("");
+$("[data-wa-number]").textContent = WA_NUMBER;
+$("[data-handles]").innerHTML = B.handles.map((h) => `<span>${h}</span>`).join("");
+$("[data-headline]").innerHTML = B.headline.map((l) => `<span class="l"><span>${l}</span></span>`).join("");
+$("[data-cards]").innerHTML = B.cards.map(([h, p], i) => `<div class="card glass"><span class="n">0${i + 1}</span><div><h4>${h}</h4><p>${p}</p></div></div>`).join("");
+
+/* ---------- Phones ---------- */
+function makePhone(name, inner, parent = $("[data-phones]")) {
+  const w = document.createElement("div");
+  w.className = "phone-wrap"; w.dataset.phone = name; w.style.opacity = 0;
+  w.innerHTML = `<div class="phone"><span class="side-btn"></span><div class="screen"><div class="island"></div>${inner}</div></div>`;
+  parent.appendChild(w);
+  return w;
+}
+const PAGE = `<img class="page" alt="">`;
+const svcPhone = makePhone("svc", PAGE, $("[data-services]"));
+svcPhone.classList.add("svc-bg");
+$("[data-services]").prepend(svcPhone);
+const ph = {};
+["left", "right", "hero", "center"].forEach((n) => { ph[n] = makePhone(n, PAGE); });
+ph.svc = svcPhone;
+
+const KB = ["qwertyuiop", "asdfghjklñ", "zxcvbnm"];
+const W = makePhone("wa", `
+  <div class="wa">
+    <div class="wa-top"><span class="back">‹</span><span class="wa-av"><span style="aspect-ratio:${LW}/${LH}"></span></span><div><b>${B.contact}</b><small data-wa-status>en línea</small></div></div>
+    <div class="wa-body">
+      <span class="day">Hoy</span>
+      <div class="bubble out" data-bubble style="opacity:0">${B.message}<span class="meta">9:41 <span class="ticks" data-ticks>✓✓</span></span></div>
+      <div class="typing" data-typing style="opacity:0"><i></i><i></i><i></i></div>
+    </div>
+    <div class="wa-input"><div class="wa-field"><span data-typed></span><span class="caret" data-caret></span><span class="ph" data-ph>Mensaje</span></div>
+      <div class="wa-send" data-send><svg viewBox="0 0 24 24"><path d="M2 21 23 12 2 3v7l15 2-15 2z"/></svg></div></div>
+    <div class="kb">${KB.map((r) => `<div class="kb-row">${[...r].map((k) => `<span class="key" data-k="${k}">${k}</span>`).join("")}</div>`).join("")}
+      <div class="kb-row"><span class="key wide" data-k=" ">espacio</span></div></div>
+  </div>`);
+
+/* Glass chips around the hero phone, tags on the collage */
+const CHIP_POS = [[90, 330], [640, 560], [60, 900], [690, 1180], [140, 1500]];
+const chips = B.chips.map((c, i) => {
+  const el = document.createElement("div");
+  el.className = "chip glass"; el.innerHTML = `<span class="dot"></span>${c}`;
+  el.style.left = CHIP_POS[i][0] + "px"; el.style.top = CHIP_POS[i][1] + "px";
+  $("#stage").appendChild(el); return el;
+});
+const TAG_POS = [[70, 300], [560, 1340], [640, 470]];
+const tags = B.tags.map(([s, t], i) => {
+  const el = document.createElement("div");
+  el.className = "tag glass"; el.innerHTML = `<small>${s}</small>${t}`;
+  el.style.left = TAG_POS[i][0] + "px"; el.style.top = TAG_POS[i][1] + "px";
+  $("#stage").appendChild(el); return el;
+});
+
+/* Page playback: each phone plays its slice of the recording at real speed */
+const playback = [];
+function playPage(name, start, offset) { playback.push({ img: $("img", ph[name]), start, offset }); }
+const FRAME_COUNT = Math.floor(B.clipLen * FPS) - 1;
+function framePath(sec) {
+  const n = Math.max(1, Math.min(FRAME_COUNT, Math.round(sec * FPS) + 1));
+  return `${B.frames}/f_${String(n).padStart(4, "0")}.jpg`;
+}
+function updatePages(t) {
+  const per = new Map();
+  for (const p of playback) if (t >= p.start - 0.6) per.set(p.img, p);
+  for (const [img, p] of per) {
+    const src = framePath(p.offset + Math.max(0, t - p.start));
+    if (img.getAttribute("src") !== src) img.setAttribute("src", src);
+  }
+}
+
+/* ---------- Timeline ---------- */
+const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+const flow = { v: 0 };
+tl.to(flow, { v: 300, duration: 30, ease: "none", onUpdate: () => {
+  document.documentElement.style.setProperty("--flow", flow.v + "%");
+  $$(".phone").forEach((p) => p.style.setProperty("--rim", flow.v * 1.5 + "deg"));
+} }, 0);
+tl.fromTo("[data-pool]", { x: 0, y: 0, scale: 1 }, { x: (i) => [240, -260, 160][i], y: (i) => [-200, -380, -260][i], scale: 1.25, duration: 30, ease: "sine.inOut" }, 0);
+tl.fromTo("[data-grid]", { y: 0, rotate: 0 }, { y: -360, rotate: 6, duration: 30, ease: "none" }, 0);
+$$("[data-orb]").forEach((o, i) => {
+  tl.fromTo(o, { x: 0, y: 0 }, { x: [-40, 50, 20][i], y: [900, -1000, 700][i], duration: 30, ease: "sine.inOut" }, 0);
+});
+
+/* Scene 1 · 0–3.4 s: the logo assembles */
+tl.fromTo("[data-flash]", { opacity: 0 }, { opacity: .5, duration: .3, yoyo: true, repeat: 1, ease: "sine.inOut" }, 0.9);
+$$(".pc", IL).forEach((el, i) => {
+  const p = B.pieces[i];
+  tl.fromTo(el, p.from, { x: 0, y: 0, rotate: 0, opacity: 1, filter: "blur(0px)", duration: 1.1, ease: "expo.out" }, p.at);
+});
+tl.fromTo($(".glow", IL), { opacity: 0 }, { opacity: .75, duration: 1 }, 1.0);
+tl.fromTo($(".shine", IL), { "--shine": "120%" }, { "--shine": "-20%", duration: 1.1, ease: "power2.inOut" }, 1.7);
+tl.fromTo("[data-plate]", { scale: .5, opacity: 0 }, { scale: 1.15, opacity: 1, duration: 1.8, stagger: .2, ease: "expo.out" }, 0.9);
+tl.to("[data-plate]", { opacity: 0, scale: 1.4, duration: .7, ease: "power2.in" }, 2.8);
+tl.fromTo(IL, { scale: 1.12 }, { scale: 1, duration: 2.6, ease: "sine.out" }, 0.2);
+tl.to(IL, { scale: .35, y: -820, opacity: 0, filter: "blur(16px)", duration: .7, ease: "power3.in" }, 2.9);
+
+/* Scene 2 · 3.1–8.6 s: hero phone + glass chips */
+const H = ph.hero;
+playPage("hero", 3.2, B.clips.hero);
+tl.fromTo(H, { opacity: 0, y: 1500, rotateX: 40, rotateY: -40, rotateZ: 14, z: -500, scale: .8 },
+  { opacity: 1, y: 40, rotateX: 10, rotateY: -20, rotateZ: 4, z: -80, scale: .9, duration: 1.4, ease: "expo.out" }, 3.05);
+tl.to(H, { rotateX: 4, rotateY: 18, rotateZ: -3, z: 40, y: 0, duration: 4.2, ease: "sine.inOut" }, 4.4);
+tl.fromTo("[data-sweep]", { xPercent: 0, opacity: 1 }, { xPercent: 520, duration: 1, ease: "power2.inOut" }, 3.3);
+chips.forEach((c, i) => {
+  tl.fromTo(c, { opacity: 0, scale: .6, y: 60, filter: "blur(10px)" }, { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: .7, ease: "back.out(1.8)" }, 4.0 + i * .28);
+  tl.to(c, { y: i % 2 ? -50 : 50, x: i % 2 ? 20 : -20, duration: 4, ease: "sine.inOut" }, 4.7 + i * .28);
+  tl.to(c, { opacity: 0, scale: .8, filter: "blur(10px)", duration: .4, ease: "power2.in" }, 8.1 + i * .04);
+});
+tl.to(H, { opacity: 0, z: -1100, rotateY: 50, x: -300, duration: .7, ease: "power3.in" }, 8.3);
+
+/* Scene 3 · 8.8–14.8 s: what we do */
+playPage("svc", 8.6, B.clips.svc);
+tl.set("[data-services]", { opacity: 1 }, 0);
+tl.fromTo(svcPhone, { opacity: 0, scale: 1.25, rotateZ: -8, x: 140 }, { opacity: .45, scale: 1.15, rotateZ: -4, x: 100, duration: 1.2 }, 8.7);
+tl.to(svcPhone, { rotateZ: 3, x: 60, y: -60, duration: 5, ease: "sine.inOut" }, 9.9);
+tl.fromTo("[data-kicker]", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .7 }, 8.85);
+tl.fromTo("[data-headline] .l > span", { yPercent: 115 }, { yPercent: 0, duration: 1, stagger: .12, ease: "expo.out" }, 8.95);
+$$(".card").forEach((c, i) => {
+  tl.fromTo(c, { opacity: 0, rotateX: -55, y: 120, z: -200, transformOrigin: "50% 0%" },
+    { opacity: 1, rotateX: 0, y: 0, z: 0, duration: .9, ease: "expo.out" }, 10.0 + i * .42);
+  tl.fromTo(c, { "--glint": "-100%" }, { "--glint": "320%", duration: 1.1, ease: "power2.inOut" }, 10.5 + i * .42);
+});
+tl.to("[data-cards]", { y: -30, duration: 4, ease: "sine.inOut" }, 10.5);
+tl.to(["[data-kicker]", "[data-headline]"], { opacity: 0, y: -80, filter: "blur(14px)", duration: .5, ease: "power2.in" }, 14.4);
+tl.to(".card", { opacity: 0, x: (i) => (i % 2 ? 300 : -300), filter: "blur(10px)", duration: .5, stagger: .05, ease: "power2.in" }, 14.4);
+tl.to(svcPhone, { opacity: 0, duration: .5 }, 14.5);
+
+/* Scene 4 · 14.9–19.6 s: three phones in depth with glass tags */
+playPage("center", 14.9, B.clips.center);
+playPage("left", 14.9, B.clips.left);
+playPage("right", 14.9, B.clips.right);
+const C = ph.center, L = ph.left, R = ph.right;
+tl.fromTo(C, { opacity: 0, z: 900, y: 80, rotateY: -30, rotateX: 10, scale: .8 },
+  { opacity: 1, z: 0, y: 0, rotateY: -8, rotateX: 4, duration: 1.1, ease: "expo.out" }, 14.9);
+tl.fromTo(L, { opacity: 0, x: -200, z: -900, rotateY: 40, scale: .72, y: 60 },
+  { opacity: 1, x: -440, z: -600, rotateY: 30, y: -70, duration: 1.3, ease: "expo.out" }, 15.05);
+tl.fromTo(R, { opacity: 0, x: 200, z: -900, rotateY: -40, scale: .72, y: 60 },
+  { opacity: 1, x: 440, z: -600, rotateY: -30, y: 110, duration: 1.3, ease: "expo.out" }, 15.15);
+tl.to(C, { rotateY: 10, rotateX: 2, z: 120, duration: 3.6, ease: "sine.inOut" }, 16.0);
+tl.to(L, { y: -170, rotateY: 22, duration: 3.6, ease: "sine.inOut" }, 16.2);
+tl.to(R, { y: 10, rotateY: -22, duration: 3.6, ease: "sine.inOut" }, 16.2);
+tags.forEach((t, i) => {
+  tl.fromTo(t, { opacity: 0, x: i === 1 ? 80 : -80, filter: "blur(10px)" }, { opacity: 1, x: 0, filter: "blur(0px)", duration: .7, ease: "expo.out" }, 15.9 + i * .3);
+  tl.to(t, { y: i % 2 ? -40 : 40, duration: 3, ease: "sine.inOut" }, 16.6 + i * .3);
+  tl.to(t, { opacity: 0, filter: "blur(10px)", duration: .35, ease: "power2.in" }, 19.2);
+});
+tl.to([L, R], { opacity: 0, z: -1600, duration: .6, ease: "power3.in" }, 19.3);
+tl.to(C, { opacity: 0, rotateY: -80, x: -900, duration: .6, ease: "power3.in" }, 19.4);
+
+/* Scene 5 · 19.6– s: someone writes to Germán */
+const T0 = 19.6;
+tl.fromTo(W, { opacity: 0, x: 900, rotateY: 70, rotateX: 8, z: -300, y: 60, scale: .92 },
+  { opacity: 1, x: 0, rotateY: -12, rotateX: 8, z: 60, y: 60, duration: 1, ease: "expo.out" }, T0);
+tl.to(W, { rotateY: 8, rotateX: 4, z: 240, y: 20, duration: 4.8, ease: "sine.inOut" }, T0 + .9);
+const msg = [...B.message];
+const typer = { n: 0 };
+const typed = $("[data-typed]", W), phl = $("[data-ph]", W), keys = $$("[data-k]", W);
+function showTyped() {
+  const n = Math.round(typer.n);
+  typed.textContent = msg.slice(0, n).join("");
+  phl.style.display = n ? "none" : "";
+  const typing = n > 0 && typer.n < msg.length;
+  const ch = typing ? msg[n - 1].toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "") : "";
+  keys.forEach((k) => k.classList.toggle("on", typing && k.dataset.k === ch));
+}
+const TYPE_AT = T0 + .8, TYPE_DUR = Math.min(2.6, msg.length * 0.05);
+tl.to(typer, { n: msg.length, duration: TYPE_DUR, ease: "none", onUpdate: showTyped }, TYPE_AT);
+const SEND = TYPE_AT + TYPE_DUR + .35;
+tl.fromTo($("[data-caret]", W), { opacity: 1 }, { opacity: 0, duration: .25, repeat: Math.floor((SEND - T0) / .25) - 1, yoyo: true, ease: "steps(1)" }, T0);
+tl.to($("[data-send]", W), { scale: .82, duration: .1, ease: "power2.in" }, SEND - .1);
+tl.to($("[data-send]", W), { scale: 1, duration: .5, ease: "elastic.out(1,.4)" }, SEND);
+tl.to(typer, { n: 0, duration: .01, onUpdate: showTyped }, SEND);
+tl.set($("[data-caret]", W), { opacity: 0 }, SEND + .02);
+tl.fromTo($("[data-bubble]", W), { opacity: 0, y: 70, scale: .7, transformOrigin: "100% 100%" },
+  { opacity: 1, y: 0, scale: 1, duration: .55, ease: "back.out(1.8)" }, SEND);
+tl.to($("[data-ticks]", W), { color: "#53bdeb", duration: .2 }, SEND + .8);
+tl.set($("[data-wa-status]", W), { textContent: "escribiendo…" }, SEND + 1.0);
+tl.fromTo($("[data-typing]", W), { opacity: 0, scale: .6, transformOrigin: "0% 100%" }, { opacity: 1, scale: 1, duration: .4, ease: "back.out(2)" }, SEND + 1.0);
+$$("[data-typing] i", W).forEach((d, i) => {
+  tl.fromTo(d, { y: 0, opacity: .5 }, { y: -10, opacity: 1, duration: .25, repeat: 5, yoyo: true, ease: "sine.inOut" }, SEND + 1.1 + i * .12);
+});
+const OUT = SEND + 2.3;
+tl.to(W, { z: 1500, opacity: 0, duration: .6, ease: "power3.in" }, OUT);
+
+/* Scene 6 · end card */
+const E = OUT + .35;
+tl.fromTo("[data-flash]", { opacity: 0 }, { opacity: .6, duration: .2, yoyo: true, repeat: 1, ease: "sine.inOut", immediateRender: false }, OUT + .3);
+tl.fromTo("[data-sweep]", { xPercent: 0, opacity: 1 }, { xPercent: 520, duration: 1, ease: "power2.inOut", immediateRender: false }, OUT + .2);
+tl.set("[data-end]", { visibility: "visible" }, E);
+tl.to("[data-orb]", { opacity: 0, duration: .5 }, OUT);
+$$(".pc", EL).forEach((el, i) => {
+  const p = B.pieces[i];
+  tl.fromTo(el, p.from, { x: 0, y: 0, rotate: 0, opacity: 1, filter: "blur(0px)", duration: .9, ease: "expo.out" }, E + p.at * .55);
+});
+tl.fromTo($(".glow", EL), { opacity: 0 }, { opacity: .7, duration: .8 }, E + .5);
+tl.fromTo($(".shine", EL), { "--shine": "120%" }, { "--shine": "-20%", duration: 1, ease: "power2.inOut" }, E + .9);
+tl.fromTo("[data-end-line] .l > span", { yPercent: 115 }, { yPercent: 0, duration: 1, stagger: .14, ease: "expo.out" }, E + .5);
+tl.fromTo("[data-contact]", { opacity: 0, y: 80, scale: .9 }, { opacity: 1, y: 0, scale: 1, duration: .9, ease: "back.out(1.6)" }, E + .9);
+tl.fromTo("[data-contact]", { "--glint": "-100%" }, { "--glint": "320%", duration: 1.2, ease: "power2.inOut" }, E + 1.6);
+tl.fromTo("[data-handles]", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .7 }, E + 1.3);
+tl.to("[data-contact]", { scale: 1.035, duration: .45, yoyo: true, repeat: 3, ease: "sine.inOut" }, E + 2.0);
+
+/* Particles: deterministic iridescent dust drifting upward */
+const pc = $("#particles"), px = pc.getContext("2d");
+const P = Array.from({ length: 110 }, (_, i) => {
+  const r = (k) => { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); };
+  return { x: r(1) * 1080, y: r(2) * 1920, s: 1 + r(3) * 3.2, v: 20 + r(4) * 70, h: 250 + r(5) * 90, ph: r(6) * 6.28, a: .25 + r(7) * .6 };
+});
+function particles(t) {
+  px.clearRect(0, 0, 1080, 1920);
+  px.globalCompositeOperation = "lighter";
+  for (const p of P) {
+    const y = ((p.y - p.v * t) % 1920 + 1920) % 1920;
+    const x = p.x + Math.sin(t * .6 + p.ph) * 30;
+    const a = p.a * (.6 + .4 * Math.sin(t * 2 + p.ph));
+    const g = px.createRadialGradient(x, y, 0, x, y, p.s * 4);
+    g.addColorStop(0, `hsla(${p.h + t * 20}, 100%, 80%, ${a})`);
+    g.addColorStop(1, `hsla(${p.h}, 100%, 60%, 0)`);
+    px.fillStyle = g; px.beginPath(); px.arc(x, y, p.s * 4, 0, 6.283); px.fill();
+  }
+}
+
+/* Film grain, seeded per frame */
+const g = $("#grain"), gx = g.getContext("2d"), gimg = gx.createImageData(g.width, g.height);
+function grain(frame) {
+  let s = (frame * 2654435761 + 1) >>> 0; const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; d[i] = d[i + 1] = d[i + 2] = s & 255; d[i + 3] = 255; }
+  gx.putImageData(gimg, 0, 0);
+}
+
+window.DURATION = E + 3.8;
+window.seek = async (t) => {
+  tl.time(t, false);
+  updatePages(t);
+  particles(t);
+  grain(Math.round(t * 60));
+  await Promise.all($$("img.page").filter((i) => i.getAttribute("src")).map((i) => i.decode().catch(() => {})));
+};
+window.ready = document.fonts.ready.then(() => window.seek(0));
+
+if (!params.has("render")) {
+  const t0 = performance.now();
+  (function loop(now) { window.seek(((now - t0) / 1000) % window.DURATION); requestAnimationFrame(loop); })(t0);
+}
+</script>
+</body>
+</html>
