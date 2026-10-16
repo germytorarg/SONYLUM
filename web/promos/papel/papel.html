@@ -8,9 +8,9 @@
      deterministic frame for render.mjs; opened directly it plays in real time. -->
 <link rel="stylesheet" href="vendor/fonts/fonts.css">
 <style>
-  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #e9e7e3; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #f3f3f1; }
   canvas#gl { position: absolute; inset: 0; width: 1080px; height: 1920px; }
-  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(85% 65% at 50% 42%, transparent 55%, rgba(40,32,24,.35)); }
+  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(85% 65% at 50% 42%, transparent 55%, rgba(30,26,22,.28)); }
   #grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .05; mix-blend-mode: overlay; pointer-events: none; }
 </style>
 <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js" } }</script>
@@ -27,6 +27,10 @@ import { RoomEnvironment } from "./vendor/three/RoomEnvironment.js";
 const params = new URLSearchParams(location.search);
 const SHEETS = (params.get("text") || "Hasta esto|se puede|contar bien.|Creando Contenidos").split("|");
 const INK = "#0a1248";
+/* Tile palette: ?tiles=brown for glazed brown ceramic, default bright white */
+const TILES = params.get("tiles") === "brown"
+  ? { grout: "#d9ccb6", tile: (r) => { const k = r() * 26 - 13; return [86 + k, 54 + k * .7, 36 + k * .5]; }, shade: 14, bg: "#e6ddd2" }
+  : { grout: "#dcdcda", tile: (r) => { const v = 250 + r() * 5; return [v, v, v]; }, shade: 4, bg: "#f3f3f1" };
 
 /* ---------- Dimensions (meters) ---------- */
 const R = 0.056, W = 0.102, CORE = 0.021;       // roll radius, paper width, core radius
@@ -46,7 +50,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color("#eceae6");
+scene.background = new THREE.Color(TILES.bg);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
 scene.environmentIntensity = 0.75;
@@ -69,14 +73,14 @@ function rand(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013
 const TILE_PX = 2048;
 function tiles(ctx, w, h, kind) {
   const r = rand(7), tw = w / 4, th = h / 8, g = 10;
-  ctx.fillStyle = kind === "color" ? "#cfcac2" : kind === "bump" ? "#000" : "#e8e8e8";
+  ctx.fillStyle = kind === "color" ? TILES.grout : kind === "bump" ? "#000" : "#e8e8e8";
   ctx.fillRect(0, 0, w, h);
   for (let row = 0; row < 8; row++) for (let col = -1; col < 5; col++) {
     const x = col * tw + (row % 2 ? tw / 2 : 0), y = row * th;
     if (kind === "color") {
-      const v = 246 + Math.floor(r() * 6);
+      const [cr, cg, cb] = TILES.tile(r), d = TILES.shade;
       const grd = ctx.createLinearGradient(x, y, x + tw, y + th);
-      grd.addColorStop(0, `rgb(${v},${v},${v - 2})`); grd.addColorStop(1, `rgb(${v - 5},${v - 5},${v - 7})`);
+      grd.addColorStop(0, `rgb(${cr},${cg},${cb})`); grd.addColorStop(1, `rgb(${cr - d},${cg - d},${cb - d})`);
       ctx.fillStyle = grd;
     } else if (kind === "bump") {
       const grd = ctx.createRadialGradient(x + tw / 2, y + th / 2, 0, x + tw / 2, y + th / 2, tw * .7);
@@ -226,7 +230,7 @@ function buildStrip(L, t) {
 }
 
 /* ---------- Lights: soft window from the left, bounce from the right ---------- */
-const sun = new THREE.DirectionalLight("#fff4e6", 3.2);
+const sun = new THREE.DirectionalLight("#fffaf2", 3.2);
 sun.position.set(-1.4, 2.2, 1.6); sun.target.position.set(0, Y0 - .15, 0);
 sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 6; sun.shadow.bias = -.0004; sun.shadow.normalBias = .01;
 Object.assign(sun.shadow.camera, { left: -.5, right: .5, top: .5, bottom: -.7, near: .5, far: 6 });

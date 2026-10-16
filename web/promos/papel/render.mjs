@@ -1,4 +1,4 @@
-// Renders papel.html to MP4 (1080x1920, 30 fps). Usage: node render.mjs [out.mp4] [--text "a|b|c"] [--fps 30]
+// Renders papel.html to MP4 (1080x1920, 30 fps). Usage: node render.mjs [out.mp4] [--text "a|b|c"] [--tiles brown|white] [--fps 30]
 import { chromium } from "playwright";
 import { spawn } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -10,11 +10,12 @@ const val = (k) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : un
 const out = path.resolve(args.find((a) => a.endsWith(".mp4")) ?? path.join(here, "papel.mp4"));
 const fps = Number(val("--fps") ?? 30);
 const text = val("--text");
+const tiles = val("--tiles");
 
 const browser = await chromium.launch({ args: ["--allow-file-access-from-files", "--enable-unsafe-swiftshader", "--force-color-profile=srgb"] });
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
 page.on("pageerror", (e) => console.error(e.message));
-const q = new URLSearchParams({ render: "1", ...(text ? { text } : {}) });
+const q = new URLSearchParams({ render: "1", ...(text ? { text } : {}), ...(tiles ? { tiles } : {}) });
 await page.goto(pathToFileURL(path.join(here, "papel.html")).href + "?" + q);
 await page.waitForFunction(() => window.ready);
 await page.evaluate(() => window.ready);
