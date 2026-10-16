@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<title>Papel higiénico · 3D</title>
+<!-- 1080x1920. Real 3D (three.js): white tiled bathroom, chrome holder, a roll that unrolls
+     sheet by sheet while a handwritten line appears on each one. window.seek(t) renders one
+     deterministic frame for render.mjs; opened directly it plays in real time. -->
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
+<style>
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #e9e7e3; }
+  canvas#gl { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(85% 65% at 50% 42%, transparent 55%, rgba(40,32,24,.35)); }
+  #grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .05; mix-blend-mode: overlay; pointer-events: none; }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="gl" width="1080" height="1920"></canvas>
+<div class="vignette"></div>
+<canvas id="grain" width="540" height="960"></canvas>
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "./vendor/three/RoomEnvironment.js";
+
+/* One line per sheet, written in the order the sheets come off the roll. */
+const params = new URLSearchParams(location.search);
+const SHEETS = (params.get("text") || "Hasta esto|se puede|contar bien.|Creando Contenidos").split("|");
+const INK = "#0a1248";
+
+/* ---------- Dimensions (meters) ---------- */
+const R = 0.056, W = 0.102, CORE = 0.021;       // roll radius, paper width, core radius
+const SH = 0.118;                               // sheet length
+const LT = SH * (SHEETS.length + 1.5);          // longest hanging length we will reach
+const Y0 = 1.0, Z0 = 0.095;                     // roll axis height and distance from wall
+
+/* ---------- Renderer ---------- */
+const canvas = document.getElementById("gl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(1080, 1920, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = .9;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color("#eceae6");
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
+scene.environmentIntensity = 0.75;
+
+const camera = new THREE.PerspectiveCamera(30, 1080 / 1920, 0.01, 20);
+
+/* ---------- Procedural textures ---------- */
+function canvasTex(w, h, draw, { srgb = true, repeat = [1, 1] } = {}) {
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  draw(c.getContext("2d"), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(...repeat);
+  t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+function rand(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+
+// Subway tiles 15 x 7.5 cm, staggered, with warm grout. One texture = 4 x 8 tiles (0.6 x 0.6 m).
+const TILE_PX = 2048;
+function tiles(ctx, w, h, kind) {
+  const r = rand(7), tw = w / 4, th = h / 8, g = 10;
+  ctx.fillStyle = kind === "color" ? "#cfcac2" : kind === "bump" ? "#000" : "#e8e8e8";
+  ctx.fillRect(0, 0, w, h);
+  for (let row = 0; row < 8; row++) for (let col = -1; col < 5; col++) {
+    const x = col * tw + (row % 2 ? tw / 2 : 0), y = row * th;
+    if (kind === "color") {
+      const v = 246 + Math.floor(r() * 6);
+      const grd = ctx.createLinearGradient(x, y, x + tw, y + th);
+      grd.addColorStop(0, `rgb(${v},${v},${v - 2})`); grd.addColorStop(1, `rgb(${v - 5},${v - 5},${v - 7})`);
+      ctx.fillStyle = grd;
+    } else if (kind === "bump") {
+      const grd = ctx.createRadialGradient(x + tw / 2, y + th / 2, 0, x + tw / 2, y + th / 2, tw * .7);
+      grd.addColorStop(0, "#fff"); grd.addColorStop(.85, "#f2f2f2"); grd.addColorStop(1, "#bbb");
+      ctx.fillStyle = grd;
+    } else ctx.fillStyle = `rgb(${40 + Math.floor(r() * 20)},0,0)`; // roughness: glossy glaze
+    ctx.beginPath(); ctx.roundRect(x + g / 2, y + g / 2, tw - g, th - g, 8); ctx.fill();
+  }
+}
+const tileColor = canvasTex(TILE_PX, TILE_PX, (c, w, h) => tiles(c, w, h, "color"), { repeat: [5, 7] });
+const tileBump = canvasTex(TILE_PX, TILE_PX, (c, w, h) => tiles(c, w, h, "bump"), { srgb: false, repeat: [5, 7] });
+const tileRough = canvasTex(TILE_PX, TILE_PX, (c, w, h) => tiles(c, w, h, "rough"), { srgb: false, repeat: [5, 7] });
+
+// Quilted emboss for one sheet (W x SH), with the perforation line at its top edge.
+const EMB_W = 256, EMB_H = Math.round(256 * SH / W);
+function emboss(ctx, w, h, withPerf) {
+  ctx.fillStyle = "#808080"; ctx.fillRect(0, 0, w, h);
+  const step = w / 9;
+  for (let y = step / 2; y < h; y += step) for (let x = 0; x <= w; x += step) {
+    const ox = (Math.round(y / step) % 2) * step / 2;
+    const grd = ctx.createRadialGradient(x + ox, y, 0, x + ox, y, step * .55);
+    grd.addColorStop(0, "#b8b8b8"); grd.addColorStop(1, "rgba(128,128,128,0)");
+    ctx.fillStyle = grd; ctx.fillRect(x + ox - step, y - step, step * 2, step * 2);
+  }
+  if (withPerf) { ctx.fillStyle = "#202020"; for (let x = 0; x < w; x += 9) ctx.fillRect(x, 0, 5, 3); }
+}
+const sheetBump = canvasTex(EMB_W, EMB_H, (c, w, h) => emboss(c, w, h, true), { srgb: false, repeat: [1, LT / SH] });
+const rollBump = canvasTex(EMB_W, EMB_H, (c, w, h) => emboss(c, w, h, false), { srgb: false, repeat: [1, 9] });
+
+// End of the roll: concentric paper layers.
+const ringTex = canvasTex(512, 512, (ctx, w) => {
+  ctx.fillStyle = "#f4f2ee"; ctx.fillRect(0, 0, w, w);
+  const r = rand(3);
+  for (let rr = w * CORE / R / 2; rr < w / 2; rr += 1.6) {
+    ctx.strokeStyle = `rgba(150,140,125,${.05 + r() * .12})`; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(w / 2, w / 2, rr, 0, Math.PI * 2); ctx.stroke();
+  }
+});
+
+/* ---------- Hanging sheet: color map with the handwriting ---------- */
+const PX_PER_M = 6200;
+const inkCanvas = document.createElement("canvas");
+inkCanvas.width = Math.round(W * PX_PER_M); inkCanvas.height = Math.round(LT * PX_PER_M);
+const ink = inkCanvas.getContext("2d");
+const sheetMap = new THREE.CanvasTexture(inkCanvas);
+sheetMap.colorSpace = THREE.SRGBColorSpace; sheetMap.anisotropy = 8;
+const written = SHEETS.map(() => 0);
+function drawInk() {
+  const w = inkCanvas.width, h = inkCanvas.height, sh = SH * PX_PER_M;
+  ink.fillStyle = "#f7f5f1"; ink.fillRect(0, 0, w, h);
+  // faint perforation dots in the color too
+  ink.fillStyle = "rgba(160,150,135,.55)";
+  for (let k = 1; k * sh < h; k++) for (let x = 6; x < w; x += 16) ink.fillRect(x, h - k * sh - 1, 8, 2);
+  SHEETS.forEach((line, k) => {
+    const p = written[k]; if (p <= 0) return;
+    const cy = h - k * sh - sh / 2; // sheet k counted from the free end, which hangs lowest
+    let size = 150;
+    ink.font = `500 ${size}px Caveat`;
+    while (ink.measureText(line).width > w * .86 && size > 60) { size -= 6; ink.font = `500 ${size}px Caveat`; }
+    const tw = ink.measureText(line).width, x0 = (w - tw) / 2;
+    ink.save();
+    ink.translate(w / 2, cy); ink.rotate((k % 2 ? 1 : -1) * 0.035); ink.translate(-w / 2, -cy);
+    ink.beginPath(); ink.rect(x0 - 20, cy - size, (tw + 40) * p, size * 2); ink.clip();
+    ink.fillStyle = INK; ink.globalAlpha = 1;
+    ink.shadowColor = "rgba(31,44,110,.35)"; ink.shadowBlur = 3; // ink bleeding into paper
+    ink.textBaseline = "middle"; ink.fillText(line, x0, cy + 6);
+    ink.restore();
+  });
+  sheetMap.needsUpdate = true;
+}
+
+/* ---------- Materials ---------- */
+const paperProps = { color: "#ffffff", roughness: .92, metalness: 0, sheen: .2, sheenRoughness: .8, sheenColor: new THREE.Color("#fffaf2") };
+const sheetMat = new THREE.MeshPhysicalMaterial({ ...paperProps, map: sheetMap, bumpMap: sheetBump, bumpScale: 1.4, side: THREE.DoubleSide });
+const rollMat = new THREE.MeshPhysicalMaterial({ ...paperProps, color: "#f6f4f0", bumpMap: rollBump, bumpScale: 1.4 });
+const ringMat = new THREE.MeshStandardMaterial({ map: ringTex, roughness: .95, side: THREE.DoubleSide });
+const coreMat = new THREE.MeshStandardMaterial({ color: "#a98a63", roughness: .9, side: THREE.DoubleSide });
+const chrome = new THREE.MeshStandardMaterial({ color: "#f2f2f2", metalness: 1, roughness: .09 });
+const wallMat = new THREE.MeshStandardMaterial({ map: tileColor, bumpMap: tileBump, bumpScale: 2.5, roughnessMap: tileRough, roughness: 1, metalness: 0 });
+
+/* ---------- Room ---------- */
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(3, 4.2), wallMat);
+wall.position.set(0, 1.0, 0); wall.receiveShadow = true; scene.add(wall);
+const side = new THREE.Mesh(new THREE.PlaneGeometry(2, 4.2), wallMat.clone());
+side.material.map = tileColor.clone(); side.material.map.repeat.set(3.3, 7); side.material.map.needsUpdate = true;
+side.rotation.y = Math.PI / 2; side.position.set(-0.42, 1.0, 1.0); side.receiveShadow = true; scene.add(side);
+// a vanity edge and a towel give the room scale, far out of focus at the bottom
+const counter = new THREE.Mesh(new THREE.BoxGeometry(1.2, .04, .5), new THREE.MeshStandardMaterial({ color: "#f3f1ee", roughness: .35 }));
+counter.position.set(.55, .38, .25); counter.castShadow = counter.receiveShadow = true; scene.add(counter);
+
+/* ---------- Holder ---------- */
+const holder = new THREE.Group(); scene.add(holder);
+const cyl = (r, l, m) => { const g = new THREE.Mesh(new THREE.CylinderGeometry(r, r, l, 48), m); g.castShadow = true; g.receiveShadow = true; return g; };
+for (const sx of [-1, 1]) {
+  const plate = cyl(.021, .01, chrome); plate.rotation.x = Math.PI / 2; plate.position.set(sx * .074, Y0, .005); holder.add(plate);
+  const arm = cyl(.0085, Z0, chrome); arm.rotation.x = Math.PI / 2; arm.position.set(sx * .074, Y0, Z0 / 2 + .005); holder.add(arm);
+  const knuckle = new THREE.Mesh(new THREE.SphereGeometry(.011, 32, 16), chrome); knuckle.position.set(sx * .074, Y0, Z0); knuckle.castShadow = true; holder.add(knuckle);
+}
+const rod = cyl(.0065, .148, chrome); rod.rotation.z = Math.PI / 2; rod.position.set(0, Y0, Z0); holder.add(rod);
+
+/* ---------- Roll ---------- */
+const roll = new THREE.Group(); roll.position.set(0, Y0, Z0); scene.add(roll);
+const outer = new THREE.Mesh(new THREE.CylinderGeometry(R, R, W, 128, 1, true), rollMat);
+outer.rotation.z = Math.PI / 2; outer.castShadow = outer.receiveShadow = true; roll.add(outer);
+for (const sx of [-1, 1]) {
+  const cap = new THREE.Mesh(new THREE.RingGeometry(CORE + .0015, R, 128), ringMat);
+  cap.rotation.y = sx * Math.PI / 2; cap.position.x = sx * W / 2; cap.receiveShadow = true; roll.add(cap);
+}
+const core = new THREE.Mesh(new THREE.CylinderGeometry(CORE + .0015, CORE + .0015, W + .002, 64, 1, true), coreMat);
+core.rotation.z = Math.PI / 2; roll.add(core);
+
+/* ---------- Hanging strip: rebuilt every frame along a soft, gravity-driven path ---------- */
+const NX = 14, NY = 220;
+const stripGeo = new THREE.BufferGeometry();
+const pos = new Float32Array((NX + 1) * (NY + 1) * 3), uv = new Float32Array((NX + 1) * (NY + 1) * 2), idx = [];
+for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) {
+  const a = j * (NX + 1) + i, b = a + 1, c = a + NX + 1, d = c + 1;
+  idx.push(a, c, b, b, c, d);
+}
+stripGeo.setIndex(idx);
+stripGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+stripGeo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+const strip = new THREE.Mesh(stripGeo, sheetMat);
+strip.castShadow = true; strip.receiveShadow = true; scene.add(strip);
+const tmp = new THREE.Vector3();
+function buildStrip(L, t) {
+  // The strip leaves the roll tangentially at the front and falls; near the roll the paper is
+  // still curved, further down it sways and the free end curls slightly toward the camera.
+  for (let j = 0; j <= NY; j++) {
+    const s = (j / NY) * L;
+    const sway = Math.sin(t * 1.1 + s * 7) * .006 * Math.min(1, s / .15) + s * s * .05;
+    const curl = Math.pow(Math.max(0, (s - (L - .045)) / .045), 2) * .018;
+    const twist = Math.sin(t * .7 + s * 4) * .25 * Math.min(1, s / .2);
+    for (let i = 0; i <= NX; i++) {
+      const u = i / NX, x = (u - .5) * W * .985;
+      const k = (j * (NX + 1) + i);
+      const bow = (Math.cos((u - .5) * Math.PI) - .7) * .004 * Math.min(1, s / .1); // paper cups a little
+      tmp.set(x, Y0 - s, Z0 + R + .0006 + sway + curl + bow + x * twist * .12);
+      pos[k * 3] = tmp.x; pos[k * 3 + 1] = tmp.y; pos[k * 3 + 2] = tmp.z;
+      uv[k * 2] = u; uv[k * 2 + 1] = (L - s) / LT;
+    }
+  }
+  stripGeo.attributes.position.needsUpdate = true;
+  stripGeo.attributes.uv.needsUpdate = true;
+  stripGeo.computeVertexNormals();
+  stripGeo.computeBoundingSphere();
+}
+
+/* ---------- Lights: soft window from the left, bounce from the right ---------- */
+const sun = new THREE.DirectionalLight("#fff4e6", 3.2);
+sun.position.set(-1.4, 2.2, 1.6); sun.target.position.set(0, Y0 - .15, 0);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 6; sun.shadow.bias = -.0004; sun.shadow.normalBias = .01;
+Object.assign(sun.shadow.camera, { left: -.5, right: .5, top: .5, bottom: -.7, near: .5, far: 6 });
+scene.add(sun, sun.target);
+scene.add(new THREE.HemisphereLight("#ffffff", "#d9d2c8", .55));
+const fill = new THREE.PointLight("#e9f0ff", .6, 4); fill.position.set(1.2, 1.3, 1.4); scene.add(fill);
+
+/* ---------- Choreography ---------- */
+// For each sheet: a short pull (the strip drops one sheet), then the line is written on it.
+const PULL = .95, WRITE = 1.35, START = .6;
+const L0 = .03;
+function smooth(x) { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); }
+function state(t) {
+  let L = L0;
+  SHEETS.forEach((_, k) => {
+    const t0 = START + k * (PULL + WRITE);
+    L += SH * smooth((t - t0) / PULL);
+    written[k] = Math.min(1, Math.max(0, (t - t0 - PULL) / (WRITE * .85)));
+  });
+  return L;
+}
+const DURATION = START + SHEETS.length * (PULL + WRITE) + 1.6;
+
+function setCamera(t) {
+  const k = t / DURATION;
+  const e = k * k * (3 - 2 * k);
+  camera.position.set(.3 - e * .12, Y0 + .07 - e * .05, .98 - e * .1);
+  camera.lookAt(-.005, Y0 - .1 - e * .03, Z0 + .03);
+}
+
+/* Film grain overlay */
+const g = document.getElementById("grain"), gx = g.getContext("2d"), gimg = gx.createImageData(g.width, g.height);
+function grain(frame) {
+  let s = (frame * 2654435761 + 1) >>> 0; const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; d[i] = d[i + 1] = d[i + 2] = s & 255; d[i + 3] = 255; }
+  gx.putImageData(gimg, 0, 0);
+}
+
+let lastInk = "";
+window.DURATION = DURATION;
+window.seek = (t) => {
+  const L = state(t);
+  roll.rotation.x = (L - L0) / R;
+  buildStrip(L, t);
+  const key = written.map((w) => w.toFixed(3)).join();
+  if (key !== lastInk) { drawInk(); lastInk = key; }
+  setCamera(t);
+  renderer.render(scene, camera);
+  grain(Math.round(t * 60));
+};
+window.ready = document.fonts.load("500 100px Caveat").then(() => { window.seek(0); });
+
+if (!params.has("render")) {
+  await window.ready;
+  const t0 = performance.now();
+  (function loop(now) { window.seek(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(t0);
+}
+</script>
+</body>
+</html>
