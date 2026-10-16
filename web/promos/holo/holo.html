@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<title>Holograma Sonylum</title>
+<!-- 1080x1920. The Instagram card in foto.png comes alive as a hologram over the palm.
+     Layers from prep.py: clean.png (no card), card.png (empty glass card); the content is cut
+     from the original photo piece by piece so it matches it exactly. Numbers count up.
+     One paused GSAP timeline, seeked frame by frame by render.mjs. -->
+<link rel="stylesheet" href="../vendor/fonts/fonts.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+#stage { position: absolute; inset: 0; overflow: hidden; }
+.world { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 556px 1050px; }
+.bg { position: absolute; inset: 0; background: url(assets/clean.png) 0 0 / 1080px auto no-repeat; }
+canvas.fx { position: absolute; inset: 0; width: 1080px; height: 1920px; pointer-events: none; }
+#bokeh { mix-blend-mode: screen; }
+#sparks { mix-blend-mode: screen; }
+.palm { position: absolute; left: 556px; top: 1370px; width: 900px; height: 520px; margin: -260px 0 0 -450px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,190,140,.55), rgba(120,170,255,.22) 55%, transparent); mix-blend-mode: screen; opacity: 0; }
+
+.holo { position: absolute; inset: 0; }
+.card { position: absolute; background: url(assets/card.png) 0 0 / 100% 100% no-repeat; }
+.ghost { position: absolute; background: url(assets/card.png) 0 0 / 100% 100% no-repeat; mix-blend-mode: screen; opacity: 0; }
+.ghost.c { filter: sepia(1) hue-rotate(150deg) saturate(6); }
+.ghost.m { filter: sepia(1) hue-rotate(260deg) saturate(6); }
+.piece { position: absolute; background-image: url(assets/foto.png); background-repeat: no-repeat; opacity: 0; }
+.piece.round { border-radius: 50%; }
+.ring { position: absolute; border-radius: 50%; mix-blend-mode: screen; opacity: 0;
+  background: conic-gradient(from var(--a, 0deg), transparent 0 70%, rgba(255,255,255,.95) 78%, rgba(120,200,255,.8) 82%, transparent 90%);
+  -webkit-mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 97%, transparent 99%); mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 97%, transparent 99%); }
+.num { position: absolute; font-family: "Poppins", sans-serif; font-weight: 600; color: #f5f7fb; white-space: nowrap; transform-origin: 0 50%; opacity: 0;
+  text-shadow: 0 0 6px rgba(255,255,255,.25); }
+.scan { position: absolute; height: 6px; border-radius: 6px; opacity: 0; mix-blend-mode: screen;
+  background: linear-gradient(90deg, transparent, rgba(140,220,255,.95) 15%, #fff 50%, rgba(255,170,120,.95) 85%, transparent);
+  box-shadow: 0 0 24px 8px rgba(120,200,255,.55), 0 0 60px 20px rgba(120,160,255,.25); }
+.sheen { position: absolute; overflow: hidden; mix-blend-mode: screen; pointer-events: none; }
+.sheen i { position: absolute; top: -20%; width: 28%; height: 140%; left: -40%; transform: rotate(16deg);
+  background: linear-gradient(90deg, transparent, rgba(190,225,255,.22), rgba(255,255,255,.35), rgba(255,200,170,.18), transparent); }
+.linkpulse { position: absolute; border-radius: 30px; mix-blend-mode: screen; opacity: 0;
+  background: radial-gradient(closest-side, rgba(70,170,255,.55), transparent); }
+
+.vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(80% 60% at 52% 50%, transparent 55%, rgba(0,0,0,.55)); }
+#grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .06; mix-blend-mode: overlay; pointer-events: none; }
+.flash { position: absolute; inset: 0; background: radial-gradient(45% 25% at 52% 62%, rgba(170,215,255,.6), transparent 70%); mix-blend-mode: screen; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="world" data-world>
+    <div class="bg"></div>
+    <canvas class="fx" id="bokeh" width="1080" height="1920"></canvas>
+    <div class="palm" data-palm></div>
+    <div class="holo" data-holo></div>
+    <canvas class="fx" id="sparks" width="1080" height="1920"></canvas>
+  </div>
+  <div class="flash" data-flash></div>
+  <div class="vignette"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+</div>
+<script src="../vendor/gsap.min.js"></script>
+<script>
+const LAYOUT = {
+  size: [941, 1672],
+  card: [96, 630, 876, 1205],
+  quad: [[133, 663], [838, 703], [836, 1168], [132, 1163]],
+  // pieces cut from the photo: [x0, y0, x1, y1] in photo pixels
+  pieces: {
+    avatar: [168, 700, 366, 904],
+    name: [392, 726, 718, 790], badge: [718, 742, 766, 790],
+    handle: [392, 774, 548, 810],
+    stat1: [392, 860, 530, 894], stat2: [570, 866, 680, 900], stat3: [726, 870, 814, 904],
+    div1: [539, 830, 551, 894], div2: [693, 836, 705, 900],
+    rule: [170, 904, 802, 918],
+    icon1: [184, 922, 236, 970], line1: [236, 922, 580, 970],
+    icon2: [184, 968, 236, 1008], line2: [236, 968, 504, 1008],
+    icon3: [184, 1005, 236, 1047], line3: [236, 1005, 520, 1047],
+    icon4: [184, 1044, 236, 1088], line4: [236, 1044, 600, 1088],
+    icon5: [180, 1086, 234, 1140], link: [234, 1086, 412, 1140],
+  },
+  nums: [{ box: [392, 826, 440, 864], value: 42 }, { box: [570, 832, 632, 870], value: 283 }, { box: [726, 836, 788, 876], value: 223 }],
+};
+const S = 1080 / LAYOUT.size[0];           // photo px -> video px
+const TILT = Math.atan2(703 - 663, 838 - 133) * 180 / Math.PI;
+const $ = (q, r = document) => r.querySelector(q);
+const $$ = (q, r = document) => [...r.querySelectorAll(q)];
+const holo = $("[data-holo]");
+const px = (v) => v * S + "px";
+function box(el, [x0, y0, x1, y1]) { Object.assign(el.style, { left: px(x0), top: px(y0), width: px(x1 - x0), height: px(y1 - y0) }); return el; }
+
+/* ---------- Build layers ---------- */
+const cardWrap = document.createElement("div"); cardWrap.style.position = "absolute"; cardWrap.style.inset = "0"; holo.appendChild(cardWrap);
+const [cx0, cy0, cx1, cy1] = LAYOUT.card;
+const ghostC = box(Object.assign(document.createElement("div"), { className: "ghost c" }), LAYOUT.card);
+const ghostM = box(Object.assign(document.createElement("div"), { className: "ghost m" }), LAYOUT.card);
+const card = box(Object.assign(document.createElement("div"), { className: "card" }), LAYOUT.card);
+cardWrap.append(ghostC, ghostM, card);
+const pieces = {};
+for (const [k, b] of Object.entries(LAYOUT.pieces)) {
+  const el = box(Object.assign(document.createElement("div"), { className: "piece" + (k === "avatar" ? " round" : "") }), b);
+  el.style.backgroundSize = `${LAYOUT.size[0] * S}px auto`;
+  el.style.backgroundPosition = `${-b[0] * S}px ${-b[1] * S}px`;
+  cardWrap.appendChild(el); pieces[k] = el;
+}
+const ring = box(Object.assign(document.createElement("div"), { className: "ring" }), [160, 692, 374, 912]); cardWrap.appendChild(ring);
+const nums = LAYOUT.nums.map(({ box: b }) => {
+  const el = Object.assign(document.createElement("div"), { className: "num" });
+  el.style.left = px(b[0] + 1); el.style.top = px(b[1] - 2);
+  el.style.fontSize = (b[3] - b[1]) * S * .98 + "px"; el.style.lineHeight = (b[3] - b[1]) * S + "px";
+  el.style.transform = `rotate(${TILT}deg)`;
+  cardWrap.appendChild(el); return el;
+});
+const scan = box(Object.assign(document.createElement("div"), { className: "scan" }), [120, 660, 850, 666]); cardWrap.appendChild(scan);
+const sheen = box(Object.assign(document.createElement("div"), { className: "sheen", innerHTML: "<i></i>" }), [133, 663, 838, 1168]);
+sheen.style.borderRadius = "28px"; cardWrap.appendChild(sheen);
+const linkPulse = box(Object.assign(document.createElement("div"), { className: "linkpulse" }), [168, 1076, 430, 1150]); cardWrap.appendChild(linkPulse);
+
+/* ---------- Timeline ---------- */
+const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+const PALM = [484 * S, 1185 * S];
+const DURATION = 10.5;
+
+// camera: slow push-in, the card floats a little on its own
+tl.fromTo("[data-world]", { scale: 1.0 }, { scale: 1.075, duration: DURATION, ease: "sine.inOut" }, 0);
+tl.fromTo(cardWrap, { y: 0 }, { y: -10, duration: 2.6, ease: "sine.inOut", yoyo: true, repeat: 3 }, 2.2);
+
+// 0 – 1.7 s · the palm lights up, the card rises out of it as a hologram
+tl.fromTo("[data-palm]", { opacity: 0, scale: .6 }, { opacity: .9, scale: 1, duration: 1.0, ease: "power2.out" }, 0.15);
+tl.to("[data-palm]", { opacity: .55, duration: 1.2, ease: "sine.inOut" }, 1.4);
+tl.set(cardWrap, { transformOrigin: `${PALM[0]}px ${PALM[1]}px` }, 0);
+tl.fromTo(cardWrap, { scaleY: .02, scaleX: .55, opacity: 0, filter: "brightness(3) blur(6px)" },
+  { scaleY: 1, scaleX: 1, opacity: 1, filter: "brightness(1) blur(0px)", duration: 1.0, ease: "expo.out" }, 0.3);
+// flicker while it stabilizes
+[[.37, .35], [.45, 1], [.51, .5], [.58, 1], [.7, .75], [.77, 1]].forEach(([t, o]) => tl.set(card, { opacity: o }, t));
+tl.fromTo(ghostC, { opacity: .8, x: -14 }, { opacity: 0, x: 0, duration: .9, ease: "power2.out" }, 0.35);
+tl.fromTo(ghostM, { opacity: .8, x: 14 }, { opacity: 0, x: 0, duration: .9, ease: "power2.out" }, 0.35);
+tl.fromTo(scan, { opacity: 1, y: 0 }, { y: (1166 - 662) * S, duration: 1.0, ease: "power2.inOut" }, 0.5);
+tl.to(scan, { opacity: 0, duration: .2 }, 1.45);
+tl.fromTo("[data-flash]", { opacity: 0 }, { opacity: .8, duration: .18, yoyo: true, repeat: 1, ease: "sine.inOut" }, 0.35);
+
+// helper: holographic reveal of a piece (wipe left -> right with a bright edge)
+function reveal(el, at, dur = .55) {
+  tl.fromTo(el, { opacity: 0, clipPath: "inset(0 100% 0 0)", filter: "brightness(2.6) blur(3px)" },
+    { opacity: 1, clipPath: "inset(0 0% 0 0)", filter: "brightness(1) blur(0px)", duration: dur, ease: "power2.out" }, at);
+}
+function popIn(el, at) {
+  tl.fromTo(el, { opacity: 0, scale: .4, filter: "brightness(3)" }, { opacity: 1, scale: 1, filter: "brightness(1)", duration: .5, ease: "back.out(2.4)" }, at);
+}
+
+// 1.7 – 2.6 s · avatar with spinning light ring
+tl.fromTo(pieces.avatar, { opacity: 0, scale: .55, filter: "brightness(3) blur(8px)" }, { opacity: 1, scale: 1, filter: "brightness(1) blur(0px)", duration: .8, ease: "back.out(1.6)" }, 1.6);
+tl.fromTo(ring, { opacity: 0 }, { opacity: 1, duration: .3 }, 1.8);
+tl.fromTo(ring, { "--a": "0deg" }, { "--a": "1080deg", duration: 8.5, ease: "none" }, 1.8);
+tl.to(ring, { opacity: .55, duration: 1 }, 3.2);
+
+// 2.3 – 3.2 s · name, verified badge, handle
+reveal(pieces.name, 2.25, .6);
+popIn(pieces.badge, 2.85);
+reveal(pieces.handle, 3.0, .45);
+
+// 3.3 – 4.6 s · stats count up
+LAYOUT.nums.forEach((n, i) => {
+  const at = 3.35 + i * .2, obj = { v: 0 };
+  tl.fromTo(nums[i], { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: .35 }, at);
+  tl.to(obj, { v: n.value, duration: 1.0, ease: "power2.out", onUpdate: () => { nums[i].textContent = Math.round(obj.v); } }, at);
+  reveal(pieces["stat" + (i + 1)], at + .1, .45);
+});
+tl.fromTo([pieces.div1, pieces.div2], { opacity: 0, scaleY: 0 }, { opacity: 1, scaleY: 1, duration: .5, stagger: .15 }, 3.5);
+tl.call(() => {}, null, 0); // keeps numbers empty before they start
+reveal(pieces.rule, 4.4, .7);
+
+// 4.8 – 6.4 s · the four lines, icon first then text
+for (let i = 1; i <= 4; i++) {
+  const at = 4.8 + (i - 1) * .38;
+  popIn(pieces["icon" + i], at);
+  reveal(pieces["line" + i], at + .1, .55);
+}
+// 6.5 s · link, then it pulses like a button
+popIn(pieces.icon5, 6.45);
+reveal(pieces.link, 6.55, .5);
+tl.fromTo(linkPulse, { opacity: 0, scale: .8 }, { opacity: .9, scale: 1.1, duration: .5, yoyo: true, repeat: 3, ease: "sine.inOut" }, 7.0);
+
+// holographic sheen sweeps across the card
+[2.0, 7.6, 9.4].forEach((t) => tl.fromTo($("i", sheen), { left: "-40%" }, { left: "120%", duration: 1.1, ease: "power2.inOut", immediateRender: false }, t));
+tl.to({}, { duration: .01 }, DURATION - .01);
+
+/* ---------- Bokeh: warm lights behind, twinkling and drifting ---------- */
+const bk = $("#bokeh").getContext("2d");
+function prand(i, k) { const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453; return x - Math.floor(x); }
+const BOKEH = Array.from({ length: 16 }, (_, i) => {
+  const side = i % 2 ? 1 : -1;
+  return { x: side > 0 ? 880 + prand(i, 1) * 220 : prand(i, 1) * 200, y: 80 + prand(i, 2) * 1300, r: 30 + prand(i, 3) * 70, ph: prand(i, 4) * 6.28, sp: .4 + prand(i, 5) * .8, hue: 28 + prand(i, 6) * 14 };
+});
+function drawBokeh(t) {
+  bk.clearRect(0, 0, 1080, 1920);
+  for (const b of BOKEH) {
+    const a = .07 + .07 * Math.sin(t * b.sp * 2 + b.ph);
+    const x = b.x + Math.sin(t * .3 + b.ph) * 14, y = b.y - t * 6 * b.sp;
+    const g = bk.createRadialGradient(x, y, 0, x, y, b.r);
+    g.addColorStop(0, `hsla(${b.hue},100%,70%,${a})`); g.addColorStop(.75, `hsla(${b.hue},100%,60%,${a * .7})`); g.addColorStop(1, `hsla(${b.hue},100%,55%,0)`);
+    bk.fillStyle = g; bk.beginPath(); bk.arc(x, y, b.r, 0, 6.283); bk.fill();
+  }
+}
+
+/* ---------- Sparks rising from the palm into the card ---------- */
+const sp = $("#sparks").getContext("2d");
+const SPARKS = Array.from({ length: 140 }, (_, i) => ({
+  t0: prand(i, 7) * 9.8, life: 1.2 + prand(i, 8) * 1.4, x: PALM[0] + (prand(i, 9) - .5) * 520, vy: 160 + prand(i, 10) * 260,
+  drift: (prand(i, 11) - .5) * 60, s: .8 + prand(i, 12) * 2.4, warm: prand(i, 13) > .55,
+}));
+function drawSparks(t) {
+  sp.clearRect(0, 0, 1080, 1920);
+  const intensity = Math.min(1, t / .6) * (t < 2 ? 1 : .55);
+  for (const p of SPARKS) {
+    const age = t - p.t0; if (age < 0 || age > p.life) continue;
+    const k = age / p.life, y = PALM[1] + 30 - p.vy * age, x = p.x + Math.sin(age * 3 + p.t0) * p.drift * k;
+    const a = Math.sin(Math.PI * k) * intensity;
+    const g = sp.createRadialGradient(x, y, 0, x, y, p.s * 5);
+    g.addColorStop(0, p.warm ? `rgba(255,210,160,${a})` : `rgba(170,225,255,${a})`); g.addColorStop(1, "rgba(0,0,0,0)");
+    sp.fillStyle = g; sp.beginPath(); sp.arc(x, y, p.s * 5, 0, 6.283); sp.fill();
+  }
+}
+
+/* ---------- Grain ---------- */
+const gr = $("#grain").getContext("2d"), gimg = gr.createImageData(540, 960);
+function grain(frame) {
+  let s = (frame * 2654435761 + 1) >>> 0; const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; d[i] = d[i + 1] = d[i + 2] = s & 255; d[i + 3] = 255; }
+  gr.putImageData(gimg, 0, 0);
+}
+
+window.DURATION = DURATION;
+window.seek = (t) => {
+  tl.time(t, false);
+  drawBokeh(t); drawSparks(t); grain(Math.round(t * 60));
+};
+window.ready = Promise.all([document.fonts.ready, ...["assets/clean.png", "assets/card.png", "assets/foto.png"].map((src) => {
+  const im = new Image(); im.src = src; return im.decode().catch(() => {});
+})]).then(() => window.seek(0));
+
+if (!new URLSearchParams(location.search).has("render")) {
+  const t0 = performance.now();
+  (function loop(now) { window.seek(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(t0);
+}
+</script>
+</body>
+</html>
