@@ -26,3 +26,13 @@ node render.mjs creando      # una sola
 ```
 
 La primera vez extrae los cuadros de las grabaciones a `frames/` (no se versiona). Necesita `ffmpeg`.
+
+## Sonido
+
+`promo-sonylum-sonido.mp4` y `promo-creando-sonido.mp4` son los mismos videos con diseño de sonido sincronizado al cuadro: arme del logo, golpe con el destello, etiquetas y tarjetas, cada tecla del mensaje, envío de WhatsApp, doble tilde, notificación, transiciones y cierre, con una base musical oscura a 100 BPM. Todo sintetizado (sin samples de terceros).
+
+```sh
+node events.mjs > events.json   # tiempos de cada evento de la animación
+python3 sound.py events.json    # -> sound-sonylum.wav, sound-creando.wav
+ffmpeg -i promo-sonylum.mp4 -i sound-sonylum.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 256k -shortest promo-sonylum-sonido.mp4
+```
