@@ -1,0 +1,181 @@
+{
+ "video": "creando/final_raw.mp4",
+ "captionY": 0.62,
+ "focusX": 0.5,
+ "flashesMs": [
+  9830
+ ],
+ "words": [
+  {
+   "text": "¿Necesitás",
+   "startMs": 260,
+   "endMs": 1000,
+   "newPage": true
+  },
+  {
+   "text": "hacer",
+   "startMs": 1000,
+   "endMs": 1560
+  },
+  {
+   "text": "CONTENIDO",
+   "startMs": 1560,
+   "endMs": 1880,
+   "style": "big",
+   "color": "gold",
+   "punch": true
+  },
+  {
+   "text": "pero no tenés",
+   "startMs": 1880,
+   "endMs": 2500,
+   "newPage": true
+  },
+  {
+   "text": "quién te",
+   "startMs": 2500,
+   "endMs": 3020
+  },
+  {
+   "text": "filme?",
+   "startMs": 3020,
+   "endMs": 3900,
+   "style": "script",
+   "color": "red"
+  },
+  {
+   "text": "Bueno,",
+   "startMs": 4019,
+   "endMs": 4320,
+   "newPage": true
+  },
+  {
+   "text": "comunicate",
+   "startMs": 4320,
+   "endMs": 4860
+  },
+  {
+   "text": "con",
+   "startMs": 4860,
+   "endMs": 5200
+  },
+  {
+   "text": "NOSOTROS",
+   "startMs": 5200,
+   "endMs": 6200,
+   "style": "big",
+   "color": "blue",
+   "punch": true
+  },
+  {
+   "text": "Somos",
+   "startMs": 6280,
+   "endMs": 6780,
+   "newPage": true
+  },
+  {
+   "text": "Creando",
+   "startMs": 6780,
+   "endMs": 7380,
+   "style": "script",
+   "color": "gold"
+  },
+  {
+   "text": "CONTENIDOS",
+   "startMs": 7380,
+   "endMs": 8140,
+   "style": "big",
+   "color": "gold",
+   "punch": true
+  },
+  {
+   "text": "y estamos para",
+   "startMs": 8140,
+   "endMs": 8920,
+   "newPage": true
+  },
+  {
+   "text": "ayudarte",
+   "startMs": 8920,
+   "endMs": 9800,
+   "style": "script"
+  },
+  {
+   "text": "Editamos,",
+   "startMs": 9990,
+   "endMs": 11210,
+   "newPage": true,
+   "style": "big",
+   "color": "gold",
+   "punch": true
+  },
+  {
+   "text": "guionamos,",
+   "startMs": 11390,
+   "endMs": 12490,
+   "style": "script"
+  },
+  {
+   "text": "colaboramos,",
+   "startMs": 12690,
+   "endMs": 13630,
+   "newPage": true
+  },
+  {
+   "text": "FILMAMOS",
+   "startMs": 13930,
+   "endMs": 14730,
+   "style": "big",
+   "color": "blue",
+   "punch": true
+  },
+  {
+   "text": "y también",
+   "startMs": 16330,
+   "endMs": 16790,
+   "newPage": true
+  },
+  {
+   "text": "COBRAMOS",
+   "startMs": 16790,
+   "endMs": 17730,
+   "style": "big",
+   "color": "red",
+   "punch": true
+  }
+ ],
+ "stickers": [
+  {
+   "name": "exclamation",
+   "startMs": 1600,
+   "endMs": 3900,
+   "x": 0.86,
+   "y": 0.58,
+   "rotate": 14
+  },
+  {
+   "name": "fire",
+   "startMs": 7400,
+   "endMs": 9800,
+   "x": 0.85,
+   "y": 0.57,
+   "size": 200
+  },
+  {
+   "name": "double-exclamation",
+   "startMs": 13930,
+   "endMs": 16230,
+   "x": 0.86,
+   "y": 0.58,
+   "rotate": 14
+  },
+  {
+   "name": "mind-blown",
+   "startMs": 16790,
+   "endMs": 17830,
+   "x": 0.5,
+   "y": 0.84,
+   "size": 240
+  }
+ ]
+}
