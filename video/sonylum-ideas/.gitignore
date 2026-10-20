@@ -1,5 +1,5 @@
 node_modules
-out/*.png
-out/frames
+out/*
+!out/sonylum-ideas.mp4
 .DS_Store
 __pycache__
