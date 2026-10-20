@@ -15,8 +15,12 @@ await import("./lib/fonts");
 declare global {
   interface Window {
     sonylumPlayer?: PlayerRef | null;
+    /** "capture": sin controles, una sola pasada, para grabar la pantalla. */
+    SONYLUM_MODE?: "page" | "capture";
   }
 }
+
+const capture = window.SONYLUM_MODE === "capture";
 
 const mount = document.getElementById("player");
 if (mount) {
@@ -31,11 +35,12 @@ if (mount) {
       compositionWidth={W}
       compositionHeight={H}
       style={{ width: "100%", height: "100%" }}
-      controls
-      loop
-      autoPlay
+      controls={!capture}
+      loop={!capture}
+      autoPlay={!capture}
       initiallyMuted
-      clickToPlay
+      clickToPlay={!capture}
+      moveToBeginningWhenEnded={!capture}
       showPosterWhenPaused={false}
       bufferStateDelayInMilliseconds={600}
     />,
