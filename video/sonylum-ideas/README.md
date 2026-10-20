@@ -10,6 +10,7 @@ marcas técnicas de plano, a partir de la referencia de Instagram
 npm install
 npm run studio     # editar / previsualizar en Remotion Studio
 npm run render     # → out/sonylum-ideas.mp4 (H.264, CRF 16)
+npm run web        # → web/player.js: la misma pieza en vivo en el navegador (Remotion Player)
 ```
 
 ## Estructura
