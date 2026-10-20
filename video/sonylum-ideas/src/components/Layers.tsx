@@ -1,10 +1,11 @@
 import React from "react";
-import { AbsoluteFill, Img, random, staticFile } from "remotion";
+import { AbsoluteFill, Img, random } from "remotion";
 import { camTransform } from "../camera";
 import { clamp, ease, prog } from "../lib/anim";
 import { T } from "../timeline";
 import { C, F, H, W } from "../theme";
 import { Cross, Rule } from "./Strokes";
+import { asset } from "../lib/asset";
 
 /** Capa que sigue a la cámara con su propia profundidad (parallax 2.5D). */
 export const CameraLayer: React.FC<{ f: number; depth?: number; children: React.ReactNode; style?: React.CSSProperties }> = ({
@@ -21,7 +22,7 @@ export const PaperBackground: React.FC = () => (
   <>
     <AbsoluteFill style={{ background: C.paper }} />
     <Img
-      src={staticFile("textures/paper.jpg")}
+      src={asset("textures/paper.jpg")}
       style={{ position: "absolute", left: -140, top: -240, width: W + 280, height: H + 480, objectFit: "cover" }}
     />
   </>
@@ -37,7 +38,7 @@ export const AnalogOverlay: React.FC<{ f: number; boost?: number }> = ({ f, boos
     <>
       <AbsoluteFill
         style={{
-          backgroundImage: `url(${staticFile(`textures/grain-${tile}.png`)})`,
+          backgroundImage: `url(${asset(`textures/grain-${tile}.jpg`)})`,
           backgroundSize: "540px 960px",
           backgroundPosition: `${ox}px ${oy}px`,
           mixBlendMode: "overlay",

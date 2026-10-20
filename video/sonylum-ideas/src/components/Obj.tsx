@@ -1,6 +1,7 @@
 import React from "react";
-import { Img, staticFile } from "remotion";
+import { Img } from "remotion";
 import { Blur, liftShadow } from "./Blur";
+import { asset } from "../lib/asset";
 
 export type Pose = {
   x: number;
@@ -55,7 +56,7 @@ export const Obj: React.FC<{
       style={{ opacity: o }}
     >
       <div style={{ position: "absolute", left: p.x, top: p.y, width: w, height: h, transform }}>
-        <Img src={staticFile(meta.src)} style={{ width: "100%", height: "100%", display: "block" }} />
+        <Img src={asset(meta.src)} style={{ width: "100%", height: "100%", display: "block" }} />
         {children}
       </div>
     </Blur>

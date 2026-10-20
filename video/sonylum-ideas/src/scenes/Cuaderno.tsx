@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Img, staticFile } from "remotion";
+import { AbsoluteFill, Img } from "remotion";
 import { Blur, liftShadow } from "../components/Blur";
 import { Obj, Pose } from "../components/Obj";
 import { Paper } from "../components/Paper";
@@ -8,6 +8,7 @@ import { Reveal, Typewriter, Words } from "../components/Type";
 import { clamp, drift, ease, lerp, prog, spr, tw } from "../lib/anim";
 import { T } from "../timeline";
 import { C, F } from "../theme";
+import { asset } from "../lib/asset";
 
 /*
  * 00:00–00:08 · LA IDEA + EL PROCESO
@@ -59,7 +60,7 @@ const Sheet: React.FC<{ f: number }> = ({ f }) => {
           transform: `translate(-50%,-50%) perspective(1800px) rotateX(${p.rx}deg) rotateY(${p.ry}deg) rotateZ(${p.rot}deg) scale(${p.s})`,
         }}
       >
-        <Img src={staticFile("objects/torn-paper.png")} style={{ width: "100%", height: "100%" }} />
+        <Img src={asset("objects/torn-paper.png")} style={{ width: "100%", height: "100%" }} />
 
         {/* TODO EMPIEZA */}
         <div style={{ position: "absolute", left: 0, right: 0, top: 128, textAlign: "center" }}>
@@ -137,7 +138,7 @@ const Sheet: React.FC<{ f: number }> = ({ f }) => {
               filter: liftShadow(0.1 + (1 - clamp(clipP)) * 0.8),
             }}
           >
-            <Img src={staticFile("objects/binder-clip.png")} style={{ width: "100%" }} />
+            <Img src={asset("objects/binder-clip.png")} style={{ width: "100%" }} />
           </div>
         ) : null}
       </div>

@@ -1,8 +1,9 @@
 import React from "react";
-import { getStaticFiles, Img, staticFile } from "remotion";
+import { getStaticFiles, Img } from "remotion";
 import { clamp, ease, prog, spr } from "../lib/anim";
 import { C, F } from "../theme";
 import { Blur } from "./Blur";
+import { asset } from "../lib/asset";
 
 /* ───────────────────────── SONYLUM ───────────────────────── */
 
@@ -77,9 +78,9 @@ export const SonylumLogo: React.FC<{
     position: "absolute",
     inset: 0,
     backgroundColor: color,
-    WebkitMaskImage: `url(${staticFile(`brands/sonylum-parts/${name}.png`)})`,
+    WebkitMaskImage: `url(${asset(`brands/sonylum-parts/${name}.png`)})`,
     WebkitMaskSize: "100% 100%",
-    maskImage: `url(${staticFile(`brands/sonylum-parts/${name}.png`)})`,
+    maskImage: `url(${asset(`brands/sonylum-parts/${name}.png`)})`,
     maskSize: "100% 100%",
   });
   const box: React.CSSProperties = { position: "absolute", left: x - width / 2, top: y - h / 2, width, height: h };
@@ -137,7 +138,7 @@ export const CreandoLogo: React.FC<{
         inset: 0,
         transform: `translate(${dx}px, ${dy}px)`,
         backgroundColor: color,
-        WebkitMaskImage: `url(${staticFile(`brands/creando-parts/${name}.png`)})`,
+        WebkitMaskImage: `url(${asset(`brands/creando-parts/${name}.png`)})`,
         WebkitMaskSize: "100% 100%",
         ...extra,
       }}

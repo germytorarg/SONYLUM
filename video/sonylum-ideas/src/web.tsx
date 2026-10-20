@@ -3,9 +3,14 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { Player, PlayerRef } from "@remotion/player";
-import { SonylumIdeas } from "./SonylumIdeas";
-import { DURATION, FPS, H, W } from "./theme";
-import "./lib/fonts";
+import { WEB_ASSETS } from "./web-assets.gen";
+
+// Los assets van embebidos: se registran antes de cargar composición y fuentes.
+window.__SONYLUM_ASSETS = WEB_ASSETS;
+
+const { SonylumIdeas } = await import("./SonylumIdeas");
+const { DURATION, FPS, H, W } = await import("./theme");
+await import("./lib/fonts");
 
 declare global {
   interface Window {

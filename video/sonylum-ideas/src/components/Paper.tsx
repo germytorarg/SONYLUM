@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
-import { random, staticFile } from "remotion";
+import { random } from "remotion";
 import { noise2D } from "@remotion/noise";
 import { C } from "../theme";
+import { asset } from "../lib/asset";
 
 type Sides = { top?: boolean; right?: boolean; bottom?: boolean; left?: boolean };
 
@@ -103,7 +104,7 @@ export const Paper: React.FC<{
         <path d={bodyPath} fill={color} />
         {texture > 0 ? (
           <image
-            href={staticFile("textures/paper.jpg")}
+            href={asset("textures/paper.jpg")}
             x={0}
             y={0}
             width={Math.max(w, 1080)}

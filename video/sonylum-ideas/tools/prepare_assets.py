@@ -122,8 +122,7 @@ def grain_tiles(w=540, h=960, count=3):
         g = ndi.gaussian_filter(g, 0.55)
         g = (g - g.min()) / np.ptp(g)
         lum = (g * 255).astype(np.uint8)
-        rgba = np.dstack([lum, lum, lum, np.full_like(lum, 255)])
-        Image.fromarray(rgba).save(os.path.join(ROOT, "textures", f"grain-{i}.png"))
+        Image.fromarray(lum).convert("RGB").save(os.path.join(ROOT, "textures", f"grain-{i}.jpg"), quality=88)
 
 
 if __name__ == "__main__":

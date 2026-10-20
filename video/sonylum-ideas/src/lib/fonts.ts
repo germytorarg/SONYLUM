@@ -1,5 +1,6 @@
 import { loadFont } from "@remotion/fonts";
-import { staticFile } from "remotion";
+import { asset } from "./asset";
+
 
 const faces: { family: string; file: string; weight: string; style?: string }[] = [
   { family: "Anton", file: "anton-latin-400-normal.woff2", weight: "400" },
@@ -17,7 +18,8 @@ export const fontsReady = Promise.all(
   faces.map((f) =>
     loadFont({
       family: f.family,
-      url: staticFile(`fonts/${f.file}`),
+      url: asset(`fonts/${f.file}`),
+      format: "woff2",
       weight: f.weight,
       style: f.style ?? "normal",
     }),

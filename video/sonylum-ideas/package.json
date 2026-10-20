@@ -2,13 +2,13 @@
   "name": "sonylum-ideas",
   "version": "1.0.0",
   "private": true,
-  "description": "SONYLUM — 'Las ideas también tienen vida'. Motion graphic editorial 9:16, 30s, Remotion.",
+  "description": "SONYLUM \u2014 'Las ideas tambi\u00e9n tienen vida'. Motion graphic editorial 9:16, 30s, Remotion.",
   "scripts": {
     "studio": "remotion studio",
     "render": "remotion render SonylumIdeas out/sonylum-ideas.mp4 --codec=h264 --crf=16",
     "still": "remotion still SonylumIdeas out/still.png --frame=60",
     "typecheck": "tsc --noEmit",
-    "web": "esbuild src/web.tsx --bundle --minify --format=iife --target=es2020 --define:process.env.NODE_ENV='\"production\"' --outfile=web/player.js"
+    "web": "node tools/gen_web_assets.mjs && esbuild src/web.tsx --bundle --minify --format=esm --target=es2022 --loader:.png=dataurl --loader:.jpg=dataurl --loader:.woff2=dataurl --define:process.env.NODE_ENV='\"production\"' --outfile=web/player.js"
   },
   "dependencies": {
     "@remotion/cli": "4.0.537",
