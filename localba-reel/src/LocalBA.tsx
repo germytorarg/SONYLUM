@@ -1,15 +1,35 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, random, staticFile, useCurrentFrame} from 'remotion';
-import {ANTON, BookmarkIcon, GOLD, GlitchText, INK, MONT, PhoneIcon, PlaceTag, Slam, easeIn, lerp, prog} from './components';
+import {
+  ANTON,
+  BookmarkIcon,
+  FloorCrawl,
+  GOLD,
+  GlitchText,
+  INK,
+  MONT,
+  ObeliskRing,
+  PerspectiveBand,
+  PhoneIcon,
+  PlaceTag,
+  Slam,
+  WallTicker,
+  easeIn,
+  lerp,
+  prog,
+} from './components';
+import AXIS from './obeliskAxis.json';
 import {loadFonts} from './fonts';
-import {CUT, MATTE_DAY, MATTE_NIGHT, SHIFT, SLOW_END, srcFrame} from './timing';
+import {CUT, MATTE_NIGHT, OFFSET, OPEN_END, SHIFT, srcFrame} from './timing';
 
 loadFonts();
 
 const VIDEO = staticFile('video/localba_src.mp4');
 const pad = (n: number) => String(n).padStart(4, '0');
-const bgFrame = (k: number) => staticFile(`bg/bg_${pad(k)}.jpg`);
-const fgFrame = (k: number) => staticFile(`fg/fg_${pad(k)}.webp`);
+const bgFrame = (dir: string, k: number) => staticFile(`${dir}/bg_${pad(k)}.jpg`);
+const fgFrame = (dir: string, k: number) => staticFile(`${dir}/fg_${pad(k)}.webp`);
+const axis = AXIS as [number, number][][];
+const RING = 'VIVÍ BUENOS AIRES · COMO UN LOCAL · ';
 const FULL: React.CSSProperties = {position: 'absolute', inset: 0, width: '100%', height: '100%'};
 
 // Golpes de zoom en los cortes (más fuertes en los acentos principales).
@@ -42,12 +62,13 @@ const shake = (f: number) => {
   return [(random(`sx${f}`) - 0.5) * a, (random(`sy${f}`) - 0.5) * a];
 };
 
-/** Toma con título detrás: fondo + título + recorte de primer plano. */
-const Matted: React.FC<{k: number; children: React.ReactNode}> = ({k, children}) => (
+/** Toma con título detrás: fondo + título (detrás) + recorte de primer plano + capa delantera. */
+const Matted: React.FC<{dir: string; k: number; children: React.ReactNode; front?: React.ReactNode}> = ({dir, k, children, front}) => (
   <>
-    <Img src={bgFrame(k)} style={FULL} />
+    <Img src={bgFrame(dir, k)} style={FULL} />
     {children}
-    <Img src={fgFrame(k)} style={FULL} />
+    <Img src={fgFrame(dir, k)} style={FULL} />
+    {front}
   </>
 );
 
@@ -71,12 +92,12 @@ const SpeedLines: React.FC<{f: number; from: number; to: number}> = ({f, from, t
 // Seguimiento del auto (medido sobre el original, en proporción del cuadro).
 const CAR: [number, number, number, number][] = [
   // frame salida, centro x, centro y, ancho
-  [57, 0.505, 0.575, 0.17],
-  [61.5, 0.51, 0.58, 0.22],
-  [66, 0.51, 0.585, 0.26],
-  [70.5, 0.52, 0.59, 0.38],
-  [75, 0.535, 0.63, 0.61],
-  [78, 0.54, 0.65, 0.75],
+  [57 + OFFSET, 0.505, 0.575, 0.17],
+  [61.5 + OFFSET, 0.51, 0.58, 0.22],
+  [66 + OFFSET, 0.51, 0.585, 0.26],
+  [70.5 + OFFSET, 0.52, 0.59, 0.38],
+  [75 + OFFSET, 0.535, 0.63, 0.61],
+  [78 + OFFSET, 0.54, 0.65, 0.75],
 ];
 const carAt = (f: number) => {
   let i = 0;
@@ -128,8 +149,8 @@ export const LocalBA: React.FC = () => {
   const buenosAires = (
     <>
       {/* sale desde detrás del Obelisco hacia la derecha y queda legible */}
-      <Slam text="BUENOS" start={3} end={35} y={800} size={196} drift={0.05} exit="cut" x={lerp(700, 1050, prog(f, 3, 15))} align="right" from="up" />
-      <Slam text="AIRES" start={5} end={35} y={1020} size={240} color={GOLD} drift={0.05} exit="cut" x={lerp(640, 1050, prog(f, 5, 17))} align="right" from="up" />
+      <Slam text="BUENOS" start={20} end={OPEN_END - 1} y={830} size={196} drift={0.05} exit="cut" x={lerp(700, 1050, prog(f, 20, 32))} align="right" from="up" />
+      <Slam text="AIRES" start={23} end={OPEN_END - 1} y={1050} size={240} color={GOLD} drift={0.05} exit="cut" x={lerp(640, 1050, prog(f, 23, 35))} align="right" from="up" />
     </>
   );
   const arrancamos = <Slam text="¿ARRANCAMOS?" start={MATTE_NIGHT.from} end={MATTE_NIGHT.to} y={640} size={170} exit="cut" drift={0.05} />;
@@ -138,15 +159,26 @@ export const LocalBA: React.FC = () => {
     <AbsoluteFill style={{backgroundColor: '#000', overflow: 'hidden'}}>
       {/* ---------------- imagen ---------------- */}
       <AbsoluteFill style={{transform: `translate(${sx}px, ${sy}px) scale(${punch(f) * (f >= CUT.logo ? 0.84 : 1)})`}}>
-        {f < SLOW_END ? (
-          <Matted k={srcFrame(f)}>{buenosAires}</Matted>
+        {f < OPEN_END ? (
+          <Matted
+            dir="open"
+            k={f}
+            front={<ObeliskRing f={f} axis={axis} text={RING} layer="front" goldFrom={5} goldTo={17} />}
+          >
+            <ObeliskRing f={f} axis={axis} text={RING} layer="back" goldFrom={5} goldTo={17} />
+            {buenosAires}
+          </Matted>
         ) : (
-          <Sequence from={SLOW_END} layout="none">
-            <OffthreadVideo src={VIDEO} trimBefore={SHIFT} muted style={FULL} />
+          <Sequence from={OPEN_END} layout="none">
+            <OffthreadVideo src={VIDEO} trimBefore={OPEN_END - SHIFT} muted style={FULL} />
           </Sequence>
         )}
-        {nightMatted ? <Matted k={srcFrame(f)}>{arrancamos}</Matted> : null}
-        <Img src={staticFile('bg/logo_hold.png')} style={{...FULL, opacity: holdLogo}} />
+        {nightMatted ? (
+          <Matted dir="night" k={srcFrame(f)}>
+            {arrancamos}
+          </Matted>
+        ) : null}
+        <Img src={staticFile('logo_hold.png')} style={{...FULL, opacity: holdLogo}} />
       </AbsoluteFill>
 
       {/* viñeta para lectura */}
@@ -159,10 +191,11 @@ export const LocalBA: React.FC = () => {
       />
 
       {/* ---------------- títulos ---------------- */}
-      {/* 1 · Obelisco: VIVÍ (adelante) + BUENOS AIRES (detrás, en Matted) */}
-      <Slam text="VIVÍ" start={2} end={35} y={430} size={78} font={MONT} weight={900} box={GOLD} tracking={0.06} from="up" exit="cut" />
+      {/* 1 · Obelisco: anillo girando alrededor + BUENOS AIRES saliendo de atrás (en Matted) */}
 
-      {/* 2 · Avenida */}
+      {/* 2 · Avenida: carteles corriendo sobre las paredes, en perspectiva */}
+      <WallTicker f={f} start={CUT.avenida} end={CUT.auto - 1} text="VIVÍ BUENOS AIRES ·" side="left" vp={[525, 950]} y={640} size={150} />
+      <WallTicker f={f} start={CUT.avenida} end={CUT.auto - 1} text="COMO UN LOCAL ·" side="right" vp={[525, 950]} y={600} size={150} color={GOLD} />
       <Slam text="COMO UN" start={CUT.avenida} end={CUT.auto - 1} y={800} size={86} font={MONT} weight={900} tracking={0.04} from="up" />
       <Slam text="LOCAL" start={CUT.avenida + 3} end={CUT.auto - 1} y={1040} size={390} color={GOLD} stagger={1.5} />
 
@@ -180,7 +213,7 @@ export const LocalBA: React.FC = () => {
       <PlaceTag n="01" name="Floralis Genérica" area="Recoleta" start={CUT.floralis + 2} end={CUT.planetario - 1} />
       <PlaceTag n="02" name="Planetario" area="Palermo" start={CUT.planetario + 1} end={CUT.lagos - 1} />
       <PlaceTag n="03" name="Bosques de Palermo" area="Palermo" start={CUT.lagos + 1} end={CUT.palacio - 1} />
-      <PlaceTag n="04" name="Puerto Madero" area="Puente de la Mujer" start={CUT.madero + 2} end={CUT.caminito - 1} areaFrom={CUT.puente} />
+      <PlaceTag n="04" name="Puerto Madero" area="Puente de la Mujer" start={CUT.madero + 2} end={CUT.caminito - 1} areaFrom={CUT.puente} y={1470} />
       <PlaceTag n="05" name="Caminito" area="La Boca" start={CUT.caminito + 1} end={CUT.tango - 1} />
 
       {/* 5 · Hook de guardado */}
@@ -201,12 +234,21 @@ export const LocalBA: React.FC = () => {
         drift={0.02}
       />
 
+      {/* Puerto Madero: crawl en perspectiva sobre el agua */}
+      <FloorCrawl f={f} start={CUT.madero} end={CUT.caminito - 1} lines={['PUERTO MADERO', 'EL RÍO', 'LOS DIQUES', 'ATARDECERES']} vp={[500, 1020]} horizon={1060} size={120} />
+      {/* Caminito: carteles sobre las paredes de chapa */}
+      <WallTicker f={f} start={CUT.caminito} end={CUT.tango - 1} text="ARTE · COLOR · BARRIO ·" side="left" vp={[440, 1075]} y={760} size={170} angle={68} />
+      <WallTicker f={f} start={CUT.caminito} end={CUT.tango - 1} text="CAMINITO · LA BOCA ·" side="right" vp={[440, 1075]} y={860} size={150} angle={66} color={GOLD} />
+
       {/* 6 · Tango */}
+      <PerspectiveBand f={f} start={CUT.tango + 2} end={CUT.skyline - 1} text="PASIÓN · TANGO · ARRABAL" y={1180} dark />
       <TangoTitle f={f} />
 
       {/* 7 · Skyline */}
       <Slam text="TU PRÓXIMA HISTORIA" start={CUT.skyline} end={CUT.obeliscoNoche - 1} y={420} size={70} font={MONT} weight={900} from="up" stagger={0.6} />
       <Slam text="EMPIEZA ACÁ" start={CUT.skyline + 4} end={CUT.obeliscoNoche - 1} y={570} size={180} color={GOLD} stagger={1.2} />
+
+      <PerspectiveBand f={f} start={CUT.skyline + 2} end={CUT.obeliscoNoche - 1} text="BUENOS AIRES TE ESPERA" y={1240} rotY={36} rotZ={8} size={110} />
 
       {/* 8 · Obelisco de noche: detrás (Matted) y luego glitch adelante */}
       <GlitchText text="¿ARRANCAMOS?" start={MATTE_NIGHT.to + 1} end={CUT.logo - 1} y={640} size={170 * 1.05} />

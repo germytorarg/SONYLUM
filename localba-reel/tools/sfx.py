@@ -13,7 +13,7 @@ import numpy as np
 from scipy.signal import butter, fftconvolve, sosfilt
 
 SR = 48000
-DUR = 15.5
+DUR = 16.2
 N = int(SR * DUR)
 rng = np.random.default_rng(11)
 L = np.zeros(N)
@@ -116,27 +116,33 @@ def pad_tail(start, length, gain=0.18):
 
 
 # ------------------------------------------------ eventos (segundos de salida)
+# La apertura dura 1,9 s; todo lo posterior se corre O segundos.
+O = 0.7
 boom(0.0, 0.55, 90, 36, 1.6)
-riser(0.15, 1.05, 0.22)
-impact(0.13, 0.55)            # VIVÍ BUENOS AIRES
-impact(1.2, 0.45)             # COMO UN LOCAL (entra la música)
-whoosh(1.9, 0.7, 250, 3500, 0.5, -0.9, 0.9)  # SIN VUELTAS, paso del auto
-for s in (2.6, 3.87, 4.57, 6.57, 7.85):       # etiquetas de lugar
-    pop(s, 0.22, 1500)
-    whoosh(s - 0.08, 0.3, 1500, 6000, 0.08, 0.6, -0.6)
-riser(4.85, 0.45, 0.16)
-impact(5.3, 0.5)              # GUARDÁ ESTE VIDEO
-impact(8.53, 0.7)             # TANGO
-whoosh(9.1, 0.5, 400, 5000, 0.18)
-impact(9.85, 0.55)            # ¿ARRANCAMOS?
-zap(10.28, 0.22)
-riser(9.95, 0.65, 0.18)
-boom(10.6, 1.0, 120, 34, 2.6)  # logo
-shimmer(10.62, 2.6, 0.07)
-pad_tail(10.6, 4.9, 0.6)
-for s in (11.25, 11.6, 11.95):  # CTA
-    whoosh(s - 0.12, 0.35, 900, 6000, 0.12, -0.4, 0.4)
-    pop(s, 0.14, 1100)
+riser(0.1, 1.8, 0.22)
+impact(0.1, 0.45)             # anillo VIVÍ BUENOS AIRES
+for k in range(4):            # el anillo pasa por delante: whoosh con paneo
+    whoosh(0.2 + k * 0.42, 0.42, 500, 3500, 0.12, 0.8, -0.8)
+impact(0.75, 0.5)             # BUENOS AIRES sale de atrás
+impact(1.2 + O, 0.45)         # COMO UN LOCAL (entra la música)
+whoosh(1.2 + O, 0.7, 300, 4000, 0.2, 0.9, -0.9)  # carteles en perspectiva
+whoosh(1.9 + O, 0.7, 250, 3500, 0.5, -0.9, 0.9)  # SIN VUELTAS, paso del auto
+for s in (2.6, 3.87, 4.57, 6.57, 7.85):          # etiquetas de lugar
+    pop(s + O, 0.22, 1500)
+    whoosh(s + O - 0.08, 0.3, 1500, 6000, 0.08, 0.6, -0.6)
+riser(4.85 + O, 0.45, 0.16)
+impact(5.3 + O, 0.5)          # GUARDÁ ESTE VIDEO
+impact(8.53 + O, 0.7)         # TANGO
+whoosh(9.1 + O, 0.5, 400, 5000, 0.18)
+impact(9.85 + O, 0.55)        # ¿ARRANCAMOS?
+zap(10.28 + O, 0.22)
+riser(9.95 + O, 0.65, 0.18)
+boom(10.6 + O, 1.0, 120, 34, 2.6)  # logo
+shimmer(10.62 + O, 2.6, 0.07)
+pad_tail(10.6 + O, 4.9, 0.6)
+for s in (11.25, 11.6, 11.95):     # CTA
+    whoosh(s + O - 0.12, 0.35, 900, 6000, 0.12, -0.4, 0.4)
+    pop(s + O, 0.14, 1100)
 
 # ------------------------------------------------ mezcla
 ir_len = int(SR * 1.6)

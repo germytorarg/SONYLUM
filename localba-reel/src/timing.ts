@@ -1,34 +1,36 @@
 // Línea de tiempo de SALIDA (30 fps). La toma 1 (Obelisco, 0–0,6 s del original
-// a 60 fps) va en cámara lenta x0,5 y dura 36 frames; desde ahí todo el video
-// original corre a velocidad normal desplazado 0,6 s (SHIFT).
+// a 60 fps) va en cámara lenta x0,3 interpolada (57 frames, public/open) para que
+// el anillo de texto gire alrededor del Obelisco. Desde ahí el original corre a
+// velocidad normal, desplazado SHIFT frames.
 export const FPS = 30;
-export const DURATION = 465; // 15,5 s
-export const SLOW_END = 36;
-export const SHIFT = 18; // 0,6 s en frames de salida
+export const OPEN_END = 57; // 1,9 s
+export const SHIFT = 39; // 1,3 s
+export const DURATION = 486; // 16,2 s
 
-/** Frame de salida -> frame del original (60 fps). */
-export const srcFrame = (f: number) => (f < SLOW_END ? f : 2 * f - 2 * SHIFT);
+/** Frame de salida -> frame del original (60 fps), desde OPEN_END. */
+export const srcFrame = (f: number) => 2 * f - 2 * SHIFT;
 
+const o = (f: number) => f + (OPEN_END - 36); // cortes medidos con la versión de 36 frames
 // Cortes del original (detección de escena) convertidos a frames de salida.
 export const CUT = {
-  avenida: 36,
-  auto: 57,
-  floralis: 78,
-  floralisCerca: 98,
-  planetario: 116,
-  lagos: 137,
-  palacio: 159,
-  mansion: 180,
-  madero: 197,
-  puente: 218,
-  caminito: 235,
-  tango: 256,
-  skyline: 275,
-  obeliscoNoche: 295,
-  logo: 318,
-  logoFin: 396,
+  avenida: o(36),
+  auto: o(57),
+  floralis: o(78),
+  floralisCerca: o(98),
+  planetario: o(116),
+  lagos: o(137),
+  palacio: o(159),
+  mansion: o(180),
+  madero: o(197),
+  puente: o(218),
+  caminito: o(235),
+  tango: o(256),
+  skyline: o(275),
+  obeliscoNoche: o(295),
+  logo: o(318),
+  logoFin: o(396),
 } as const;
+export const OFFSET = OPEN_END - 36;
 
-// Cuadros con recorte de primer plano (título detrás del Obelisco).
-export const MATTE_DAY = {from: 0, to: 35};
-export const MATTE_NIGHT = {from: 296, to: 308}; // original 556–580, antes del glitch
+// Cuadros nocturnos con recorte de primer plano (original 556–580, antes del glitch).
+export const MATTE_NIGHT = {from: o(296), to: o(308)};
