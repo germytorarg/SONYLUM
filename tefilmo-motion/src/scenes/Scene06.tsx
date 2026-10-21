@@ -1,15 +1,15 @@
 import React from 'react';
-import {AbsoluteFill, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Img, useCurrentFrame} from 'remotion';
 import {ease, prog, tw, wobble} from '../anim';
-import {ASSETS, HOTSPOTS} from '../assets';
+import {ASSETS, HOTSPOTS, LOGO, LOGO_HOTSPOTS} from '../assets';
 import {Bokeh, Glint} from '../components/Atmosphere';
 import {Cutout} from '../components/Cutout';
 import {KineticText} from '../components/KineticText';
-import {COLORS, FONTS} from '../config';
+import {COLORS} from '../config';
 import {SYNC} from '../timing';
 
 // ESCENA 06 | 750-899 | RECUERDO / MARCA — assets 18, 19, 20, 21, 22.
-// 21 y 22 nunca en pantalla a la vez. Sin logotipo inventado: marca tipográfica.
+// 21 y 22 nunca en pantalla a la vez. Cierre con el logo auténtico de TEFILMO.
 
 const CX = 540;
 const CY = 900;
@@ -75,63 +75,44 @@ const FilmWrap: React.FC<{frame: number; half: 'back' | 'front'; t: number; run:
   );
 };
 
-const WORD = 'TEFILMO';
-const BrandWord: React.FC<{frame: number}> = ({frame}) => {
+/** Logo auténtico: revelado por barrido de luz, sin alterar su diseño. */
+const LOGO_W = 860;
+const BrandLogo: React.FC<{frame: number}> = ({frame}) => {
   const start = SYNC.brand;
-  const size = 140;
-  const shine = tw(frame, 866, 892, -20, 120, ease.inOut);
-  const letters = (anim: boolean) =>
-    Array.from(WORD).map((c, i) => {
-      const f0 = start + i * 2.4;
-      const p = anim ? prog(frame, f0, f0 + 24) : 1;
-      const blur = anim ? tw(frame, f0, f0 + 20, 14, 0) : 0;
-      return (
-        <span
-          key={i}
-          style={{
-            display: 'inline-block',
-            opacity: p,
-            transform: `translateY(${(1 - p) * 40}px)`,
-            filter: blur > 0.1 ? `blur(${blur}px)` : undefined,
-          }}
-        >
-          {c}
-        </span>
-      );
-    });
-  const track = tw(frame, start, start + 40, 0.34, 0.16, ease.out);
-  const common: React.CSSProperties = {
-    position: 'absolute',
-    left: 0,
-    width: 1080,
-    top: CY,
-    transform: 'translateY(-52%)',
-    textAlign: 'center',
-    fontFamily: FONTS.serif,
-    fontWeight: 500,
-    fontSize: size,
-    lineHeight: 1,
-    letterSpacing: `${track}em`,
-    paddingLeft: `${track}em`,
-  };
+  const h = (LOGO_W * LOGO.h) / LOGO.w;
+  const p = prog(frame, start, start + 30, ease.inOut);
+  const edge = p * 130 - 15;
+  const blur = tw(frame, start, start + 26, 10, 0);
+  const scale = tw(frame, start, start + 60, 1.04, 1.0, ease.out);
+  const left = CX - LOGO_W / 2;
+  const top = CY - h / 2;
+  const star = (hs: {x: number; y: number}, at: number, size: number) => (
+    <Glint
+      x={left + hs.x * LOGO_W}
+      y={top + hs.y * h}
+      size={size}
+      opacity={prog(frame, at, at + 6) * (1 - prog(frame, at + 8, at + 24))}
+      rotate={frame * 2}
+    />
+  );
   return (
     <>
-      <div style={{...common, color: COLORS.champagne, textShadow: '0 0 40px rgba(217,190,134,0.35)'}}>{letters(true)}</div>
-      {frame >= 864 ? (
-        <div
-          style={{
-            ...common,
-            backgroundImage: `linear-gradient(100deg, rgba(255,246,221,0) ${shine - 12}%, rgba(255,248,230,0.95) ${shine}%, rgba(255,246,221,0) ${
-              shine + 12
-            }%)`,
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
-        >
-          {letters(false)}
-        </div>
-      ) : null}
+      <Img
+        src={LOGO.src}
+        style={{
+          position: 'absolute',
+          left,
+          top,
+          width: LOGO_W,
+          height: h,
+          transform: `scale(${scale})`,
+          filter: `${blur > 0.1 ? `blur(${blur}px) ` : ''}drop-shadow(0 0 26px rgba(255,236,200,0.28))`,
+          WebkitMaskImage: `linear-gradient(90deg, #000 ${edge - 12}%, transparent ${edge + 12}%)`,
+          maskImage: `linear-gradient(90deg, #000 ${edge - 12}%, transparent ${edge + 12}%)`,
+        }}
+      />
+      {star(LOGO_HOTSPOTS.phoneStar, start + 8, 120)}
+      {star(LOGO_HOTSPOTS.star, start + 28, 170)}
     </>
   );
 };
@@ -184,6 +165,7 @@ export const Scene06: React.FC = () => {
   const wrapT = prog(frame, 832, 866, ease.inOut);
   const run = (frame - 832) * 4;
   const brandO = prog(frame, 826, 846);
+  const wrapO = brandO * (1 - prog(frame, 868, 884, ease.soft));
 
   return (
     <AbsoluteFill style={{opacity: sceneIn}}>
@@ -277,11 +259,11 @@ export const Scene06: React.FC = () => {
       <Bokeh seed="s6dark" count={16} opacity={0.5 * dusk} drift={[0.05, -0.2]} color="217, 190, 134" sizeScale={0.6} />
 
       {/* marca */}
-      <FilmWrap frame={frame} half="back" t={wrapT} run={run} o={brandO} />
+      <FilmWrap frame={frame} half="back" t={wrapT} run={run} o={wrapO} />
       <div style={{opacity: brandO}}>
-        <BrandWord frame={frame} />
+        <BrandLogo frame={frame} />
       </div>
-      <FilmWrap frame={frame} half="front" t={wrapT} run={run} o={brandO} />
+      <FilmWrap frame={frame} half="front" t={wrapT} run={run} o={wrapO} />
 
       <Cutout
         asset={ASSETS.cinta}
@@ -295,13 +277,12 @@ export const Scene06: React.FC = () => {
         trail={{dx: filmX - prevX, dy: filmY - prevY, samples: 5}}
         shadow
       />
-      <Glint x={CX + RX * 0.92} y={CY + 40} size={160} opacity={prog(frame, 858, 866) * (1 - prog(frame, 868, 884))} rotate={frame * 2} />
 
       <KineticText
         text="Tu historia merece quedarse"
         start={842}
         exit={2000}
-        y={1190}
+        y={1150}
         size={64}
         italic
         weight={400}
@@ -312,7 +293,7 @@ export const Scene06: React.FC = () => {
         text="tefilmo.ar"
         start={858}
         exit={2000}
-        y={1296}
+        y={1250}
         size={34}
         font="sans"
         weight={400}

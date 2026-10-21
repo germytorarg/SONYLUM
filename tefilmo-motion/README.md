@@ -62,10 +62,12 @@ docs/                guion, inventario, prompt maestro y vista general del kit
 | → | 584–620 | — | Empuje de cámara a través del arco + destello | |
 | 05 Promesa | 600–749 | 15, 01, 16, 17, 24 | Cortes rápidos con cámara continua: manos → rack focus a los anillos 01 → 16 → 17 en contraluz → 24 brindis con rebote, burbujas y destello; wipes de luz verticales en cada corte | «Momentos irrepetibles» |
 | → | 724–772 | — | Disolución cálida ámbar | |
-| 06 Recuerdo / Marca | 750–899 | 18, 19, 20, 21, 22 | 18 como fondo en parallax (más placa de color desenfocada); 21 al inicio y sale antes de 22; 19 aparece y queda enmarcado en 22 (recuerdo); 20 atraviesa cámara y se convierte en una cinta vectorial que se enrolla alrededor del texto central (mitad detrás, mitad delante); anochecer a negro suave | Últimos 2,5 s (825–899): **TEFILMO**, «Tu historia merece quedarse», «tefilmo.ar» |
+| 06 Recuerdo / Marca | 750–899 | 18, 19, 20, 21, 22 | 18 como fondo en parallax (más placa de color desenfocada); 21 al inicio y sale antes de 22; 19 aparece y queda enmarcado en 22 (recuerdo); 20 atraviesa cámara y se convierte en una cinta vectorial que se enrolla alrededor del logo (mitad detrás, mitad delante) y se retira para dejar el final limpio; anochecer a negro suave | Últimos 2,5 s (825–899): logo TEFILMO, «Tu historia merece quedarse», «tefilmo.ar» |
 
 Paleta: marfil, dorado champagne y negro suave. Tipografía: Cormorant Garamond (titulares,
-cursiva para el énfasis) y Montserrat (URL). La marca es tipográfica: no se inventó logotipo.
+cursiva para el énfasis) y Montserrat (URL). El cierre usa el logo auténtico de TEFILMO
+(`public/brand/`: original entregado y versión blanca con alfa a 4×), revelado con un barrido de luz y
+destellos sobre sus dos estrellas, sin modificar su diseño.
 
 ## Música y sincronía
 
@@ -93,7 +95,7 @@ al contenido y escala ×2. Los originales quedan intactos en `public/assets/orig
 | 02 | Destellos y fragmento de otro anillo en el borde derecho y superior | Eliminados (los brillos se generan por código) |
 | 03 | Trozos de cinta de cine arriba | Eliminados |
 | 04 | Fragmento de otra figura a la derecha; base cortada en recto | Eliminado; la base se funde con máscara |
-| 05 | Novio de otra lámina a la derecha | Eliminado |
+| 05 | Novio de otra lámina a la derecha; el borde superior corta el pelo del novio | Eliminado; el remate del pelo se reconstruyó con la propia textura del cabello reflejada (`domes` en el script) |
 | 06 | Fragmentos de otras figuras en ambos bordes | Eliminados (componentes + recorte) |
 | 07, 11, 12, 14, 24 | Pedacitos de flores u objetos vecinos en los bordes | Eliminados |
 | 08 | Pétalo y flores ajenas arriba y abajo | Eliminados |
@@ -102,7 +104,7 @@ al contenido y escala ×2. Los originales quedan intactos en `public/assets/orig
 | 13 | Fila inferior con farol, cruz y flores de otra lámina | Eliminada |
 | 15 | Recortes superiores ajenos | Eliminados; las mangas cortadas quedan fuera de cuadro |
 | 16 | Espalda del novio cortada en recto a la izquierda | Fundido con máscara lateral |
-| 17 | Silla ajena a la derecha; cabezas tocando el borde superior | Silla eliminada; el borde superior se funde contra el contraluz. **Limitación:** el PNG corta la parte superior de las cabezas y no se puede reconstruir sin inventar imagen |
+| 17 | Silla ajena a la derecha; el borde superior corta las cabezas a la altura de la frente y la espalda del novio | Silla eliminada. La reconstrucción no daba un resultado creíble en silueta, así que se resolvió con encuadre: plano cerrado con los bordes cortados fuera de cuadro y la escala anclada arriba |
 | 18 | Fragmento de otra lámina a la derecha y abajo; baja resolución (314 px) | Eliminado; se usa como fondo desenfocado con una placa de color, donde la baja resolución no se nota |
 | 19 | Fragmento de arco ajeno a la derecha | Eliminado |
 | 20 | Varios tramos sueltos de cinta | Se conserva la cinta principal |

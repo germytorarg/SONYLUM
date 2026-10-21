@@ -20,12 +20,16 @@ from scipy import ndimage
 # erase: rectángulos (x0, y0, x1, y1) donde se anula el alfa (restos pegados).
 # split: exporta cada componente por separado (pétalos individuales).
 # layers: divide el elemento en capas por polígono (sobre abierto / cerrado).
+# domes: remates de cabeza cortados por el borde superior del recorte. Cada
+#   domo (cx, rx, ry, tilt°, rim) se apoya en la fila 0. Sin rim se rellena
+#   con la textura reflejada de la propia imagen (pelo); con rim (siluetas a
+#   contraluz) se usa el tono oscuro de la cabeza y luz de borde cálida.
 SPEC = {
     "01_anillos_entrelazados": {},
     "02_anillo_solitario": {},
     "03_destellos": {},
     "04_silueta_encuentro": {},
-    "05_novios_de_frente": {},
+    "05_novios_de_frente": {"domes": [(118, 20, 11, -8, 0.0)]},
     "06_novios_caminando": {"box": (0, 0, 303, 490)},
     "07_ramo": {},
     "08_rosa_individual": {},
@@ -37,6 +41,7 @@ SPEC = {
     "14_velas": {},
     "15_manos_alianza": {},
     "16_novios_abrazo": {},
+    # 17: cabezas cortadas por el borde superior; se resuelve con encuadre (borde fuera de cuadro).
     "17_novios_beso_silueta": {},
     "18_atardecer_mar": {},
     "19_novios_atardecer": {"box": (0, 0, 323, 350)},
@@ -61,6 +66,44 @@ def components(alpha):
     sizes = ndimage.sum(m, lab, range(1, n + 1))
     order = np.argsort(-sizes) + 1
     return lab, order
+
+
+def add_domes(rgba, domes):
+    """Completa cabezas cortadas por el borde superior con píxeles propios."""
+    pad = int(max(d[2] for d in domes)) + 6
+    h, w = rgba.shape[:2]
+    out = np.zeros((h + pad, w, 4), np.float32)
+    out[pad:] = rgba
+    src = rgba.astype(np.float32)
+    ys, xs = np.mgrid[0:pad, 0:w]
+    yo = ys - pad + 0.5  # coordenada original (negativa: por encima del corte)
+    for cx, rx, ry, tilt, rim in domes:
+        t = np.radians(tilt)
+        dx, dy = xs - cx, yo
+        u = dx * np.cos(t) + dy * np.sin(t)
+        v = -dx * np.sin(t) + dy * np.cos(t)
+        r = np.sqrt((u / rx) ** 2 + (v / ry) ** 2)
+        inside = np.clip((1.0 - r) * min(rx, ry) / 1.5, 0, 1)
+        # textura reflejada respecto de la fila 0
+        sy = np.clip(-yo.astype(int), 0, h - 1)
+        sx = np.clip(xs, 0, w - 1)
+        col = src[sy, sx, :3]
+        ok = src[sy, sx, 3:4] > 200
+        row = src[0:6, max(0, cx - rx):cx + rx]
+        mean = np.median(row[row[..., 3] > 200][:, :3], axis=0)
+        col = np.where(ok, col, mean)
+        if rim > 0:
+            dark = row[(row[..., 3] > 200) & (row[..., :3].mean(-1) < 60)][:, :3]
+            tone = np.median(dark, axis=0)
+            # leve degradé vertical para que no quede plano
+            col = np.broadcast_to(tone, col.shape) * (1 + 0.12 * (yo / pad))[..., None]
+            band = np.clip(1 - np.abs(r - 0.93) / 0.09, 0, 1)[..., None] * rim
+            col = col * (1 - band) + np.array([255, 198, 132], np.float32) * band
+        a_new = inside * 255
+        blend = (a_new > out[:pad, :, 3])[..., None]
+        out[:pad, :, :3] = np.where(blend, col, out[:pad, :, :3])
+        out[:pad, :, 3] = np.maximum(out[:pad, :, 3], a_new)
+    return np.clip(out, 0, 255).astype(np.uint8)
 
 
 def defringe(rgba):
@@ -104,6 +147,8 @@ def main(src, dst):
             mask = np.zeros(rgba.shape[:2], bool)
             mask[y0:y1, x0:x1] = True
             rgba[..., 3] = np.where(mask, rgba[..., 3], 0)
+        if "domes" in spec:
+            rgba = add_domes(rgba, spec["domes"])
         for x0, y0, x1, y1 in spec.get("erase", []):
             rgba[y0:y1, x0:x1, 3] = 0
         lab, order = components(rgba[..., 3])

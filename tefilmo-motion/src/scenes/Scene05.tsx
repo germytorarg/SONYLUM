@@ -127,8 +127,8 @@ export const Scene05: React.FC = () => {
       <div
         style={{
           position: 'absolute',
-          left: 520 - 420,
-          top: 560 - 420,
+          left: 300 - 420,
+          top: 140 - 420,
           width: 840,
           height: 840,
           borderRadius: '50%',
@@ -137,15 +137,17 @@ export const Scene05: React.FC = () => {
           background: 'radial-gradient(closest-side, rgba(255,240,205,0.95), rgba(255,214,150,0.35) 55%, rgba(255,214,150,0))',
         }}
       />
+      {/* Plano cerrado: el PNG corta las cabezas arriba y la espalda a la izquierda;
+          esos bordes quedan fuera de cuadro y la escala crece desde arriba. */}
       <Cutout
         asset={ASSETS.beso}
-        x={560 + driftX}
-        y={1380}
+        x={600 + driftX * 0.6}
+        y={-10 + (1280 * ASSETS.beso.h) / ASSETS.beso.w}
         anchor="bottom"
-        width={1000}
-        scale={tw(frame, SYNC.cutKiss - 4, SYNC.clink, 1.04, 1.0, ease.soft)}
+        width={1280}
+        scale={tw(frame, SYNC.cutKiss - 4, SYNC.clink, 1.05, 1.0, ease.soft)}
+        transformOrigin="50% 0%"
         opacity={kissO}
-        maskImage="linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 4%, #000 9%)"
         glow="rgba(255, 222, 170, 0.45)"
       />
 

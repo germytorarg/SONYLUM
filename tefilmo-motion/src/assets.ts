@@ -15,7 +15,7 @@ export const ASSETS = {
   anilloSolitario: a('02_anillo_solitario', 554, 572),
   destellos: a('03_destellos', 582, 294),
   siluetaEncuentro: a('04_silueta_encuentro', 746, 836),
-  noviosDeFrente: a('05_novios_de_frente', 786, 982),
+  noviosDeFrente: a('05_novios_de_frente', 786, 1016),
   noviosCaminando: a('06_novios_caminando', 620, 976),
   ramo: a('07_ramo', 638, 954),
   rosa: a('08_rosa_individual', 356, 366),
@@ -57,6 +57,13 @@ export const HOTSPOTS = {
   waxSeal: {x: 0.55, y: 0.62},
   diamond: {x: 0.5, y: 0.12},
 } as const;
+
+// Logo auténtico de TEFILMO (blanco sobre transparente, extraído del original).
+export const LOGO = {src: staticFile('brand/tefilmo_logo_white@4x.png'), w: 2344, h: 524};
+export const LOGO_HOTSPOTS = {
+  star: {x: 0.942, y: 0.305},
+  phoneStar: {x: 0.109, y: 0.534},
+};
 
 export const MUSIC = staticFile('audio/tefilmo_music.wav');
 // Colocar audio/voiceover.wav en public/audio y activar en src/config.ts.
