@@ -1,0 +1,7 @@
+TEFILMO — Paquete organizado.
+1) Descomprimí todo el ZIP en una carpeta.
+2) Abrí Claude Code con esa carpeta.
+3) Pegá el contenido de 02_PROMPT_PARA_CLAUDE_CODE.md.
+4) Claude debe leer 00_INVENTARIO.csv y 01_GUION_ESCENAS.md.
+5) Los 24 PNG están identificados numéricamente.
+ATENCIÓN: recortes de láminas generadas, requieren inspección visual; no son elementos vectoriales ni personajes articulados.

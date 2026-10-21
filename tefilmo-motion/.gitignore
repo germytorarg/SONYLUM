@@ -1,0 +1,6 @@
+node_modules
+out/*.png
+out/stills
+.DS_Store
+out/preview_lowres.mp4
+__pycache__
