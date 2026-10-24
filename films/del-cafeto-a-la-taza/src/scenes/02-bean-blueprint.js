@@ -492,6 +492,18 @@
         }
         stroke(ctx, reg, lav, 0.4, 1.2);
       }
+      // full-bleed rulers down the left edge and across the bottom (scenery), centre crosshair
+      L.ticks(ctx, 60, 220, { length: 1320, angle: Math.PI / 2, n: 44, len: 9, major: 4, majorLen: 20, side: 1, alpha: 0.35, width: 1.2, color: lav });
+      L.ticks(ctx, 120, 1620, { length: 840, angle: 0, n: 28, len: 8, major: 7, majorLen: 18, side: -1, alpha: 0.25, width: 1.2, color: lav });
+      {
+        const ch = new Path2D();
+        ch.moveTo(520, 900);
+        ch.lineTo(560, 900);
+        ch.moveTo(540, 880);
+        ch.lineTo(540, 920);
+        stroke(ctx, ch, lav, 0.35, 1);
+      }
+      const kOutG = hit(B_OUTLINE, 9);
       // G2 cherry guide oval: 1.06 at the cut (01's last frame), settling to 1.00 by T 1.875
       {
         const s = lerp(1.06, 1, E.outCubic(clamp(t / B_OUTLINE)));
@@ -507,6 +519,26 @@
           qt.lineTo(x + nx * 8, y + ny * 8);
         }
         stroke(ctx, qt, lav, 0.5, 1.5);
+        // a graduated ring of ticks around the oval, every 5 degrees, longer every 30
+        const gt = new Path2D(), gtM = new Path2D();
+        for (let d = 0; d < 360; d += 5) {
+          const a = d * DEG;
+          const x = G2.x + Math.cos(a) * G2.rx * s, y = G2.y + Math.sin(a) * G2.ry * s;
+          let nx = Math.cos(a) / G2.rx, ny = Math.sin(a) / G2.ry;
+          const nl = Math.hypot(nx, ny);
+          nx /= nl;
+          ny /= nl;
+          const major = d % 30 === 0;
+          const pth = major ? gtM : gt;
+          pth.moveTo(x - nx * 3, y - ny * 3);
+          pth.lineTo(x - nx * (major ? 16 : 8), y - ny * (major ? 16 : 8));
+        }
+        stroke(ctx, gt, lav, 0.38, 1.2);
+        stroke(ctx, gtM, lav, 0.6, 1.5);
+        // the G1 construction ghost, dashed, the target the spark is heading for
+        const gh = new Path2D();
+        addPoly(gh, g.outer, true);
+        stroke(ctx, gh, lav, 0.26 * (1 - 0.5 * clamp(kOutG)), 1.2, [6, 7]);
         // the calyx scar disc of G2, as a faint construction ring
         const sc = new Path2D();
         sc.ellipse(540, 900 + 272 * s, 34 * s, 24 * s, 0, 0, TAU);

@@ -210,6 +210,19 @@
     ctx.stroke(path);
     ctx.restore();
   }
+  // a static layer rendered once per boil drawing into an offscreen canvas (y0..y0+h band)
+  function sprite(ctx, L, key, y0, h, bi, drawFn) {
+    const S = FILM.S || 1;
+    const c = L.cached([ID, key, y0, h, S, bi].join('|'), () => {
+      const cv = FILM.makeCanvas(Math.round(1080 * S), Math.round(h * S));
+      const g = cv.getContext('2d');
+      g.scale(S, S);
+      g.translate(0, -y0);
+      drawFn(g);
+      return cv;
+    });
+    ctx.drawImage(c, 0, y0, 1080, h);
+  }
   function fillPoly(ctx, pts, color, alpha = 1) {
     ctx.save();
     ctx.globalAlpha *= alpha;
@@ -777,7 +790,7 @@
 
       // ---- hand pose ------------------------------------------------------------
       // angle of the hand (local +x toward the wrist) as a function of target x
-      const thetaAt = (x) => lerp(30, 68, clamp((x - 260) / 600)) * DEG;
+      const thetaAt = (x) => lerp(30, 60, clamp((x - 260) / 600)) * DEG;
       const pose = (() => {
         const tt = tw;
         // find the segment
@@ -793,7 +806,7 @@
           y += 18;
         }
         if (dt < TWIST - 1e-6) {
-          if (e.pick) twist = 15 * DEG * E.outCubic(clamp((dt + 1 / 12) / TWIST));
+          if (e.pick) twist = 15 * DEG * E.outCubic(clamp(dt / TWIST));
         } else {
           const next = k + 1 < EV.length ? EV[k + 1] : null;
           const tEnd = next ? next.t : info.dur;
@@ -833,7 +846,9 @@
       L.stripes(ctx, { colors: [P.stripeCream, P.stripeSage], width: 140, angle: -0.52, offset: 8 * info.T });
 
       // ---- 2 leaves and back rows -------------------------------------------------
-      for (const lf of G.LEAVES) drawLeaf(ctx, L, P, lf, bi);
+      sprite(ctx, L, 'leaves', 80, 960, bi, (g) => {
+        for (const lf of G.LEAVES) drawLeaf(g, L, P, lf, bi);
+      });
       const isGone = (k, i) => EV.some((e, j) => e.cl === k && e.ci === i && picked(j));
       const isHeld = (k, i) => EV.some((e, j) => e.cl === k && e.ci === i && e.pick && t >= e.t - 1e-6);
       for (let k = 0; k < 3; k++) {
@@ -892,7 +907,7 @@
         // the heap darkens toward the basket wall on the right and deep inside
         L.hatch(ctx, null, {
           bounds: [160, 1180 - lift, 760, 300], spacing: 6, width: 1.3, color: P.cherryDeep, alpha: 0.7, length: [10, 28], seed: sd('heapsh'),
-          density: (x, y) => 0.8 * sstep(640, 900, x) + 0.5 * sstep(1360, 1440, y),
+          density: (x, y) => (y > heapTopAt(x, lift) + 14 ? 0.8 * sstep(640, 900, x) + 0.5 * sstep(1360, 1440, y) : 0),
         });
         // shadow at the heap's lower right and deep in the basket
         ctx.restore();
@@ -914,7 +929,7 @@
       });
 
       // ---- 5 basket front ------------------------------------------------------------
-      drawBasketFront(ctx, L, P, bi);
+      sprite(ctx, L, 'basket', 1200, 720, bi, (g) => drawBasketFront(g, L, P, bi));
 
       // ---- 6 falling cherries ------------------------------------------------------
       const fallPos = (k, tt) => {

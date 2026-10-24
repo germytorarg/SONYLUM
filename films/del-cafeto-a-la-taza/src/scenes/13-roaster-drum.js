@@ -286,25 +286,63 @@
   // ---------------------------------------------------------------------------
   // Drawing helpers
   // ---------------------------------------------------------------------------
+
+  // boil override while painting the cached static layer (null = live, follow lib.T)
+  let CB = null;
+  const ink = (ctx, pts, o) => L.inkPath(ctx, pts, CB == null ? o : Object.assign({}, o, { boil: CB }));
+  const hat = (ctx, c, o) => L.hatch(ctx, c, CB == null ? o : Object.assign({}, o, { boil: CB }));
+  const xhat = (ctx, c, o) => L.crossHatch(ctx, c, CB == null ? o : Object.assign({}, o, { boil: CB }));
+
+  // the static machine (floor, legs, plinth, body, chimney) cached as three boil drawings at 1.6x
+  // resolution so the push-in stays crisp
+  const SX0 = 130, SY0 = 236, SW = 860, SH = 1380, SK = 1.6;
+  function staticLayer(G, v) {
+    const S = FILM.S || 1;
+    return L.cached(['static', ID, S, v].join('|'), () => {
+      const c = FILM.makeCanvas(Math.ceil(SW * SK * S), Math.ceil(SH * SK * S));
+      const g = c.getContext('2d');
+      g.scale(SK * S, SK * S);
+      g.translate(-SX0, -SY0);
+      CB = v * 5 + 2;
+      try {
+        drawFloorAndBase(g);
+        drawChimney(g);
+        drawBody(g, G);
+      } finally {
+        CB = null;
+      }
+      return c;
+    });
+  }
+  function drawCollectorWindow(ctx, tw) {
+    for (let i = 0; i < 6; i++) {
+      const a = L.h3(i, Math.floor(tw * 12), 5) * TAU;
+      ctx.fillStyle = P.silverskin;
+      ctx.beginPath();
+      ctx.ellipse(206 + Math.cos(a + i) * 9, 376 + Math.sin(a * 1.3 + i) * 12, 3, 1.6, a, 0, TAU);
+      ctx.fill();
+    }
+  }
+
   function drawFloorAndBase(ctx) {
     // floor shadow
     const sh = L.ellipsePts(570, 1572, 470, 36, 48);
-    L.hatch(ctx, sh, { angle: -Math.PI / 4, spacing: 6, width: 1.4, color: INK, alpha: 0.5, length: [14, 40], seed: sd('floorsh'), density: (x, y) => 1 - sstep(0.5, 1, Math.hypot((x - 570) / 470, (y - 1572) / 36)) });
-    L.inkPath(ctx, [[40, 1590], [1040, 1594]], { width: 1.5, color: INKFAINT, alpha: 0.45, seed: sd('floor'), taper: [40, 40] });
+    hat(ctx, sh, { angle: -Math.PI / 4, spacing: 6, width: 1.4, color: INK, alpha: 0.5, length: [14, 40], seed: sd('floorsh'), density: (x, y) => 1 - sstep(0.5, 1, Math.hypot((x - 570) / 470, (y - 1572) / 36)) });
+    ink(ctx, [[40, 1590], [1040, 1594]], { width: 1.5, color: INKFAINT, alpha: 0.45, seed: sd('floor'), taper: [40, 40] });
     // legs
     for (const lx of [222, 858]) {
       const leg = [[lx - 20, 1430], [lx + 20, 1430], [lx + 16, 1566], [lx - 16, 1566]];
-      L.inkPath(ctx, leg, { closed: true, width: 3, fill: STEELD, seed: sd('leg', lx), smooth: false, wobble: 0.6 });
-      L.hatch(ctx, [[lx + 2, 1432], [lx + 18, 1432], [lx + 14, 1562], [lx + 2, 1562]], { angle: 0.1, spacing: 5, width: 1.3, color: INK, alpha: 0.7, length: [10, 24], seed: sd('legh', lx) });
-      L.inkPath(ctx, L.ellipsePts(lx, 1568, 30, 8, 20), { closed: true, width: 2.5, fill: STEEL, seed: sd('foot', lx), wobble: 0.4 });
+      ink(ctx, leg, { closed: true, width: 3, fill: STEELD, seed: sd('leg', lx), smooth: false, wobble: 0.6 });
+      hat(ctx, [[lx + 2, 1432], [lx + 18, 1432], [lx + 14, 1562], [lx + 2, 1562]], { angle: 0.1, spacing: 5, width: 1.3, color: INK, alpha: 0.7, length: [10, 24], seed: sd('legh', lx) });
+      ink(ctx, L.ellipsePts(lx, 1568, 30, 8, 20), { closed: true, width: 2.5, fill: STEEL, seed: sd('foot', lx), wobble: 0.4 });
     }
-    L.inkPath(ctx, [[240, 1512], [840, 1512]], { width: 6, color: INK, seed: sd('bar'), taper: [2, 2], swell: 0 });
-    L.inkPath(ctx, [[240, 1512], [840, 1512]], { width: 3, color: STEEL, seed: sd('bar2'), taper: [2, 2], swell: 0 });
+    ink(ctx, [[240, 1512], [840, 1512]], { width: 6, color: INK, seed: sd('bar'), taper: [2, 2], swell: 0 });
+    ink(ctx, [[240, 1512], [840, 1512]], { width: 3, color: STEEL, seed: sd('bar2'), taper: [2, 2], swell: 0 });
     // plinth
     const pl = L.rrectPts(176, 1378, 728, 62, 10, 20);
-    L.inkPath(ctx, pl, { closed: true, width: 4, fill: STEEL, seed: sd('plinth'), wobble: 0.8 });
-    L.hatch(ctx, pl, { angle: -Math.PI / 4, spacing: 6, width: 1.4, color: STEELD, alpha: 0.85, seed: sd('plh'), density: (x, y) => sstep(1390, 1440, y) * 0.6 + sstep(700, 904, x) * 0.6 });
-    L.inkPath(ctx, [[186, 1392], [892, 1392]], { width: 1.8, color: STEEL_L, alpha: 0.9, seed: sd('plhi'), taper: [20, 20] });
+    ink(ctx, pl, { closed: true, width: 4, fill: STEEL, seed: sd('plinth'), wobble: 0.8 });
+    hat(ctx, pl, { angle: -Math.PI / 4, spacing: 6, width: 1.4, color: STEELD, alpha: 0.85, seed: sd('plh'), density: (x, y) => sstep(1390, 1440, y) * 0.6 + sstep(700, 904, x) * 0.6 });
+    ink(ctx, [[186, 1392], [892, 1392]], { width: 1.8, color: STEEL_L, alpha: 0.9, seed: sd('plhi'), taper: [20, 20] });
   }
 
   function drawBody(ctx, G) {
@@ -317,21 +355,21 @@
     // top face (lit) above the front, left of the corner diagonal
     fillPoly(ctx, [[0, BY0 + 2], [BX1 - 16, BY0 + 2], [BX1 - 16 + 140, BY0 + 2 - 107], [0, BY0 - 107]], ENAMEL_T);
     // side face hatch (shadow)
-    L.crossHatch(ctx, [[BX1 - 4, BY0 - 30], [BX1 + DX + 4, BY0 - 30], [BX1 + DX + 4, BY1 + 4], [BX1 - 4, BY1 + 4]], { tone: 0.55, spacing: 5, width: 1.4, color: INK, alpha: 0.7, seed: sd('sideh'), length: [16, 50] });
+    xhat(ctx, [[BX1 - 4, BY0 - 30], [BX1 + DX + 4, BY0 - 30], [BX1 + DX + 4, BY1 + 4], [BX1 - 4, BY1 + 4]], { tone: 0.55, spacing: 5, width: 1.4, color: INK, alpha: 0.7, seed: sd('sideh'), length: [16, 50] });
     ctx.restore();
-    L.inkPath(ctx, G.hull, { closed: true, width: 4, seed: sd('hull'), wobble: 1.2 });
-    L.inkPath(ctx, [[BX1 - 14, BY0 + 10], [BX1 - 14 + DX, BY0 + 10 + DY]], { width: 2.4, seed: sd('edge1'), taper: [3, 3] });
-    L.inkPath(ctx, [[BX0 + 14, BY0 + 12], [BX0 + 14 + DX, BY0 + 12 + DY]], { width: 2.2, seed: sd('edge2'), taper: [3, 3] });
+    ink(ctx, G.hull, { closed: true, width: 4, seed: sd('hull'), wobble: 1.2 });
+    ink(ctx, [[BX1 - 14, BY0 + 10], [BX1 - 14 + DX, BY0 + 10 + DY]], { width: 2.4, seed: sd('edge1'), taper: [3, 3] });
+    ink(ctx, [[BX0 + 14, BY0 + 12], [BX0 + 14 + DX, BY0 + 12 + DY]], { width: 2.2, seed: sd('edge2'), taper: [3, 3] });
     // front face
-    L.inkPath(ctx, G.front, { closed: true, width: 5, fill: ENAMEL, seed: sd('front'), wobble: 1.4, double: { offset: -4, alpha: 0.4 } });
+    ink(ctx, G.front, { closed: true, width: 5, fill: ENAMEL, seed: sd('front'), wobble: 1.4, double: { offset: -4, alpha: 0.4 } });
     // enamel shadow: right and bottom of the front face (clipped strips, constant tone)
     ctx.save();
     ctx.beginPath();
     L.tracePath(ctx, G.front, true);
     ctx.clip();
-    L.crossHatch(ctx, [[760, BY0], [BX1 + 4, BY0], [BX1 + 4, BY1 + 4], [800, BY1 + 4]], { tone: 0.42, spacing: 7, crossSpacing: 7, width: 1.5, color: ENAMEL_D, alpha: 0.85, seed: sd('fronth'), length: [18, 60], edge: 0.3 });
-    L.hatch(ctx, [[BX0, 1262], [800, 1262], [800, BY1 + 4], [BX0, BY1 + 4]], { spacing: 7, width: 1.5, color: ENAMEL_D, alpha: 0.85, seed: sd('fronth2'), length: [18, 60], edge: 0.3 });
-    L.hatch(ctx, [[836, BY0], [BX1 + 4, BY0], [BX1 + 4, BY1 + 4], [836, BY1 + 4]], { angle: -Math.PI / 4 - Math.PI / 3, spacing: 6, width: 1.4, color: ENAMEL_D, alpha: 0.85, seed: sd('fronth3'), length: [18, 50] });
+    xhat(ctx, [[760, BY0], [BX1 + 4, BY0], [BX1 + 4, BY1 + 4], [800, BY1 + 4]], { tone: 0.42, spacing: 7, crossSpacing: 7, width: 1.5, color: ENAMEL_D, alpha: 0.85, seed: sd('fronth'), length: [18, 60], edge: 0.3 });
+    hat(ctx, [[BX0, 1262], [800, 1262], [800, BY1 + 4], [BX0, BY1 + 4]], { spacing: 7, width: 1.5, color: ENAMEL_D, alpha: 0.85, seed: sd('fronth2'), length: [18, 60], edge: 0.3 });
+    hat(ctx, [[836, BY0], [BX1 + 4, BY0], [BX1 + 4, BY1 + 4], [836, BY1 + 4]], { angle: -Math.PI / 4 - Math.PI / 3, spacing: 6, width: 1.4, color: ENAMEL_D, alpha: 0.85, seed: sd('fronth3'), length: [18, 50] });
     ctx.restore();
     // gloss streaks along the lit top-left edge
     ctx.save();
@@ -355,9 +393,9 @@
     ctx.stroke();
     ctx.restore();
     // panel seams
-    L.inkPath(ctx, [[BX0 + 8, 646], [BX1 - 8, 646]], { width: 1.8, color: INKSOFT, alpha: 0.9, seed: sd('seam1'), taper: [10, 10] });
-    L.inkPath(ctx, [[BX0 + 8, 1296], [BX1 - 8, 1296]], { width: 1.8, color: INKSOFT, alpha: 0.9, seed: sd('seam2'), taper: [10, 10] });
-    L.inkPath(ctx, [[BX0 + 10, 650], [BX1 - 10, 650]], { width: 1.2, color: ENAMEL_T, alpha: 0.9, seed: sd('seam1h'), taper: [10, 10] });
+    ink(ctx, [[BX0 + 8, 646], [BX1 - 8, 646]], { width: 1.8, color: INKSOFT, alpha: 0.9, seed: sd('seam1'), taper: [10, 10] });
+    ink(ctx, [[BX0 + 8, 1296], [BX1 - 8, 1296]], { width: 1.8, color: INKSOFT, alpha: 0.9, seed: sd('seam2'), taper: [10, 10] });
+    ink(ctx, [[BX0 + 10, 650], [BX1 - 10, 650]], { width: 1.2, color: ENAMEL_T, alpha: 0.9, seed: sd('seam1h'), taper: [10, 10] });
     // rivets
     for (const [x, y] of G.rivets) {
       ctx.save();
@@ -379,19 +417,19 @@
       ctx.restore();
     }
     // sample trier handle on the right of the window
-    L.inkPath(ctx, L.rrectPts(866, 1060, 40, 26, 6, 10), { closed: true, width: 2.6, fill: STEEL, seed: sd('trier'), wobble: 0.4 });
-    L.inkPath(ctx, L.ellipsePts(912, 1073, 10, 16, 18), { closed: true, width: 2.6, fill: P.wood, seed: sd('trierk'), wobble: 0.4 });
+    ink(ctx, L.rrectPts(866, 1060, 40, 26, 6, 10), { closed: true, width: 2.6, fill: STEEL, seed: sd('trier'), wobble: 0.4 });
+    ink(ctx, L.ellipsePts(912, 1073, 10, 16, 18), { closed: true, width: 2.6, fill: P.wood, seed: sd('trierk'), wobble: 0.4 });
     // gas pipe and valve under the burner, down to the plinth
-    L.inkPath(ctx, [[790, 1316], [850, 1316], [850, 1376]], { width: 12, color: INK, seed: sd('gas0'), taper: [0, 0], swell: 0, smooth: false });
-    L.inkPath(ctx, [[790, 1316], [850, 1316], [850, 1376]], { width: 7, color: P.ochre, seed: sd('gas1'), taper: [0, 0], swell: 0, smooth: false });
-    L.inkPath(ctx, L.ellipsePts(850, 1316, 15, 15, 20), { closed: true, width: 2.6, fill: P.red, seed: sd('valve'), wobble: 0.3 });
-    L.inkPath(ctx, [[838, 1304], [862, 1328]], { width: 3, seed: sd('valveh'), taper: [1, 1] });
+    ink(ctx, [[790, 1316], [850, 1316], [850, 1376]], { width: 12, color: INK, seed: sd('gas0'), taper: [0, 0], swell: 0, smooth: false });
+    ink(ctx, [[790, 1316], [850, 1316], [850, 1376]], { width: 7, color: P.ochre, seed: sd('gas1'), taper: [0, 0], swell: 0, smooth: false });
+    ink(ctx, L.ellipsePts(850, 1316, 15, 15, 20), { closed: true, width: 2.6, fill: P.red, seed: sd('valve'), wobble: 0.3 });
+    ink(ctx, [[838, 1304], [862, 1328]], { width: 3, seed: sd('valveh'), taper: [1, 1] });
   }
 
-  function drawChimney(ctx, tw) {
+  function drawChimney(ctx) {
     // pipe from the top face up to the collector
     const pipe = [[192, 548], [192, 300], [248, 300], [248, 548]];
-    L.inkPath(ctx, pipe, { closed: true, width: 3, fill: STEEL, seed: sd('pipe'), smooth: false, wobble: 0.8 });
+    ink(ctx, pipe, { closed: true, width: 3, fill: STEEL, seed: sd('pipe'), smooth: false, wobble: 0.8 });
     // contour hatching on the right half (horizontal, slightly curved)
     const ph = new Path2D();
     for (let y = 306; y < 544; y += 7) {
@@ -405,10 +443,10 @@
     ctx.lineWidth = 1.4;
     ctx.stroke(ph);
     ctx.restore();
-    for (const y of [380, 470, 530]) L.inkPath(ctx, [[192, y], [248, y + 2]], { width: 1.8, color: INKSOFT, seed: sd('band', y), taper: [2, 2] });
+    for (const y of [380, 470, 530]) ink(ctx, [[192, y], [248, y + 2]], { width: 1.8, color: INKSOFT, seed: sd('band', y), taper: [2, 2] });
     // chaff collector drum (cylinder)
     const col = L.rrectPts(160, 320, 120, 112, 14, 14);
-    L.inkPath(ctx, col, { closed: true, width: 3.4, fill: STEEL, seed: sd('coll'), wobble: 0.8 });
+    ink(ctx, col, { closed: true, width: 3.4, fill: STEEL, seed: sd('coll'), wobble: 0.8 });
     const ch = new Path2D();
     for (let y = 326; y < 428; y += 6) {
       const j = L.h3(y, 9, 77);
@@ -421,24 +459,17 @@
     ctx.globalAlpha = 0.9;
     ctx.stroke(ch);
     ctx.restore();
-    L.inkPath(ctx, [[166, 340], [274, 342]], { width: 1.8, color: INKSOFT, seed: sd('collb1'), taper: [3, 3] });
-    L.inkPath(ctx, [[166, 412], [274, 414]], { width: 1.8, color: INKSOFT, seed: sd('collb2'), taper: [3, 3] });
-    L.inkPath(ctx, [[176, 352], [176, 400]], { width: 3, color: STEEL_L, seed: sd('collhi'), taper: [6, 6] });
+    ink(ctx, [[166, 340], [274, 342]], { width: 1.8, color: INKSOFT, seed: sd('collb1'), taper: [3, 3] });
+    ink(ctx, [[166, 412], [274, 414]], { width: 1.8, color: INKSOFT, seed: sd('collb2'), taper: [3, 3] });
+    ink(ctx, [[176, 352], [176, 400]], { width: 3, color: STEEL_L, seed: sd('collhi'), taper: [6, 6] });
     // little window into the collector showing chaff
-    L.inkPath(ctx, L.ellipsePts(206, 376, 16, 20, 20), { closed: true, width: 2.2, fill: CAVITY, seed: sd('collw'), wobble: 0.3 });
-    for (let i = 0; i < 6; i++) {
-      const a = L.h3(i, Math.floor(tw * 12), 5) * TAU;
-      ctx.fillStyle = P.silverskin;
-      ctx.beginPath();
-      ctx.ellipse(206 + Math.cos(a + i) * 9, 376 + Math.sin(a * 1.3 + i) * 12, 3, 1.6, a, 0, TAU);
-      ctx.fill();
-    }
+    ink(ctx, L.ellipsePts(206, 376, 16, 20, 20), { closed: true, width: 2.2, fill: CAVITY, seed: sd('collw'), wobble: 0.3 });
     // upper pipe and rain cap
-    L.inkPath(ctx, [[204, 320], [204, 290], [236, 290], [236, 320]], { closed: true, width: 2.6, fill: STEEL, seed: sd('pipe2'), smooth: false, wobble: 0.4 });
-    L.inkPath(ctx, [[220, 290], [220, 280]], { width: 2, seed: sd('capstem'), taper: [0, 0] });
+    ink(ctx, [[204, 320], [204, 290], [236, 290], [236, 320]], { closed: true, width: 2.6, fill: STEEL, seed: sd('pipe2'), smooth: false, wobble: 0.4 });
+    ink(ctx, [[220, 290], [220, 280]], { width: 2, seed: sd('capstem'), taper: [0, 0] });
     const cap = [[168, 282], [220, 256], [272, 282], [262, 286], [178, 286]];
-    L.inkPath(ctx, cap, { closed: true, width: 3, fill: STEEL, seed: sd('cap'), smooth: false, wobble: 0.5 });
-    L.hatch(ctx, [[220, 258], [272, 282], [262, 286], [220, 286]], { angle: -Math.PI / 4, spacing: 4, width: 1.2, color: STEELD, alpha: 0.9, seed: sd('caph'), length: [6, 16] });
+    ink(ctx, cap, { closed: true, width: 3, fill: STEEL, seed: sd('cap'), smooth: false, wobble: 0.5 });
+    hat(ctx, [[220, 258], [272, 282], [262, 286], [220, 286]], { angle: -Math.PI / 4, spacing: 4, width: 1.2, color: STEELD, alpha: 0.9, seed: sd('caph'), length: [6, 16] });
   }
 
   function drawHopper(ctx, t, A, G, step) {
@@ -935,9 +966,11 @@
       // camera: locked, then push 1.0 -> 1.6 on the window from T 26.25
       const zoom = t < B_CINN ? 1 : 1 + 0.6 * E.inOutCubic((t - B_CINN) / (B_MED - B_CINN));
       L.camera(ctx, { x: CX, y: CY, zoom }, (ctx) => {
-        drawFloorAndBase(ctx);
-        drawChimney(ctx, tw);
-        drawBody(ctx, G);
+        ctx.save();
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(staticLayer(G, ((bi % 3) + 3) % 3), SX0, SY0, SW, SH);
+        ctx.restore();
+        drawCollectorWindow(ctx, tw);
         drawDial(ctx, t);
         drawHopper(ctx, t, A, G);
         drawBurner(ctx, t);
@@ -951,7 +984,7 @@
         drawBeans(ctx, t, tw, th, G, A);
         if (t >= B_YELLOW - 0.15) drawChaffIn(ctx, t, G);
         ctx.restore();
-        if(0) drawBezel(ctx);
+        drawBezel(ctx);
         if (t >= B_YELLOW - 0.1) drawChaffOut(ctx, t, G);
         drawOverlays(ctx, t);
       });

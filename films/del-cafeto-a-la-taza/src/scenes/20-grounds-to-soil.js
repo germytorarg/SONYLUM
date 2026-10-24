@@ -154,6 +154,48 @@
     LIB.stipple(ctx, cp, Object.assign({}, o, { spacing: (o.spacing || 7.5) * k, r: [r[0] * k, r[1] * k], boilAmp: (o.boilAmp != null ? o.boilAmp : 0.35) * k, boil: BOIL }));
   }
 
+  // the runs of a polyline that fall inside the visible rect (padded), so off-screen ink costs nothing
+  function runsIn(Z, pts, closed) {
+    if (Z.k <= 1.01) return [closed ? pts.concat([pts[0]]) : pts];
+    const pad = 60 / Z.k;
+    const x0 = Z.v[0] - pad, y0 = Z.v[1] - pad, x1 = Z.v[2] + pad, y1 = Z.v[3] + pad;
+    const src = closed ? pts.concat([pts[0]]) : pts;
+    const out = [];
+    let cur = null;
+    for (let i = 0; i < src.length; i++) {
+      const p = src[i];
+      const inside = p[0] >= x0 && p[0] <= x1 && p[1] >= y0 && p[1] <= y1;
+      if (inside) {
+        if (!cur) {
+          cur = [];
+          if (i > 0) cur.push(src[i - 1]);
+        }
+        cur.push(p);
+      } else if (cur) {
+        cur.push(p);
+        out.push(cur);
+        cur = null;
+      }
+    }
+    if (cur) out.push(cur);
+    return out.filter((r) => r.length > 1);
+  }
+
+  // ink a long line or outline only where it shows; closed outlines get their fill separately
+  function inkRuns(ctx, Z, pts, o = {}) {
+    if (Z.k <= 1.01) {
+      ink(ctx, Z, pts, o);
+      return;
+    }
+    if (o.closed && o.fill) fillPoly(ctx, pts, o.fill, o.fillAlpha != null ? o.fillAlpha : 1);
+    const runs = runsIn(Z, pts, !!o.closed);
+    const q = Object.assign({}, o, { closed: false, fill: null });
+    runs.forEach((r, i) => {
+      const whole = !o.closed && r[0] === pts[0] && r[r.length - 1] === pts[pts.length - 1];
+      ink(ctx, Z, r, Object.assign({}, q, { seed: (o.seed || 1) + i * 31, taper: whole ? o.taper : [0, 0] }));
+    });
+  }
+
   function fillPoly(ctx, pts, color, alpha = 1) {
     ctx.save();
     ctx.globalAlpha *= alpha;
@@ -224,9 +266,9 @@
     if (!visB(Z, lf.b, 10)) return;
     const col = o.color || P.leafCoffee;
     ink(ctx, Z, lf.petiole, { width: Math.max(2.5, 2.4 * Z.k), color: P.ink, seed: seed + 1, taper: [2, 6] });
-    ink(ctx, Z, lf.outline, { closed: true, width: o.width || 3, fill: col, seed: seed + 2, wobble: 1.4 });
+    inkRuns(ctx, Z, lf.outline, { closed: true, width: o.width || 3, fill: col, seed: seed + 2, wobble: 1.4 });
     // gloss streak along one side of the midrib
-    ink(ctx, Z, lf.sheen, { width: 5, color: P.leafSheen, alpha: 0.8, seed: seed + 3, taper: [20, 30], wobble: 1 });
+    inkRuns(ctx, Z, lf.sheen, { width: 5, color: P.leafSheen, alpha: 0.8, seed: seed + 3, taper: [20, 30], wobble: 1 });
     // shadow half: hatching roughly parallel to the laterals
     hatchZ(ctx, Z, lf.halfR, { angle: lf.ang + 0.75, spacing: 7, width: 1.3, color: P.leafDeep, alpha: 0.75, length: [10, 34], seed: seed + 4, density: 0.85 });
     // veins
@@ -242,7 +284,7 @@
     ctx.lineCap = 'round';
     ctx.stroke(vp);
     ctx.restore();
-    ink(ctx, Z, lf.mid, { width: 2.5, color: P.leafDeep, seed: seed + 5, taper: [4, 30], wobble: 0.8 });
+    inkRuns(ctx, Z, lf.mid, { width: 2.5, color: P.leafDeep, seed: seed + 5, taper: [4, 30], wobble: 0.8 });
   }
 
   const CHERRY_COLS = {
@@ -320,8 +362,8 @@
     const along = Math.atan2(tb.sm[tb.sm.length - 1][1] - tb.sm[0][1], tb.sm[tb.sm.length - 1][0] - tb.sm[0][0]);
     hatchZ(ctx, Z, tb.shade, { angle: along, spacing: 5, width: 1.3, color: P.barkDeep, alpha: 0.85, length: [12, 40], seed: seed + 1, angleJitter: 0.03 });
     hatchZ(ctx, Z, tb.poly, { angle: along, spacing: 11, width: 1.1, color: P.barkDeep, alpha: 0.45, length: [8, 26], seed: seed + 2, density: 0.6 });
-    ink(ctx, Z, tb.L, { width: o.width || 3, seed: seed + 3, taper: [4, 20] });
-    ink(ctx, Z, tb.R, { width: o.width || 3, seed: seed + 4, taper: [4, 20] });
+    inkRuns(ctx, Z, tb.L, { width: o.width || 3, seed: seed + 3, taper: [4, 20] });
+    inkRuns(ctx, Z, tb.R, { width: o.width || 3, seed: seed + 4, taper: [4, 20] });
   }
 
   // ---------------------------------------------------------------------------
