@@ -105,13 +105,6 @@
     { x: 880, y: 1340, kind: 'water' },
   ];
 
-  // beats (shot-local seconds; the shot starts at T 1.50)
-  const B_SPARK = 0; // T 1.50
-  const B_OUTLINE = 0.375; // T 1.875
-  const B_CREASE = 0.75; // T 2.25
-  const B_EMBRYO = 1.5; // T 3.00
-  const B_NET = [1.5, 1.75, 2.0]; // T 3.00, 3.25, 3.50 (8th-triplets)
-  const B_BRACKET = 1.875; // T 3.375
 
   // ---------------------------------------------------------------------------
   // Progress glyph: canonical, copied verbatim from docs/storyboard.md.
