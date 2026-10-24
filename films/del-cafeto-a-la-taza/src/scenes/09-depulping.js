@@ -51,7 +51,7 @@
   // events: a cherry pops at the gap at te = k * 0.375 (k = -4 .. 3); k = 1 is a double batch whose
   // beans hit the water on the T 17.25 beat
   const EVENTS = [];
-  for (let k = -4; k <= 3; k++) {
+  for (let k = -5; k <= 3; k++) {
     const nb = k === 1 ? 5 : 3;
     EVENTS.push({ k, te: k * STEP, nb });
   }
@@ -273,8 +273,8 @@
   function drawPlate(ctx, L, P, G, bi) {
     // ground below the channel
     fillPoly(ctx, [[0, FLOOR + 80], [1080, FLOOR + 80], [1080, 1920], [0, 1920]], P.soil);
-    L.crossHatch(ctx, [[0, FLOOR + 80], [1080, FLOOR + 80], [1080, 1920], [0, 1920]], { spacing: 7, width: 1.3, color: P.soilDeep, alpha: 0.85, length: [12, 36], seed: sd('soil'), tone: 0.55 });
-    L.stipple(ctx, [[0, FLOOR + 90], [1080, FLOOR + 90], [1080, 1920], [0, 1920]], { spacing: 11, color: P.soilDeep, alpha: 0.7, seed: sd('soilst') });
+    L.hatch(ctx, [[0, FLOOR + 80], [1080, FLOOR + 80], [1080, 1920], [0, 1920]], { spacing: 8, width: 1.3, color: P.soilDeep, alpha: 0.85, length: [12, 36], seed: sd('soil') });
+    L.stipple(ctx, [[0, FLOOR + 90], [1080, FLOOR + 90], [1080, 1920], [0, 1920]], { spacing: 16, color: P.soilDeep, alpha: 0.7, seed: sd('soilst') });
     // pebbles in the ground
     for (let i = 0; i < 26; i++) {
       const x = 30 + i * 41 + 20 * h3(i, 1, sd('peb')), y = FLOOR + 140 + 230 * h3(i, 2, sd('peb'));
@@ -545,10 +545,11 @@
         const x0 = CHUTE1[0] - 22 - j * 9;
         const u = clamp(ds / T_SINK);
         // a short drop to the surface, then a slowing sink, drifting right with the flow
-        const settle = FLOOR - 26 - 34 * h3(ev.k + 20, j, sd('settle'));
+        const settle = FLOOR - 30 - 50 * h3(ev.k + 20, j, sd('settle'));
         const y = ds < 2 * FR ? lerp(CHUTE1[1], SURF + 10, ds / (2 * FR)) : lerp(SURF + 10, settle, E.outQuad(clamp((ds - 2 * FR) / (T_SINK - 2 * FR))));
         const sway = Math.sin(ds * 9 + j * 1.7 + ev.k) * 12 * (1 - u);
-        const x = x0 + 120 * E.outQuad(u) + sway + j * 16;
+        const drift = 60 + 170 * h3(ev.k + 40, j, sd('drift'));
+        const x = x0 + drift * E.outQuad(u) + sway + j * 22;
         return { x, y, rot: 0.6 + ds * 2.5 * (1 - u) + j, stage: 3, under: y > SURF + 12, u };
       };
       for (const ev of EVENTS) {
