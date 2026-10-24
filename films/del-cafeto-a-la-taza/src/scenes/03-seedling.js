@@ -576,6 +576,73 @@ const LS_END = J[1] - 781 - R_STRAIGHT * Math.sin(15 * DEG); // straight length 
   }
 
   // ---------------------------------------------------------------------------
+  // the static plate: construction lines and the soil cutaway. Nothing in it moves, so it is drawn once
+  // per boil phase (a three-drawing boil cycle, still re-wobbling every 1/12 s) and reused.
+  // ---------------------------------------------------------------------------
+
+  function boilLib(b) {
+    const o = {};
+    for (const k of Object.keys(LIB)) o[k] = LIB[k];
+    const pin = (fn) => (ctx, a, opts) => fn(ctx, a, Object.assign({}, opts, { boil: b }));
+    o.inkPath = pin(LIB.inkPath);
+    o.hatch = pin(LIB.hatch);
+    o.crossHatch = pin(LIB.crossHatch);
+    o.stipple = pin(LIB.stipple);
+    return o;
+  }
+
+  function drawPlate(ctx, L, P, g, bi) {
+    // ---- 2 construction lines ---------------------------------------------------------
+    {
+      const cons = { width: 1.5, color: P.inkFaint, alpha: 0.3, taper: [0, 0], wobble: 1.5, smooth: false, step: 8 };
+      L.inkPath(ctx, [[540, -40], [540, SURF]], Object.assign({ seed: sd('axis') }, cons));
+      L.inkPath(ctx, [[60, 700], [1020, 700]], Object.assign({ seed: sd('h700') }, cons));
+      L.inkPath(ctx, [[60, 900], [1020, 900]], Object.assign({ seed: sd('h900'), alpha: 0.18 }, cons));
+      L.guideCircle(ctx, 540, 700, 330, { color: P.inkFaint, alpha: 0.22, width: 1.5, dash: [3, 8] });
+      // a height scale on the left, surface up to the soldier height
+      const sc = new Path2D();
+      sc.moveTo(70, SURF);
+      sc.lineTo(70, 640);
+      for (let k = 0; k <= 27; k++) {
+        const y = SURF - k * 20;
+        if (y < 640) break;
+        sc.moveTo(70, y);
+        sc.lineTo(70 + (k % 5 === 0 ? 22 : 10), y);
+      }
+      strokePath(ctx, sc, P.inkFaint, 0.5, 1.5);
+      const marks = new Path2D();
+      for (const [x, y] of [[540, 700], [540, 900], [540, 1350], [420, 640], [660, 640], [540, 1800]]) {
+        marks.moveTo(x - 9, y);
+        marks.lineTo(x + 9, y);
+        marks.moveTo(x, y - 9);
+        marks.lineTo(x, y + 9);
+      }
+      strokePath(ctx, marks, P.inkFaint, 0.5, 1.5);
+    }
+
+    // ---- 3 soil -------------------------------------------------------------------------
+    drawSoil(ctx, L, P, g, bi);
+  }
+
+  function plate(P, g, b) {
+    const S = FILM.S || 1;
+    return LIB.cached(['seedling-plate', b, S].join('|'), () => {
+      const w = Math.round(1080 * S), h = Math.round(1920 * S);
+      let c;
+      if (FILM.makeCanvas) c = FILM.makeCanvas(w, h);
+      else {
+        c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+      }
+      const x = c.getContext('2d');
+      x.scale(w / 1080, h / 1920);
+      drawPlate(x, boilLib(b), P, g, b);
+      return c;
+    });
+  }
+
+  // ---------------------------------------------------------------------------
   // the seedbed: two neighbours at other stages (left just hooked through, right a week older),
   // so the row reads as a nursery and the tall frame stays dense
   // ---------------------------------------------------------------------------
@@ -658,36 +725,8 @@ const LS_END = J[1] - 781 - R_STRAIGHT * Math.sin(15 * DEG); // straight length 
       // ---- 1 stripes -----------------------------------------------------------------
       L.stripes(ctx, { colors: [P.stripeCream, P.stripeSpring], width: 140, angle: -0.52, offset: 8 * info.T, seed: sd('stripes') });
 
-      // ---- 2 construction lines ---------------------------------------------------------
-      {
-        const cons = { width: 1.5, color: P.inkFaint, alpha: 0.3, taper: [0, 0], wobble: 1.5, smooth: false, step: 8 };
-        L.inkPath(ctx, [[540, -40], [540, SURF]], Object.assign({ seed: sd('axis') }, cons));
-        L.inkPath(ctx, [[60, 700], [1020, 700]], Object.assign({ seed: sd('h700') }, cons));
-        L.inkPath(ctx, [[60, 900], [1020, 900]], Object.assign({ seed: sd('h900'), alpha: 0.18 }, cons));
-        L.guideCircle(ctx, 540, 700, 330, { color: P.inkFaint, alpha: 0.22, width: 1.5, dash: [3, 8] });
-        // a height scale on the left, surface up to the soldier height
-        const sc = new Path2D();
-        sc.moveTo(70, SURF);
-        sc.lineTo(70, 640);
-        for (let k = 0; k <= 27; k++) {
-          const y = SURF - k * 20;
-          if (y < 640) break;
-          sc.moveTo(70, y);
-          sc.lineTo(70 + (k % 5 === 0 ? 22 : 10), y);
-        }
-        strokePath(ctx, sc, P.inkFaint, 0.5, 1.5);
-        const marks = new Path2D();
-        for (const [x, y] of [[540, 700], [540, 900], [540, 1350], [420, 640], [660, 640], [540, 1800]]) {
-          marks.moveTo(x - 9, y);
-          marks.lineTo(x + 9, y);
-          marks.moveTo(x, y - 9);
-          marks.lineTo(x, y + 9);
-        }
-        strokePath(ctx, marks, P.inkFaint, 0.5, 1.5);
-      }
-
-      // ---- 3 soil -------------------------------------------------------------------------
-      drawSoil(ctx, L, P, g, bi);
+      // ---- 2 and 3 the static plate: construction lines, soil cutaway ------------------------
+      ctx.drawImage(plate(P, g, ((bi % 3) + 3) % 3), 0, 0, 1080, 1920);
 
       // ---- 3b the neighbours in the seedbed ---------------------------------------------------
       drawNeighbours(ctx, L, P, tw, bi);

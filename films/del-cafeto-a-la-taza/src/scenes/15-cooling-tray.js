@@ -478,22 +478,22 @@
       const a = phi + k * Math.PI;
       const pts = [];
       for (let i = 0; i <= 10; i++) pts.push(tp(34 + (i / 10) * 382, a, 16));
-      L.inkPath(ctx, pts, { width: 13, color: INK, seed: sd('armo', k), taper: [0, 2], swell: 0, wobble: 0.4 });
-      L.inkPath(ctx, pts, { width: 7, color: STEEL, seed: sd('arm', k), taper: [0, 2], swell: 0, wobble: 0.4 });
+      L.inkPath(ctx, pts, { width: 18, color: INK, seed: sd('armo', k), taper: [0, 2], swell: 0, wobble: 0.4 });
+      L.inkPath(ctx, pts, { width: 11, color: STEEL, seed: sd('arm', k), taper: [0, 2], swell: 0, wobble: 0.4 });
       L.inkPath(ctx, pts.slice(0, 9).map(([x, y]) => [x, y - 2]), { width: 2, color: STEEL_L, seed: sd('armh', k), taper: [4, 4], wobble: 0.3 });
       // paddles hanging into the beans, with little bristle brushes
       for (const r of [140, 250, 360]) {
         const p = tp(r, a, 16);
         const nx = -Math.sin(a), ny = Math.cos(a) * KY;
         const nl = Math.hypot(nx, ny) || 1;
-        const hw = 22;
-        const pad = [[p[0] - (nx / nl) * hw, p[1] - (ny / nl) * hw], [p[0] + (nx / nl) * hw, p[1] + (ny / nl) * hw], [p[0] + (nx / nl) * hw, p[1] + (ny / nl) * hw + 22], [p[0] - (nx / nl) * hw, p[1] - (ny / nl) * hw + 22]];
+        const hw = 32;
+        const pad = [[p[0] - (nx / nl) * hw, p[1] - (ny / nl) * hw], [p[0] + (nx / nl) * hw, p[1] + (ny / nl) * hw], [p[0] + (nx / nl) * hw, p[1] + (ny / nl) * hw + 30], [p[0] - (nx / nl) * hw, p[1] - (ny / nl) * hw + 30]];
         L.inkPath(ctx, pad, { closed: true, width: 2.6, fill: STEEL, smooth: false, seed: sd('pad', k, r), wobble: 0.3 });
         L.hatch(ctx, pad, { angle: -Math.PI / 4, spacing: 4, width: 1.1, color: STEELD, alpha: 0.85, seed: sd('padh', k, r), length: [6, 14] });
         const br = new Path2D();
         for (let m = 0; m <= 8; m++) {
           const u = m / 8 - 0.5;
-          const bx = p[0] + (nx / nl) * hw * 2 * u, by = p[1] + (ny / nl) * hw * 2 * u + 22;
+          const bx = p[0] + (nx / nl) * hw * 2 * u, by = p[1] + (ny / nl) * hw * 2 * u + 30;
           br.moveTo(bx, by);
           br.lineTo(bx + (L.h3(m, r, k) - 0.5) * 3, by + 7);
         }
