@@ -194,7 +194,7 @@
         return e ? e(u) : u;
       };
       const popTwos = (a) => (t < a ? 0 : [0.72, 1.08, 1][Math.min(2, drawing(a))]);
-      const ink = (pts, o) => L.inkPath(ctx, pts, o);
+      const ink = (pts, o) => L.inkPath(ctx, pts, Object.assign({ step: 4.5 }, o));
 
       const ink0 = P.ink, inkSoft = P.inkSoft, steel = P.steel, steelDeep = P.steelDeep;
       const steelLight = L.mix(P.steel, P.white, 0.45);

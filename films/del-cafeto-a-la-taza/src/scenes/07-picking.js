@@ -133,7 +133,27 @@
     }
     heap.sort((a, b) => a.y - b.y);
 
-    GEO = { clusters, branchPoly, top, bot, spine, LEAVES, heap, COLS };
+    // a lower lateral at the left, with unripe cherries left for a later pass
+    const b2y = (x) => 1010 + (x + 40) * 0.13 + 5 * Math.sin(x * 0.01);
+    const s2 = [];
+    for (let i = 0; i <= 16; i++) {
+      const x = lerp(-60, 330, i / 16);
+      s2.push([x, b2y(x)]);
+    }
+    const hw2 = (x) => lerp(13, 5, clamp((x + 60) / 390));
+    const top2 = s2.map(([x, y]) => [x, y - hw2(x)]);
+    const bot2 = s2.map(([x, y]) => [x, y + hw2(x)]);
+    const low = {
+      poly: top2.concat(bot2.slice().reverse()), top: top2, bot: bot2, y: b2y,
+      leaves: [[170, -100, 270, 1], [170, 96, 250, -1], [-10, 70, 230, 1]].map((d, i) => buildLeaf(L, d[0], b2y(d[0]), d[1] * DEG, d[2], d[3], sd('leaf2', i))),
+      cherries: [[-46, -26, 'g'], [8, -32, 'g'], [-60, 26, 'y'], [-8, 40, 'g'], [44, 22, 'g'], [52, -18, 'y']].map((o, i) => {
+        const x = 80 + o[0], y = b2y(80) + o[1];
+        const rot = Math.atan2(o[1] + (o[1] < 0 ? -10 : 10), o[0] * 0.6) - Math.PI / 2;
+        return { x, y, r: 34 + 3 * h3(i, 5, sd('lc')), rot, col: COLS[o[2]], back: o[1] < 0, seed: sd('lc', i) };
+      }),
+    };
+
+    GEO = { clusters, branchPoly, top, bot, spine, LEAVES, heap, COLS, low };
     return GEO;
   }
 
@@ -617,7 +637,27 @@
       const dT = tb.N[iTT][1] > 0 ? 1 : -1;
       nail(tb, iTT, dT, 34, 20, 0, 32);
       const md = H.mid;
-      nail(md, 3, md.N[3][0] < 0 ? 1 : -1, 22, 12, 0, 33);
+      nail(md, 3, md.N[3][0] < 0 ? 1 : -1, 16, 9, 0, 33);
+    }
+  }
+
+  function drawBranch(ctx, L, P, G) {
+    fillPoly(ctx, G.branchPoly, P.bark);
+    L.hatch(ctx, G.branchPoly, { angle: 0.1, spacing: 5, width: 1.3, color: P.barkDeep, alpha: 0.9, length: [14, 44], seed: sd('brh'), density: (x, y) => sstep(-2, 12, y - branchY(x)) });
+    L.inkPath(ctx, G.top, { width: 3.6, seed: sd('brT'), taper: [0, 0] });
+    L.inkPath(ctx, G.bot, { width: 4.4, seed: sd('brB'), taper: [0, 0] });
+    // bark flecks and node rings
+    const fl = new Path2D();
+    const r = L.rng(sd('fleck'));
+    for (let i = 0; i < 46; i++) {
+      const x = r.range(-20, 1100), y = branchY(x) + r.range(-8, 4);
+      fl.moveTo(x, y);
+      fl.lineTo(x + r.range(6, 14), y + r.range(-1, 1));
+    }
+    strokePath(ctx, fl, P.barkDeep, 0.8, 1.4);
+    for (const nx of [110, 260, 410, 560, 710, 860, 1010]) {
+      const ny = branchY(nx);
+      L.inkPath(ctx, [[nx - 4, ny - 14], [nx + 2, ny], [nx - 3, ny + 13]], { width: 2.2, color: P.barkDeep, seed: sd('node', nx), taper: [3, 3] });
     }
   }
 
@@ -790,7 +830,7 @@
 
       // ---- hand pose ------------------------------------------------------------
       // angle of the hand (local +x toward the wrist) as a function of target x
-      const thetaAt = (x) => lerp(30, 60, clamp((x - 260) / 600)) * DEG;
+      const thetaAt = (x) => lerp(30, 70, clamp((x - 260) / 600)) * DEG;
       const pose = (() => {
         const tt = tw;
         // find the segment
@@ -846,72 +886,72 @@
       L.stripes(ctx, { colors: [P.stripeCream, P.stripeSage], width: 140, angle: -0.52, offset: 8 * info.T });
 
       // ---- 2 leaves and back rows -------------------------------------------------
-      sprite(ctx, L, 'leaves', 80, 960, bi, (g) => {
-        for (const lf of G.LEAVES) drawLeaf(g, L, P, lf, bi);
-      });
-      const isGone = (k, i) => EV.some((e, j) => e.cl === k && e.ci === i && picked(j));
+      const isEvent = (k, i) => EV.some((e) => e.cl === k && e.ci === i);
       const isHeld = (k, i) => EV.some((e, j) => e.cl === k && e.ci === i && e.pick && t >= e.t - 1e-6);
+      // leaves, the untouched cherries and the branch never change: one sprite per boil drawing
+      sprite(ctx, L, 'branch', 80, 1320, bi, (g) => {
+        // the lower lateral first (further back)
+        const lw = G.low;
+        for (const lf of lw.leaves) drawLeaf(g, L, P, lf, bi);
+        for (const c of lw.cherries) if (c.back) drawCherry(g, L, P, c, c.x, c.y, c.rot);
+        fillPoly(g, lw.poly, P.bark);
+        L.hatch(g, lw.poly, { angle: 0.1, spacing: 5, width: 1.2, color: P.barkDeep, alpha: 0.9, length: [12, 36], seed: sd('b2h'), density: (x, y) => sstep(-2, 8, y - lw.y(x)) });
+        L.inkPath(g, lw.top, { width: 3, seed: sd('b2T'), taper: [0, 14] });
+        L.inkPath(g, lw.bot, { width: 3.6, seed: sd('b2B'), taper: [0, 14] });
+        for (const c of lw.cherries) if (!c.back) drawCherry(g, L, P, c, c.x, c.y, c.rot);
+        for (const lf of G.LEAVES) drawLeaf(g, L, P, lf, bi);
+        for (let k = 0; k < 3; k++) {
+          G.clusters[k].forEach((c, i) => {
+            if (c.back && !isEvent(k, i)) drawCherry(g, L, P, c, c.x, c.y, c.rot);
+          });
+        }
+        drawBranch(g, L, P, G);
+        for (let k = 0; k < 3; k++) {
+          G.clusters[k].forEach((c, i) => {
+            if (!c.back && !isEvent(k, i)) drawCherry(g, L, P, c, c.x, c.y, c.rot);
+          });
+        }
+      });
+      // the cherries the hand visits (all in the front rows)
       for (let k = 0; k < 3; k++) {
         G.clusters[k].forEach((c, i) => {
-          if (c.back && !isHeld(k, i)) drawCherry(ctx, L, P, c, c.x, c.y, c.rot);
-        });
-      }
-
-      // ---- 3 branch and front rows -------------------------------------------------
-      {
-        fillPoly(ctx, G.branchPoly, P.bark);
-        L.hatch(ctx, G.branchPoly, { angle: 0.1, spacing: 5, width: 1.3, color: P.barkDeep, alpha: 0.9, length: [14, 44], seed: sd('brh'), density: (x, y) => sstep(-2, 12, y - branchY(x)) });
-        L.inkPath(ctx, G.top, { width: 3.6, seed: sd('brT'), taper: [0, 0] });
-        L.inkPath(ctx, G.bot, { width: 4.4, seed: sd('brB'), taper: [0, 0] });
-        // bark flecks and node rings
-        const fl = new Path2D();
-        const r = L.rng(sd('fleck'));
-        for (let i = 0; i < 46; i++) {
-          const x = r.range(-20, 1100), y = branchY(x) + r.range(-8, 4);
-          fl.moveTo(x, y);
-          fl.lineTo(x + r.range(6, 14), y + r.range(-1, 1));
-        }
-        strokePath(ctx, fl, P.barkDeep, 0.8, 1.4);
-        for (const nx of [110, 260, 410, 560, 710, 860, 1010]) {
-          const ny = branchY(nx);
-          L.inkPath(ctx, [[nx - 4, ny - 14], [nx + 2, ny], [nx - 3, ny + 13]], { width: 2.2, color: P.barkDeep, seed: sd('node', nx), taper: [3, 3] });
-        }
-      }
-      for (let k = 0; k < 3; k++) {
-        G.clusters[k].forEach((c, i) => {
-          if (!c.back && !isHeld(k, i)) drawCherry(ctx, L, P, c, c.x, c.y, c.rot);
+          if (isEvent(k, i) && !isHeld(k, i)) drawCherry(ctx, L, P, c, c.x, c.y, c.rot);
         });
       }
 
       // ---- 4 basket inside: back wall, heap, landed cherries ----------------------
-      drawBasketBack(ctx, L, P, bi);
-      {
-        // clip: above the front rim curve and inside the basket mouth (the heap may rise over the back rim)
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(RIM.cx - RIM.rx + 4, RIM.cy);
-        for (let i = 0; i <= 40; i++) {
-          const a = Math.PI - (i / 40) * Math.PI;
-          ctx.lineTo(RIM.cx + Math.cos(a) * (RIM.rx - 4), RIM.cy + Math.sin(a) * (RIM.ry - 4));
+      const liftQ = Math.round(lift * 10) / 10;
+      sprite(ctx, L, 'heap' + liftQ, 1080, 420, bi, (g) => {
+        const lift = liftQ;
+        drawBasketBack(g, L, P, bi);
+        {
+          // clip: above the front rim curve and inside the basket mouth (the heap may rise over the back rim)
+          g.save();
+          g.beginPath();
+          g.moveTo(RIM.cx - RIM.rx + 4, RIM.cy);
+          for (let i = 0; i <= 40; i++) {
+            const a = Math.PI - (i / 40) * Math.PI;
+            g.lineTo(RIM.cx + Math.cos(a) * (RIM.rx - 4), RIM.cy + Math.sin(a) * (RIM.ry - 4));
+          }
+          g.lineTo(RIM.cx + RIM.rx - 30, 1150);
+          g.lineTo(RIM.cx - RIM.rx + 30, 1150);
+          g.closePath();
+          g.clip();
+          for (const h of G.heap) {
+            const y = h.y - lift;
+            const col = h.kind === 'r' ? G.COLS.r : { fill: P.cherryDeep, deep: P.ink, hi: P.cherryRed };
+            if (h.y < heapSurf(h.x) + 30) drawCherry(g, L, P, { r: h.r, col, seed: h.seed }, h.x, y, h.rot, { width: 2.8 });
+            else cheapCherry(g, P, h.x, y, h.r, col, h.rot);
+          }
+          // the heap darkens toward the basket wall on the right and deep inside
+          L.hatch(g, null, {
+            bounds: [160, 1180 - lift, 760, 300], spacing: 6, width: 1.3, color: P.cherryDeep, alpha: 0.7, length: [10, 28], seed: sd('heapsh'),
+            density: (x, y) => (y > heapTopAt(x, lift) + 14 ? 0.8 * sstep(640, 900, x) + 0.5 * sstep(1360, 1440, y) : 0),
+          });
+          // shadow at the heap's lower right and deep in the basket
+          g.restore();
         }
-        ctx.lineTo(RIM.cx + RIM.rx - 30, 1150);
-        ctx.lineTo(RIM.cx - RIM.rx + 30, 1150);
-        ctx.closePath();
-        ctx.clip();
-        for (const h of G.heap) {
-          const y = h.y - lift;
-          const col = h.kind === 'r' ? G.COLS.r : { fill: P.cherryDeep, deep: P.ink, hi: P.cherryRed };
-          if (h.y < heapSurf(h.x) + 30) drawCherry(ctx, L, P, { r: h.r, col, seed: h.seed }, h.x, y, h.rot, { width: 2.8 });
-          else cheapCherry(ctx, P, h.x, y, h.r, col, h.rot);
-        }
-        // the heap darkens toward the basket wall on the right and deep inside
-        L.hatch(ctx, null, {
-          bounds: [160, 1180 - lift, 760, 300], spacing: 6, width: 1.3, color: P.cherryDeep, alpha: 0.7, length: [10, 28], seed: sd('heapsh'),
-          density: (x, y) => (y > heapTopAt(x, lift) + 14 ? 0.8 * sstep(640, 900, x) + 0.5 * sstep(1360, 1440, y) : 0),
-        });
-        // shadow at the heap's lower right and deep in the basket
-        ctx.restore();
-      }
+      });
       // landed cherries on top of the heap
       EV.forEach((e, k) => {
         if (!e.pick || tw < landT[k] - 1e-6) return;
@@ -998,6 +1038,20 @@
           ctx.stroke();
           ctx.restore();
         }
+      });
+      // annYellow snap marks round the pinch on each pick beat (6 frames)
+      EV.forEach((e, k) => {
+        if (!e.pick || t < e.t - 1e-6 || t > e.t + 6 * FR) return;
+        const u = clamp((t - e.t) / (6 * FR) + 1 / 6);
+        const [x, y] = evPos[k];
+        const r0 = 50 + 26 * E.outExpo(u), r1 = r0 + 16 * (1 - u) + 6;
+        const mk = new Path2D();
+        for (let i = 0; i < 6; i++) {
+          const a = (-150 + i * 22) * DEG;
+          mk.moveTo(x + Math.cos(a) * r0, y + Math.sin(a) * r0);
+          mk.lineTo(x + Math.cos(a) * r1, y + Math.sin(a) * r1);
+        }
+        strokePath(ctx, mk, P.annYellow, 1 - sstep(0.6, 1, u), 3);
       });
       // annYellow check rings on each picked cherry's former spot
       EV.forEach((e, k) => {

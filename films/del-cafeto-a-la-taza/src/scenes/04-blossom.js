@@ -33,6 +33,14 @@
   };
   const sd = (...k) => LIB.hash(ID, ...k) & 0x7fffffff;
 
+  // While the cached static layer is drawn, BOIL pins every line to one of four boil drawings
+  // (a 4-drawing boil cycle), so each cached layer is the same whichever frame builds it.
+  let BOIL = null;
+  const bo = (o) => (BOIL == null ? o : Object.assign({}, o, { boil: BOIL }));
+  const ink = (ctx, pts, o) => LIB.inkPath(ctx, pts, bo(o));
+  const hatchB = (ctx, clip, o) => LIB.hatch(ctx, clip, bo(o));
+  const stippleB = (ctx, clip, o) => LIB.stipple(ctx, clip, bo(o));
+
   // beats (shot-local seconds; global T in comments)
   const B_C1 = 0; // T 6.00 cluster 1 opens (the cut)
   const B_C2 = 0.75; // T 6.75 cluster 2 (hero)
@@ -198,23 +206,23 @@
     const k = Lf.key;
     const wScale = o.thin ? 0.8 : 1;
     // petiole
-    L.inkPath(ctx, Lf.stalk, { width: 13 * wScale, color: C.ink, seed: sd('pet0', k), taper: [0, 5], swell: 0, wobble: 0.4 });
-    L.inkPath(ctx, Lf.stalk, { width: 7 * wScale, color: C.leafLight, seed: sd('pet', k), taper: [0, 4], swell: 0, wobble: 0.4 });
-    L.inkPath(ctx, Lf.outline, { closed: true, width: 3 * wScale, fill: C.leaf, seed: sd('leafline', k), wobble: 1.2 });
+    ink(ctx, Lf.stalk, { width: 13 * wScale, color: C.ink, seed: sd('pet0', k), taper: [0, 5], swell: 0, wobble: 0.4 });
+    ink(ctx, Lf.stalk, { width: 7 * wScale, color: C.leafLight, seed: sd('pet', k), taper: [0, 4], swell: 0, wobble: 0.4 });
+    ink(ctx, Lf.outline, { closed: true, width: 3 * wScale, fill: C.leaf, seed: sd('leafline', k), wobble: 1.2 });
     const shadowHalf = Lf.litSide > 0 ? Lf.halfB : Lf.halfA;
     const litHalf = Lf.litSide > 0 ? Lf.halfA : Lf.halfB;
     const angShadow = Lf.litSide > 0 ? Lf.angB : Lf.angA;
     const angLit = Lf.litSide > 0 ? Lf.angA : Lf.angB;
     const B = Lf.bounds;
     // shadow half: hatch parallel to the side veins, darker toward the margin and tip
-    L.hatch(ctx, shadowHalf, {
+    hatchB(ctx, shadowHalf, {
       angle: angShadow, spacing: 5.5, width: 1.6, color: C.leafDeep, alpha: 0.9, length: [12, 34], bounds: B, seed: sd('lh', k),
       density: (x, y) => {
         const q = Lf.uvOf(x, y);
         return 0.5 + 0.5 * sstep(0.1, 0.75, Math.abs(q[1]));
       },
     });
-    L.hatch(ctx, shadowHalf, {
+    hatchB(ctx, shadowHalf, {
       angle: angShadow + 1.05, spacing: 7, width: 1.3, color: C.ink, alpha: 0.42, length: [10, 26], bounds: B, seed: sd('lh2', k),
       density: (x, y) => {
         const q = Lf.uvOf(x, y);
@@ -222,7 +230,7 @@
       },
     });
     // lit half: only a light shade near the margin and in the base
-    L.hatch(ctx, litHalf, {
+    hatchB(ctx, litHalf, {
       angle: angLit, spacing: 9, width: 1.3, color: C.leafDeep, alpha: 0.8, length: [10, 24], bounds: B, seed: sd('uh', k),
       density: (x, y) => {
         const q = Lf.uvOf(x, y);
@@ -241,10 +249,10 @@
     strokeP(ctx, flick, C.sheenWhite, 0.9, 2.2);
     // sunken lateral veins and the midrib
     for (let i = 0; i < Lf.veins.length; i++) {
-      L.inkPath(ctx, Lf.veins[i].pts, { width: 1.8, color: C.leafDeep, alpha: 0.95, seed: sd('lv', k, i), taper: [3, 14], wobble: 0.5, step: 3 });
+      ink(ctx, Lf.veins[i].pts, { width: 1.8, color: C.leafDeep, alpha: 0.95, seed: sd('lv', k, i), taper: [3, 14], wobble: 0.5, step: 3 });
     }
-    L.inkPath(ctx, Lf.mid, { width: 4 * wScale, color: C.leafLight, seed: sd('mid', k), taper: [2, 70], wobble: 0.6 });
-    L.inkPath(ctx, Lf.mid, { width: 1.2, color: C.leafInk, alpha: 0.6, seed: sd('mid2', k), taper: [10, 90], wobble: 0.6 });
+    ink(ctx, Lf.mid, { width: 4 * wScale, color: C.leafLight, seed: sd('mid', k), taper: [2, 70], wobble: 0.6 });
+    ink(ctx, Lf.mid, { width: 1.2, color: C.leafInk, alpha: 0.6, seed: sd('mid2', k), taper: [10, 90], wobble: 0.6 });
   }
 
   // ---------------------------------------------------------------------------
@@ -355,11 +363,11 @@
     }
     const poly = up.concat(dn.slice(1, n).reverse());
     // little green calyx cup at the base
-    L.inkPath(ctx, L.ellipsePts(b.x + ux * 4, b.y + uy * 4, 6 * scale, 4.5 * scale, 14, b.phi), { closed: true, width: 1.5, fill: C.leafLight, seed: sd('budcal', b.id), wobble: 0.3 });
-    L.inkPath(ctx, poly, { closed: true, width: 2, fill: C.petal, seed: sd('bud', b.id), wobble: 0.5, taper: [4, 8] });
+    ink(ctx, L.ellipsePts(b.x + ux * 4, b.y + uy * 4, 6 * scale, 4.5 * scale, 14, b.phi), { closed: true, width: 1.5, fill: C.leafLight, seed: sd('budcal', b.id), wobble: 0.3 });
+    ink(ctx, poly, { closed: true, width: 2, fill: C.petal, seed: sd('bud', b.id), wobble: 0.5, taper: [4, 8] });
     // shadow side (lower right) hatch and the twisted petal seam
     const lit = nx + ny < 0 ? -1 : 1; // the side of dn faces down-right when lit = -1
-    L.hatch(ctx, poly, {
+    hatchB(ctx, poly, {
       angle: b.phi + 1.2, spacing: 3.6, width: 1.1, color: C.petalHatch, alpha: 0.9, length: [4, 10], inset: 1, overshoot: 0, seed: sd('budh', b.id),
       density: (x, y) => {
         const v = ((x - b.x) * nx + (y - b.y) * ny) * lit;
@@ -372,7 +380,7 @@
       const hw = w * 0.35 * Math.sin(s * 5.5);
       seam.push([b.x + ux * s * len + nx * hw, b.y + uy * s * len + ny * hw]);
     }
-    L.inkPath(ctx, seam, { width: 1.1, color: C.inkSoft, alpha: 0.6, seed: sd('seam', b.id), taper: [3, 6], wobble: 0.2 });
+    ink(ctx, seam, { width: 1.1, color: C.inkSoft, alpha: 0.6, seed: sd('seam', b.id), taper: [3, 6], wobble: 0.2 });
   }
 
   function drawFlower(ctx, F, o, skip) {
@@ -405,8 +413,13 @@
     ctx.restore();
     for (const pt of petals) {
       L.inkPath(ctx, pt.pts, { closed: true, width: 2, color: C.ink, seed: sd('pet', F.id, pt.k), wobble: 0.5, tremble: 0.25, taper: [6, 10] });
-      L.inkPath(ctx, pt.vein, { width: 1, color: C.petalHatch, alpha: 0.8, seed: sd('pv', F.id, pt.k), taper: [3, 8], wobble: 0.3, double: false });
     }
+    const veinP = new Path2D();
+    for (const pt of petals) {
+      veinP.moveTo(pt.vein[0][0], pt.vein[0][1]);
+      veinP.lineTo(pt.vein[1][0], pt.vein[1][1]);
+    }
+    strokeP(ctx, veinP, C.petalHatch, 0.8, 1);
     // corolla tube centre
     const tube = L.ellipsePts(F.x, F.y, 7, 7 * F.sq, 16, F.phi);
     L.inkPath(ctx, tube, { closed: true, width: 1.4, fill: C.petalShade, seed: sd('tube', F.id), wobble: 0.2 });
@@ -423,12 +436,19 @@
         ant.push([q1, q2]);
       }
       strokeP(ctx, a5, C.petalHatch, 0.9, 1.4);
+      const antP = new Path2D();
       for (const [q1, q2] of ant) {
         const mx = (q1[0] + q2[0]) / 2, my = (q1[1] + q2[1]) / 2;
         const ang = Math.atan2(q2[1] - q1[1], q2[0] - q1[0]);
         const len = Math.max(5, Math.hypot(q2[0] - q1[0], q2[1] - q1[1]) * 0.75);
-        L.inkPath(ctx, L.ellipsePts(mx, my, len, 2.8, 12, ang), { closed: true, width: 1.1, fill: C.anther, seed: sd('ant', F.id, mx | 0), wobble: 0.15, taper: [2, 4] });
+        antP.moveTo(mx + Math.cos(ang) * len, my + Math.sin(ang) * len);
+        antP.ellipse(mx, my, len, 2.9, ang, 0, TAU);
       }
+      ctx.save();
+      ctx.fillStyle = C.anther;
+      ctx.fill(antP);
+      ctx.restore();
+      strokeP(ctx, antP, C.ink, 0.9, 1.1);
       const sa = F.rho + 0.2;
       const s1 = rot([F.R * 0.42, 0], sa);
       const st = xf(s1[0], s1[1]);
@@ -584,10 +604,10 @@
       const m = Bp.mid[Math.round(s * (Bp.mid.length - 1))];
       return -((x - m[0]) * Bp.nx + (y - m[1]) * Bp.ny) / half;
     };
-    L.hatch(ctx, Bp.poly, { angle: ang + 0.04, spacing: 3.6, width: 1.4, color: C.barkDeep, alpha: 0.9, length: [16, 46], seed: sd('bh', key), density: (x, y) => sstep(-0.25, 0.55, below(x, y)) });
-    L.hatch(ctx, Bp.poly, { angle: ang + Math.PI / 2 + 0.25, spacing: 6, width: 1.3, color: C.ink, alpha: 0.5, length: [5, 10], seed: sd('bc', key), density: (x, y) => sstep(0.45, 0.9, below(x, y)) });
+    hatchB(ctx, Bp.poly, { angle: ang + 0.04, spacing: 3.6, width: 1.4, color: C.barkDeep, alpha: 0.9, length: [16, 46], seed: sd('bh', key), density: (x, y) => sstep(-0.25, 0.55, below(x, y)) });
+    hatchB(ctx, Bp.poly, { angle: ang + Math.PI / 2 + 0.25, spacing: 6, width: 1.3, color: C.ink, alpha: 0.5, length: [5, 10], seed: sd('bc', key), density: (x, y) => sstep(0.45, 0.9, below(x, y)) });
     // bark flecks and lenticels
-    L.stipple(ctx, Bp.poly, { spacing: 13, r: [1.0, 1.8], color: C.barkDeep, alpha: 0.75, seed: sd('len', key), density: (x, y) => 0.55 + 0.4 * sstep(-0.6, 0.4, below(x, y)) });
+    stippleB(ctx, Bp.poly, { spacing: 13, r: [1.0, 1.8], color: C.barkDeep, alpha: 0.75, seed: sd('len', key), density: (x, y) => 0.55 + 0.4 * sstep(-0.6, 0.4, below(x, y)) });
     void vOf;
     // node swellings: a slight ring where each leaf pair joins
     for (let i = 0; i < nodes.length; i++) {
@@ -596,10 +616,10 @@
       for (let k = -1; k <= 1; k += 2) ring.push([x + Bp.ux * k * 6 + Bp.nx * (half + 2), y + Bp.uy * k * 6 + Bp.ny * (half + 2)]);
       const p1 = [x + Bp.nx * (half + 3), y + Bp.ny * (half + 3)], p2 = [x - Bp.nx * (half + 3), y - Bp.ny * (half + 3)];
       const c = [x + Bp.ux * 5, y + Bp.uy * 5];
-      L.inkPath(ctx, L.smoothPts([p1, c, p2], false, 3), { width: 1.8, color: C.inkSoft, alpha: 0.9, seed: sd('nodering', key, i), taper: [4, 4], wobble: 0.3 });
+      ink(ctx, L.smoothPts([p1, c, p2], false, 3), { width: 1.8, color: C.inkSoft, alpha: 0.9, seed: sd('nodering', key, i), taper: [4, 4], wobble: 0.3 });
     }
-    L.inkPath(ctx, Bp.top, { width: w, seed: sd('btop', key), taper: [0, 0], wobble: 1.2 });
-    L.inkPath(ctx, Bp.bot, { width: w + 0.5, seed: sd('bbot', key), taper: [0, 0], wobble: 1.2 });
+    ink(ctx, Bp.top, { width: w, seed: sd('btop', key), taper: [0, 0], wobble: 1.2 });
+    ink(ctx, Bp.bot, { width: w + 0.5, seed: sd('bbot', key), taper: [0, 0], wobble: 1.2 });
   }
 
   // ---------------------------------------------------------------------------
@@ -731,11 +751,17 @@
   // The scenery and leaves do not move: render them once per boil drawing into an offscreen layer.
   function staticLayer(L, bi) {
     const S = FILM.S || 1;
-    return L.cached(ID + ':static:' + bi + ':' + S, () => {
+    const b = ((bi % 4) + 4) % 4;
+    return L.cached(ID + ':static:' + b + ':' + S, () => {
       const cv = FILM.makeCanvas(Math.round(1080 * S), Math.round(1920 * S));
       const ctx = cv.getContext('2d');
       ctx.setTransform(S, 0, 0, S, 0, 0);
-      drawStatic(ctx, L);
+      BOIL = b;
+      try {
+        drawStatic(ctx, L);
+      } finally {
+        BOIL = null;
+      }
       return cv;
     });
   }
@@ -757,7 +783,7 @@
       for (const Lf of G.leaves) {
         ctx.save();
         ctx.clip(pathOf(Lf.outline));
-        L.hatch(ctx, sh, { angle: -Math.PI / 4 + 1.05, spacing: 4.5, width: 1.3, color: C.ink, alpha: 0.4, length: [8, 22], seed: sd('csh', cl.c, Lf.key), bounds: bboxOf(sh), density: (px, py) => 1 - sstep(0.5, 1, Math.hypot((px - x - 26) / 120, (py - y - 40) / 70)) });
+        hatchB(ctx, sh, { angle: -Math.PI / 4 + 1.05, spacing: 4.5, width: 1.3, color: C.ink, alpha: 0.4, length: [8, 22], seed: sd('csh', cl.c, Lf.key), bounds: bboxOf(sh), density: (px, py) => 1 - sstep(0.5, 1, Math.hypot((px - x - 26) / 120, (py - y - 40) / 70)) });
         ctx.restore();
       }
     }
@@ -776,7 +802,7 @@
       const G = geo();
 
       // timing helpers
-      const drawing = (a) => Math.floor((t - a) * 12 + 1e-6);
+      const drawing = (a) => Math.max(0, Math.floor((t - a) * 12 + 1e-4));
       const hit = (a, frames, e, lead = 1) => (t < a - 1e-6 ? 0 : (e || ((u) => u))(clamp((t - a) / (frames * FR) + lead / frames)));
       const POP = [0.45, 1.08, 1];
       const openAmt = (a) => (t < a - 1e-6 ? 0 : POP[Math.min(2, drawing(a))]);

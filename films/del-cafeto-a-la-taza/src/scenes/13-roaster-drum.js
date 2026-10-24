@@ -219,7 +219,7 @@
     const f = L.rng(sd('fly'));
     g.fly = [];
     for (let i = 0; i < 58; i++) {
-      const ar = f.range(204, 232) * DEG;
+      const ar = f.range(198, 240) * DEG;
       const land = f.range(0.3, 0.96);
       g.fly.push({
         per: f.range(0.95, 1.35), ph: f.range(0, 1), ar, r: f.range(232, 248),
@@ -665,14 +665,6 @@
       ctx.fill();
     }
     // shadow crescent from the bezel lip, upper left inside the drum
-    const cres = [];
-    for (let i = 0; i <= 40; i++) cres.push(polar((100 + (i / 40) * 250) * DEG, RD));
-    for (let i = 40; i >= 0; i--) {
-      const a = (100 + (i / 40) * 250) * DEG;
-      const p = [CX + 30 + Math.cos(a) * (RD - 6), CY + 30 + Math.sin(a) * (RD - 6)];
-      cres.push(Math.hypot(p[0] - CX, p[1] - CY) < RD ? p : polar(a, RD));
-    }
-    L.crossHatch(ctx, cres, { tone: 0.5, spacing: 5, width: 1.3, color: INK, alpha: 0.75, seed: sd('cres'), length: [10, 30], clip: true, boil: bi });
   }
 
   function vanePoly(a) {
@@ -685,7 +677,7 @@
     for (let k = 0; k < 8; k++) {
       const a = th + (k * TAU) / 8;
       const v = vanePoly(a);
-      L.inkPath(ctx, v, { closed: true, width: 2.4, fill: STEEL, seed: sd('vane', k), smooth: false, wobble: 0.4, boil: Math.floor(L.boil(L.T)) });
+      L.inkPath(ctx, v, { closed: true, width: 2.4, fill: STEEL, seed: sd('vane', k), smooth: false, wobble: 0.4 });
       L.inkPath(ctx, [v[0], v[1]], { width: 1.6, color: STEEL_L, seed: sd('vaneh', k), taper: [4, 4], wobble: 0.2 });
       // bracket bolt at the shell
       const b = polar(a, RD - 10);
@@ -698,11 +690,12 @@
 
   // bean state helpers
   function streamPos(b, tw, land) {
-    // falling from the top of the drum into its landing place during the pour
+    // falling in a narrow column from the top of the drum, fanning out only as it lands
     const t0 = b.arr - 0.3;
     const u = clamp((tw - t0) / 0.3);
-    const x0 = CX + b.sx * 0.5, y0 = CY - RD + 26;
-    return [lerp(x0, land[0], u * 0.9 + 0.1 * u * u), lerp(y0, land[1], u * u), u];
+    const x0 = CX + 10 + b.sx * 0.35, y0 = CY - RD + 20;
+    const fan = sstep(0.6, 1, u);
+    return [lerp(x0, land[0], fan), lerp(y0, land[1], u * u), u];
   }
   function bedPos(b, tw) {
     const a = b.ph + b.w * tw;
@@ -832,6 +825,17 @@
     }
   }
 
+  function drawCrescent(ctx) {
+    const cres = [];
+    for (let i = 0; i <= 40; i++) cres.push(polar((100 + (i / 40) * 250) * DEG, RD));
+    for (let i = 40; i >= 0; i--) {
+      const a = (100 + (i / 40) * 250) * DEG;
+      const p = [CX + 30 + Math.cos(a) * (RD - 6), CY + 30 + Math.sin(a) * (RD - 6)];
+      cres.push(Math.hypot(p[0] - CX, p[1] - CY) < RD ? p : polar(a, RD));
+    }
+    xhat(ctx, cres, { tone: 0.5, spacing: 5, width: 1.3, color: INK, alpha: 0.75, seed: sd('cres'), length: [10, 30], clip: true });
+  }
+
   function drawBezel(ctx) {
     const outer = L.ellipsePts(CX, CY, RB, RB, 96);
     const inner = L.ellipsePts(CX, CY, RW, RW, 96);
@@ -845,9 +849,9 @@
     const ann = [];
     for (let i = 0; i <= 36; i++) ann.push(polar((-40 + (i / 36) * 220) * DEG, RB + 2));
     for (let i = 36; i >= 0; i--) ann.push(polar((-40 + (i / 36) * 220) * DEG, RW - 1));
-    L.hatch(ctx, ann, { angle: -Math.PI / 4, spacing: 4, width: 1.3, color: STEELD, alpha: 0.9, seed: sd('bezh'), length: [8, 22], clip: true, edge: 0.25 });
-    L.inkPath(ctx, outer, { closed: true, width: 4, seed: sd('bezo'), wobble: 1, double: { offset: 5, alpha: 0.35 } });
-    L.inkPath(ctx, inner, { closed: true, width: 3, seed: sd('bezi'), wobble: 1 });
+    hat(ctx, ann, { angle: -Math.PI / 4, spacing: 4, width: 1.3, color: STEELD, alpha: 0.9, seed: sd('bezh'), length: [8, 22], clip: true, edge: 0.25 });
+    ink(ctx, outer, { closed: true, width: 4, seed: sd('bezo'), wobble: 1, double: { offset: 5, alpha: 0.35 } });
+    ink(ctx, inner, { closed: true, width: 3, seed: sd('bezi'), wobble: 1 });
     ctx.save();
     ctx.strokeStyle = STEEL_L;
     ctx.lineWidth = 3;
@@ -869,12 +873,12 @@
       ctx.fill();
     }
     // hinge (left) and latch with handle (right)
-    L.inkPath(ctx, L.rrectPts(CX - RB - 22, CY - 54, 34, 108, 8, 12), { closed: true, width: 3, fill: STEEL, seed: sd('hinge'), wobble: 0.5 });
-    L.inkPath(ctx, [[CX - RB - 5, CY - 46], [CX - RB - 5, CY + 46]], { width: 2, color: INKSOFT, seed: sd('hingeline'), taper: [2, 2] });
-    L.hatch(ctx, L.rrectPts(CX - RB - 5, CY - 52, 16, 104, 6, 10), { angle: 0.05, spacing: 4, width: 1.2, color: STEELD, alpha: 0.9, seed: sd('hingeh'), length: [8, 20] });
-    L.inkPath(ctx, L.rrectPts(CX + RB - 14, CY - 30, 40, 60, 8, 12), { closed: true, width: 3, fill: STEEL, seed: sd('latch'), wobble: 0.5 });
-    L.inkPath(ctx, [[CX + RB + 26, CY - 18], [CX + RB + 44, CY - 18], [CX + RB + 44, CY + 70], [CX + RB + 30, CY + 70]], { width: 5, seed: sd('handle'), taper: [1, 1], swell: 0, smooth: false });
-    L.inkPath(ctx, L.ellipsePts(CX + RB + 37, CY + 82, 11, 15, 16), { closed: true, width: 2.4, fill: P.wood, seed: sd('handlek'), wobble: 0.3 });
+    ink(ctx, L.rrectPts(CX - RB - 22, CY - 54, 34, 108, 8, 12), { closed: true, width: 3, fill: STEEL, seed: sd('hinge'), wobble: 0.5 });
+    ink(ctx, [[CX - RB - 5, CY - 46], [CX - RB - 5, CY + 46]], { width: 2, color: INKSOFT, seed: sd('hingeline'), taper: [2, 2] });
+    hat(ctx, L.rrectPts(CX - RB - 5, CY - 52, 16, 104, 6, 10), { angle: 0.05, spacing: 4, width: 1.2, color: STEELD, alpha: 0.9, seed: sd('hingeh'), length: [8, 20] });
+    ink(ctx, L.rrectPts(CX + RB - 14, CY - 30, 40, 60, 8, 12), { closed: true, width: 3, fill: STEEL, seed: sd('latch'), wobble: 0.5 });
+    ink(ctx, [[CX + RB + 26, CY - 18], [CX + RB + 44, CY - 18], [CX + RB + 44, CY + 70], [CX + RB + 30, CY + 70]], { width: 5, seed: sd('handle'), taper: [1, 1], swell: 0, smooth: false });
+    ink(ctx, L.ellipsePts(CX + RB + 37, CY + 82, 11, 15, 16), { closed: true, width: 2.4, fill: P.wood, seed: sd('handlek'), wobble: 0.3 });
     // glass glare: two flat white strokes across the window
     ctx.save();
     ctx.beginPath();
@@ -896,10 +900,35 @@
     ctx.restore();
   }
 
+  const BZX0 = 190, BZY0 = 630, BZW = 730, BZH = 670;
+  function bezelLayer(v) {
+    const S = FILM.S || 1;
+    return L.cached(['bezel', ID, S, v].join('|'), () => {
+      const c = FILM.makeCanvas(Math.ceil(BZW * SK * S), Math.ceil(BZH * SK * S));
+      const g = c.getContext('2d');
+      g.scale(SK * S, SK * S);
+      g.translate(-BZX0, -BZY0);
+      CB = v * 5 + 3;
+      try {
+        g.save();
+        g.beginPath();
+        g.arc(CX, CY, RW, 0, TAU);
+        g.clip();
+        drawCrescent(g);
+        g.restore();
+        drawBezel(g);
+      } finally {
+        CB = null;
+      }
+      return c;
+    });
+  }
+
   function drawOverlays(ctx, t) {
     // annYellow roast arc round the window, sweeping with the roast progress
     const rp = clamp(t / B_MED);
     const a0 = -Math.PI / 2;
+    L.guideCircle(ctx, CX, CY, 332, { color: P.annYellow, alpha: 0.4, width: 1.5, dash: [6, 10], start: a0, p: 0.9 });
     L.arcAnnotation(ctx, CX, CY, 332, a0, a0 + rp * 0.9 * TAU, { color: P.annYellow, width: 2.5, arrow: 13, dot: 5, endTicks: 10 });
     // stage dots on the arc at green, yellow, cinnamon, medium
     const stages = [[0, P.beanGreen], [B_GREEN_END, P.beanGreen], [B_YELLOW, P.beanYellow], [B_CINN, P.beanCinnamon], [B_MED, P.beanMedium]];
@@ -984,7 +1013,10 @@
         drawBeans(ctx, t, tw, th, G, A);
         if (t >= B_YELLOW - 0.15) drawChaffIn(ctx, t, G);
         ctx.restore();
-        drawBezel(ctx);
+        ctx.save();
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(bezelLayer(((bi % 3) + 3) % 3), BZX0, BZY0, BZW, BZH);
+        ctx.restore();
         if (t >= B_YELLOW - 0.1) drawChaffOut(ctx, t, G);
         drawOverlays(ctx, t);
       });
