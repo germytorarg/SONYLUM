@@ -205,7 +205,7 @@
   for (const Lf of LEAVES) Lf.g.path = pathOf(Lf.g.outline);
 
   function drawLeaf(ctx, P, Lf, COL, castShadows) {
-    const L = LIB;
+    const L = CUR;
     const g = Lf.g, key = Lf.key;
     const sh = g.shadowSide, lit = g.litSide;
     // petiole
@@ -271,6 +271,7 @@
     return { x, y, rx: r, ry: r * 1.1, rot, kind, key };
   }
 
+  const HERO_BASE = { x: 540, y: 900, rx: 260, ry: 290, rot: 0, kind: 'red', key: 'hero' };
   const BACK = [cherryDef(120, 1000, 110, 'green', 'cg'), cherryDef(980, 1040, 120, 'deep', 'cd')];
   const MIDC = [cherryDef(230, 760, 130, 'yellow', 'cy'), cherryDef(850, 760, 140, 'red', 'cr')];
 
@@ -308,7 +309,7 @@
   }
 
   function drawCherry(ctx, P, c, o) {
-    const L = LIB;
+    const L = CUR;
     const col = cherryColours(P, c.kind);
     const hero = !!o.hero;
     const key = c.key;
@@ -461,7 +462,7 @@
   })();
 
   function drawBranch(ctx, P) {
-    const L = LIB;
+    const L = CUR;
     const B = BRANCH;
     fillPoly(ctx, B.outline, P.bark);
     // lengthwise hatching on the lower (shadow) half
@@ -539,7 +540,7 @@
   ];
 
   function drawTwig(ctx, P, COL) {
-    const L = LIB;
+    const L = CUR;
     fillPoly(ctx, TWIG.outline, P.bark);
     L.hatch(ctx, TWIG.outline, {
       angle: -0.16, spacing: 4.5, width: 1.3, color: P.barkDeep, alpha: 0.9, length: [16, 50], gap: [3, 10], seed: sd('twh'),
@@ -549,6 +550,157 @@
     L.inkPath(ctx, TWIG.bot, { width: 3, color: P.ink, seed: sd('twb'), taper: [0, 0], wobble: 1, step: 4 });
     for (const Lf of TLEAVES) drawLeaf(ctx, P, Lf, COL, null);
     for (const c of TCHER) drawCherry(ctx, P, c, {});
+  }
+
+  // ---------------------------------------------------------------------------
+  // the static plate: construction, twig, both leaf pairs and the branch. None of it moves, so it is
+  // drawn once per boil phase (a three-drawing boil cycle, still re-wobbling every 1/12 s) into a canvas
+  // at 1.06x so the push-in never upsamples it.
+  // ---------------------------------------------------------------------------
+
+  let CUR = LIB; // the lib the drawing helpers use: LIB, or a wrapper that pins the boil drawing
+  function boilLib(b) {
+    const o = {};
+    for (const k of Object.keys(LIB)) o[k] = LIB[k];
+    const pin = (fn) => (ctx, a, opts) => fn(ctx, a, Object.assign({}, opts, { boil: b }));
+    o.inkPath = pin(LIB.inkPath);
+    o.hatch = pin(LIB.hatch);
+    o.crossHatch = pin(LIB.crossHatch);
+    o.stipple = pin(LIB.stipple);
+    return o;
+  }
+
+  function drawPlate(ctx, L, P, COL) {
+    // ---- 2 construction lines --------------------------------------------------
+    {
+      const cons = { width: 1.5, color: P.inkFaint, alpha: 0.3, taper: [0, 0], wobble: 1.5, smooth: false, step: 8 };
+      L.inkPath(ctx, [[540, -60], [540, 1980]], Object.assign({ seed: sd('axis') }, cons));
+      L.inkPath(ctx, [[-40, 900], [1120, 900]], Object.assign({ seed: sd('hz') }, cons));
+      L.guideCircle(ctx, 540, 900, 420, { color: P.inkFaint, alpha: 0.28, width: 1.5 });
+      L.guideCircle(ctx, 540, 900, 560, { color: P.inkFaint, alpha: 0.18, width: 1.5, dash: [3, 8] });
+      const deg = new Path2D();
+      for (let a = 0; a < 360; a += 10) {
+        const c = Math.cos(a * DEG), s = Math.sin(a * DEG);
+        const l = a % 30 === 0 ? 16 : 8;
+        deg.moveTo(540 + c * 420, 900 + s * 420);
+        deg.lineTo(540 + c * (420 + l), 900 + s * (420 + l));
+      }
+      strokePath(ctx, deg, P.inkFaint, 0.45, 1.5);
+      const marks = new Path2D();
+      for (const [x, y] of [[230, 760], [850, 760], [120, 1000], [980, 1040], [540, 602], [540, 610], [540, 1190], [280, 900], [800, 900]]) {
+        marks.moveTo(x - 9, y);
+        marks.lineTo(x + 9, y);
+        marks.moveTo(x, y - 9);
+        marks.lineTo(x, y + 9);
+      }
+      strokePath(ctx, marks, P.inkFaint, 0.55, 1.5);
+      // rays from the node through each cluster cherry
+      const rays = new Path2D();
+      for (const c of BACK.concat(MIDC)) {
+        const a = Math.atan2(c.y - NODE[1], c.x - NODE[0]);
+        rays.moveTo(NODE[0] + Math.cos(a) * 60, NODE[1] + Math.sin(a) * 60);
+        rays.lineTo(NODE[0] + Math.cos(a) * 760, NODE[1] + Math.sin(a) * 760);
+      }
+      strokePath(ctx, rays, P.inkFaint, 0.22, 1.5, [10, 8]);
+    }
+
+    // ---- 2b the lower twig ---------------------------------------------------------
+    drawTwig(ctx, P, COL);
+
+    // ---- 3 lower leaf pair (behind the edge cherries) ---------------------------
+    const backPos = BACK;
+
+    const castOn = (g, list) => {
+      // cherry shadows fall down and right onto the blade (light from the upper left)
+      ctx.save();
+      ctx.clip(g.path);
+      for (const c of list) {
+        const s = ovalPts(c.x + c.rx * 0.18, c.y + c.ry * 0.16, c.rx, c.ry, c.rot, 48);
+        L.hatch(ctx, s, { angle: -Math.PI / 4 - Math.PI / 3, spacing: 5, width: 1.3, color: P.ink, alpha: 0.5, length: [10, 26], seed: sd('lcs', c.key, g.width) });
+      }
+      ctx.restore();
+    };
+    drawLeaf(ctx, P, LEAVES[0], COL, (g) => castOn(g, [backPos[0]]));
+    drawLeaf(ctx, P, LEAVES[1], COL, (g) => castOn(g, [backPos[1]]));
+
+    // ---- 4 upper opposite leaf pair ---------------------------------------------
+    drawLeaf(ctx, P, LEAVES[2], COL, (g) => {
+      // the branch casts a strip of shade across the leaf base
+      ctx.save();
+      ctx.clip(g.path);
+      L.hatch(ctx, offsetPts(BRANCH.outline, 14, 18), { bounds: { x: 0, y: 560, w: 1080, h: 100 }, angle: -Math.PI / 4, spacing: 4.5, width: 1.3, color: P.ink, alpha: 0.5, length: [8, 20], seed: sd('brs', 'l') });
+      ctx.restore();
+    });
+    drawLeaf(ctx, P, LEAVES[3], COL, (g) => {
+      ctx.save();
+      ctx.clip(g.path);
+      L.hatch(ctx, offsetPts(BRANCH.outline, 14, 18), { bounds: { x: 0, y: 560, w: 1080, h: 100 }, angle: -Math.PI / 4, spacing: 4.5, width: 1.3, color: P.ink, alpha: 0.5, length: [8, 20], seed: sd('brs', 'r') });
+      ctx.restore();
+    });
+
+    // ---- 5 branch ------------------------------------------------------------------
+    drawBranch(ctx, P);
+  }
+
+  function plate(P, COL, b) {
+    const S = FILM.S || 1;
+    const k = 1.06 * S;
+    return LIB.cached(['hero-cherries-plate', b, S].join('|'), () => {
+      const w = Math.ceil(1080 * k), h = Math.ceil(1920 * k);
+      let c;
+      if (FILM.makeCanvas) c = FILM.makeCanvas(w, h);
+      else {
+        c = document.createElement('canvas');
+        c.width = w;
+        c.height = h;
+      }
+      const g = c.getContext('2d');
+      g.scale(w / 1080, h / 1920);
+      const prev = CUR;
+      CUR = boilLib(b);
+      try {
+        drawPlate(g, CUR, P, COL);
+      } finally {
+        CUR = prev;
+      }
+      return c;
+    });
+  }
+
+  // a cherry drawn once per boil phase into a sprite (1.06x), then placed at its swayed / bobbed offset
+  function cherrySprite(P, c, hero, b) {
+    const S = FILM.S || 1;
+    const k = 1.06 * S;
+    const m = 24;
+    const ext = Math.max(c.rx, c.ry) + m + (hero ? 16 : 6);
+    const x0 = c.x - ext, y0 = c.y - ext, side = ext * 2;
+    const img = LIB.cached(['hero-cherries-cherry', c.key, b, S].join('|'), () => {
+      const w = Math.ceil(side * k);
+      let cv;
+      if (FILM.makeCanvas) cv = FILM.makeCanvas(w, w);
+      else {
+        cv = document.createElement('canvas');
+        cv.width = w;
+        cv.height = w;
+      }
+      const g = cv.getContext('2d');
+      g.scale(w / side, w / side);
+      g.translate(-x0, -y0);
+      const prev = CUR;
+      CUR = boilLib(b);
+      try {
+        drawCherry(g, P, c, { hero });
+      } finally {
+        CUR = prev;
+      }
+      return cv;
+    });
+    return { img, x0, y0, side };
+  }
+
+  function placeCherry(ctx, P, base, pos, hero, b) {
+    const sp = cherrySprite(P, base, hero, b);
+    ctx.drawImage(sp.img, sp.x0 + (pos.x - base.x), sp.y0 + (pos.y - base.y), sp.side, sp.side);
   }
 
   // ---------------------------------------------------------------------------
@@ -595,80 +747,16 @@
       const cam = { x: 540, y: 900 + 60 / zoom, zoom };
 
       L.camera(ctx, cam, (ctx) => {
-        // ---- 2 construction lines --------------------------------------------------
-        {
-          const cons = { width: 1.5, color: P.inkFaint, alpha: 0.3, taper: [0, 0], wobble: 1.5, smooth: false, step: 8 };
-          L.inkPath(ctx, [[540, -60], [540, 1980]], Object.assign({ seed: sd('axis') }, cons));
-          L.inkPath(ctx, [[-40, 900], [1120, 900]], Object.assign({ seed: sd('hz') }, cons));
-          L.guideCircle(ctx, 540, 900, 420, { color: P.inkFaint, alpha: 0.28, width: 1.5 });
-          L.guideCircle(ctx, 540, 900, 560, { color: P.inkFaint, alpha: 0.18, width: 1.5, dash: [3, 8] });
-          const deg = new Path2D();
-          for (let a = 0; a < 360; a += 10) {
-            const c = Math.cos(a * DEG), s = Math.sin(a * DEG);
-            const l = a % 30 === 0 ? 16 : 8;
-            deg.moveTo(540 + c * 420, 900 + s * 420);
-            deg.lineTo(540 + c * (420 + l), 900 + s * (420 + l));
-          }
-          strokePath(ctx, deg, P.inkFaint, 0.45, 1.5);
-          const marks = new Path2D();
-          for (const [x, y] of [[230, 760], [850, 760], [120, 1000], [980, 1040], [540, 602], [540, 610], [540, 1190], [280, 900], [800, 900]]) {
-            marks.moveTo(x - 9, y);
-            marks.lineTo(x + 9, y);
-            marks.moveTo(x, y - 9);
-            marks.lineTo(x, y + 9);
-          }
-          strokePath(ctx, marks, P.inkFaint, 0.55, 1.5);
-          // rays from the node through each cluster cherry
-          const rays = new Path2D();
-          for (const c of BACK.concat(MIDC)) {
-            const a = Math.atan2(c.y - NODE[1], c.x - NODE[0]);
-            rays.moveTo(NODE[0] + Math.cos(a) * 60, NODE[1] + Math.sin(a) * 60);
-            rays.lineTo(NODE[0] + Math.cos(a) * 760, NODE[1] + Math.sin(a) * 760);
-          }
-          strokePath(ctx, rays, P.inkFaint, 0.22, 1.5, [10, 8]);
-        }
+        // ---- 2 to 5 the static plate: construction, twig, leaves, branch ----------------
+        const bp = ((bi % 3) + 3) % 3;
+        ctx.drawImage(plate(P, COL, bp), 0, 0, 1080, 1920);
 
-        // ---- 2b the lower twig ---------------------------------------------------------
-        drawTwig(ctx, P, COL);
-
-        // ---- 3 lower leaf pair (behind the edge cherries) ---------------------------
         const backPos = BACK.map((c, i) => Object.assign({}, c, { x: c.x + sway(2 + i), y: c.y + 0.5 * sway(3 + i) + (i ? sideBob : 0) }));
         const midPos = MIDC.map((c, i) => Object.assign({}, c, { x: c.x + sway(4 + i * 1.7), y: c.y + 0.5 * sway(5 + i) + sideBob }));
         const heroC = { x: G2.x + hx, y: G2.y + hy, rx: G2.rx, ry: G2.ry, rot: 0, kind: 'red', key: 'hero' };
 
-        const castOn = (g, list) => {
-          // cherry shadows fall down and right onto the blade (light from the upper left)
-          ctx.save();
-          ctx.clip(g.path);
-          for (const c of list) {
-            const s = ovalPts(c.x + c.rx * 0.18, c.y + c.ry * 0.16, c.rx, c.ry, c.rot, 48);
-            L.hatch(ctx, s, { angle: -Math.PI / 4 - Math.PI / 3, spacing: 5, width: 1.3, color: P.ink, alpha: 0.5, length: [10, 26], seed: sd('lcs', c.key, g.width) });
-          }
-          ctx.restore();
-        };
-        drawLeaf(ctx, P, LEAVES[0], COL, (g) => castOn(g, [backPos[0]]));
-        drawLeaf(ctx, P, LEAVES[1], COL, (g) => castOn(g, [backPos[1]]));
-
-        // ---- 4 upper opposite leaf pair ---------------------------------------------
-        drawLeaf(ctx, P, LEAVES[2], COL, (g) => {
-          // the branch casts a strip of shade across the leaf base
-          ctx.save();
-          ctx.clip(g.path);
-          L.hatch(ctx, offsetPts(BRANCH.outline, 14, 18), { bounds: { x: 0, y: 560, w: 1080, h: 100 }, angle: -Math.PI / 4, spacing: 4.5, width: 1.3, color: P.ink, alpha: 0.5, length: [8, 20], seed: sd('brs', 'l') });
-          ctx.restore();
-        });
-        drawLeaf(ctx, P, LEAVES[3], COL, (g) => {
-          ctx.save();
-          ctx.clip(g.path);
-          L.hatch(ctx, offsetPts(BRANCH.outline, 14, 18), { bounds: { x: 0, y: 560, w: 1080, h: 100 }, angle: -Math.PI / 4, spacing: 4.5, width: 1.3, color: P.ink, alpha: 0.5, length: [8, 20], seed: sd('brs', 'r') });
-          ctx.restore();
-        });
-
-        // ---- 5 branch ------------------------------------------------------------------
-        drawBranch(ctx, P);
-
         // ---- 6 back cherries, then the shoulder cherries -----------------------------
-        for (let i = 0; i < BACK.length; i++) drawCherry(ctx, P, backPos[i], {});
+        for (let i = 0; i < BACK.length; i++) placeCherry(ctx, P, BACK[i], backPos[i], false, bp);
         // the shoulder cherries' shadows on the back ones
         {
           const backPath = new Path2D();
@@ -682,7 +770,7 @@
         }
         drawStalk(ctx, P, midPos[0], 0, 0, 0);
         drawStalk(ctx, P, midPos[1], 0, 0, 1);
-        for (let i = 0; i < MIDC.length; i++) drawCherry(ctx, P, midPos[i], {});
+        for (let i = 0; i < MIDC.length; i++) placeCherry(ctx, P, MIDC[i], midPos[i], false, bp);
 
         // ---- 7 the hero's cast shadow on the cherries behind it ----------------------
         {
@@ -695,7 +783,7 @@
         }
 
         // ---- 8 hero cherry on G2 ---------------------------------------------------------
-        drawCherry(ctx, P, heroC, { hero: true });
+        placeCherry(ctx, P, HERO_BASE, heroC, true, bp);
 
         // dew drop at (650, 760), r 18: it trembles on twos
         {

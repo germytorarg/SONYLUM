@@ -1448,8 +1448,9 @@
     // 10.5 yellows: plucks A4 B4 D5 E5 on triplets
     ['A4', 'B4', 'D5', 'E5'].forEach((n, i) => pluck(at(10.5 + i * TR), n, 0.22, { dec: 0.6, room: 0.2, pan: -0.3 + i * 0.2 }));
     // 11.25 reds: glock F#5 A5 B5 D6 E6 with pops
+    // the scene turns the reds two, two, one on 11.25, 11.5 and 11.75 (the shot ends at 12.0)
     ['F#5', 'A5', 'B5', 'D6', 'E6'].forEach((n, i) => {
-      const t = at(11.25 + i * TR);
+      const t = at([11.25, 11.27, 11.5, 11.52, 11.75][i]);
       glock(t, hz(n), 0.24, { dec: 0.9, pan: -0.4 + i * 0.2 });
       plip(t, hz('A5'), hz('A6'), 0.1, { pan: -0.4 + i * 0.2 });
     });

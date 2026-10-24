@@ -62,7 +62,7 @@
   // layout
   // ---------------------------------------------------------------------------
   const LIP = [540, 398]; // where the beans leave the scoop
-  const V0 = 200, GRAV = 1600; // stream: initial speed and gravity (px/s, px/s2)
+  const V0 = 420, GRAV = 1500; // stream: initial speed and gravity (px/s, px/s2)
   const MOUTH_X = 540, MOUTH_Y = 1180, MOUTH_RX = 300, MOUTH_RY = 70;
   const SACK_PIVOT = [540, 1920];
   const fallY = (tau) => LIP[1] + V0 * tau + 0.5 * GRAV * tau * tau;
@@ -91,10 +91,10 @@
     // the stream: two seeded sequences (the second only after the tip)
     g.stream = [];
     const r = L.rng(sd('stream'));
-    for (let ts = -1.4, i = 0; ts < 1.6; ts += r.range(0.026, 0.04), i++) {
+    for (let ts = -1.4, i = 0; ts < 1.6; ts += r.range(0.042, 0.06), i++) {
       g.stream.push({ ts, ox: r.range(-16, 16), drift: r.range(-34, 34), len: r.range(40, 60), rot: r() * TAU, spin: r.range(-9, 9), extra: false, flip: r() < 0.5 });
     }
-    for (let ts = B_TIP - 0.2; ts < 1.6; ts += r.range(0.03, 0.045)) {
+    for (let ts = B_TIP - 0.2; ts < 1.6; ts += r.range(0.04, 0.06)) {
       g.stream.push({ ts, ox: r.range(-26, 26), drift: r.range(-50, 50), len: r.range(40, 58), rot: r() * TAU, spin: r.range(-10, 10), extra: true, flip: r() < 0.5 });
     }
     // the heap texture: packed small beans in rows, back to front
@@ -218,28 +218,34 @@
   // ---------------------------------------------------------------------------
   function drawBackSacks(ctx, L, P, bi) {
     const sacks = [
-      { pts: [[-90, 1250], [40, 1210], [150, 1236], [190, 1400], [200, 1980], [-90, 1980]], seed: 1, tie: [40, 1210] },
-      { pts: [[890, 1236], [1000, 1196], [1150, 1226], [1170, 1980], [880, 1980], [884, 1420]], seed: 2, tie: [1000, 1196] },
+      { pts: [[-90, 1236], [-40, 1214], [40, 1206], [130, 1214], [176, 1250], [190, 1400], [200, 1980], [-90, 1980]], seed: 1, tie: [40, 1206] },
+      { pts: [[884, 1420], [896, 1240], [940, 1204], [1020, 1194], [1110, 1204], [1170, 1226], [1170, 1980], [880, 1980]], seed: 2, tie: [1020, 1194] },
     ];
     for (const s of sacks) {
-      L.inkPath(ctx, s.pts, { closed: true, fill: L.mix(P.jute, P.paper, 0.25), width: 3, seed: sd('bsack', s.seed), taper: [6, 10] });
-      L.crossHatch(ctx, s.pts, { spacing: 7, crossSpacing: 7, angle: 0, turn: [Math.PI / 2], layers: 2, width: 1, color: P.juteDeep, alpha: 0.4, seed: sd('bweave', s.seed) });
-      L.hatch(ctx, s.pts, { spacing: 5, width: 1.3, color: P.juteDeep, alpha: 0.75, seed: sd('bshade', s.seed), density: (x, y) => (s.seed === 1 ? sstep(60, 190, x) : sstep(1040, 1160, x)) });
-      // the gathered top tied with twine
+      L.inkPath(ctx, s.pts, { closed: true, fill: L.mix(P.jute, P.paper, 0.25), width: 3, boil: bi, seed: sd('bsack', s.seed), taper: [6, 10] });
+      L.crossHatch(ctx, s.pts, { spacing: 7, crossSpacing: 7, angle: 0, turn: [Math.PI / 2], layers: 2, width: 1, color: P.juteDeep, alpha: 0.4, boil: bi, seed: sd('bweave', s.seed) });
+      L.hatch(ctx, s.pts, { spacing: 5, width: 1.3, color: P.juteDeep, alpha: 0.75, boil: bi, seed: sd('bshade', s.seed), density: (x, y) => (s.seed === 1 ? sstep(60, 190, x) : sstep(1040, 1160, x)) });
+      // the stitched top seam with its two corner ears
       const [tx, ty] = s.tie;
-      L.inkPath(ctx, [[tx - 30, ty + 30], [tx, ty + 24], [tx + 30, ty + 30]], { width: 3.4, color: P.barkDeep, seed: sd('btie', s.seed) });
-      L.inkPath(ctx, [[tx - 22, ty + 4], [tx - 8, ty - 26], [tx + 2, ty - 6], [tx + 14, ty - 30], [tx + 22, ty + 4]], { width: 2.4, seed: sd('btop', s.seed) });
+      L.inkPath(ctx, [[tx - 120, ty + 40], [tx - 60, ty + 12], [tx, ty + 4], [tx + 60, ty + 12], [tx + 120, ty + 40]], { width: 2, color: P.juteDeep, boil: bi, seed: sd('bseam', s.seed) });
+      const st = new Path2D();
+      for (let k = -5; k <= 5; k++) {
+        const x = tx + k * 21, y = ty + 4 + Math.pow(k / 5, 2) * 34;
+        st.moveTo(x - 5, y - 6);
+        st.lineTo(x + 5, y + 6);
+      }
+      strokeP(ctx, st, P.barkDeep, 0.9, 1.6);
     }
   }
 
   function drawSack(ctx, L, P, g, yh, bi) {
     // body
     const body = g.sackPoly;
-    L.inkPath(ctx, body, { closed: true, fill: P.jute, width: 5, seed: sd('sack'), taper: [8, 14] });
+    L.inkPath(ctx, body, { closed: true, fill: P.jute, width: 5, boil: bi, seed: sd('sack'), taper: [8, 14] });
     // jute weave: a grid of warp and weft, slightly bowed
-    L.crossHatch(ctx, body, { spacing: 6, crossSpacing: 6, angle: 0.02, turn: [Math.PI / 2 - 0.04], layers: 2, width: 1.1, color: P.juteDeep, alpha: 0.45, length: [30, 90], gap: [1, 3], seed: sd('weave') });
+    L.crossHatch(ctx, body, { spacing: 6, crossSpacing: 6, angle: 0.02, turn: [Math.PI / 2 - 0.04], layers: 2, width: 1.1, color: P.juteDeep, alpha: 0.45, length: [30, 90], gap: [1, 3], boil: bi, seed: sd('weave') });
     // shading: the right side and the underside of the rim, light from upper left
-    L.crossHatch(ctx, body, { spacing: 6, crossSpacing: 7, width: 1.4, color: P.juteDeep, alpha: 0.85, tone: 0.7, seed: sd('sackshade'), density: (x, y) => clamp(sstep(640, 900, x) + 0.9 * sstep(1290, 1230, y) + 0.3 * sstep(260, 180, x)) });
+    L.crossHatch(ctx, body, { spacing: 6, crossSpacing: 7, width: 1.4, color: P.juteDeep, alpha: 0.85, tone: 0.7, boil: bi, seed: sd('sackshade'), density: (x, y) => clamp(sstep(640, 900, x) + 0.9 * sstep(1290, 1230, y) + 0.3 * sstep(260, 180, x)) });
     // folds: long soft creases down the body
     const folds = [
       [[330, 1300], [322, 1460], [300, 1640], [292, 1900]],
@@ -247,16 +253,16 @@
       [[760, 1300], [776, 1500], [800, 1760]],
     ];
     folds.forEach((f, i) => {
-      L.inkPath(ctx, f, { width: 2, color: P.juteDeep, seed: sd('fold', i) });
+      L.inkPath(ctx, f, { width: 2, color: P.juteDeep, boil: bi, seed: sd('fold', i) });
       const off = f.map(([x, y]) => [x + 9, y]);
-      L.hatch(ctx, ribbonPoly(off, () => 16), { spacing: 4, width: 1.1, color: P.juteDeep, alpha: 0.7, seed: sd('foldh', i), length: [10, 30] });
+      L.hatch(ctx, ribbonPoly(off, () => 16), { spacing: 4, width: 1.1, color: P.juteDeep, alpha: 0.7, boil: bi, seed: sd('foldh', i), length: [10, 30] });
     });
     // stencilled emblem: an oval with its crease (no text)
     const em = place(g.small, 540, 1515, 0.3, -12 * DEG);
-    L.inkPath(ctx, em, { closed: true, width: 7, color: P.juteDeep, alpha: 0.9, seed: sd('emblem'), taper: [4, 8], wobble: 1 });
-    L.inkPath(ctx, place([[10, -190], [-12, -90], [10, 10], [-10, 110], [4, 190]], 540, 1515, 0.3, -12 * DEG), { width: 6, color: P.juteDeep, alpha: 0.9, seed: sd('emcrease') });
+    L.inkPath(ctx, em, { closed: true, width: 7, color: P.juteDeep, alpha: 0.9, boil: bi, seed: sd('emblem'), taper: [4, 8], wobble: 1 });
+    L.inkPath(ctx, place([[10, -190], [-12, -90], [10, 10], [-10, 110], [4, 190]], 540, 1515, 0.3, -12 * DEG), { width: 6, color: P.juteDeep, alpha: 0.9, boil: bi, seed: sd('emcrease') });
     // stencil bridges and a ring around the emblem
-    L.inkPath(ctx, L.ellipsePts(540, 1515, 104, 104, 48), { closed: true, width: 3, color: P.juteDeep, alpha: 0.8, seed: sd('emring'), taper: [4, 8] });
+    L.inkPath(ctx, L.ellipsePts(540, 1515, 104, 104, 48), { closed: true, width: 3, color: P.juteDeep, alpha: 0.8, boil: bi, seed: sd('emring'), taper: [4, 8] });
     // rope tie round the neck: two twisted strands, a knot and hanging ends
     const rope = [];
     for (let i = 0; i <= 40; i++) {
@@ -264,7 +270,7 @@
       rope.push([540 + Math.cos(a) * 318, 1268 + Math.sin(a) * 66]);
     }
     rope.reverse();
-    L.inkPath(ctx, ribbonPoly(rope, () => 15), { closed: true, fill: L.mix(P.jute, P.white, 0.25), width: 2.6, seed: sd('rope'), taper: [3, 6] });
+    L.inkPath(ctx, ribbonPoly(rope, () => 15), { closed: true, fill: L.mix(P.jute, P.white, 0.25), width: 2.6, boil: bi, seed: sd('rope'), taper: [3, 6] });
     const twist = new Path2D();
     for (let i = 1; i < rope.length - 1; i++) {
       const [x, y] = rope[i];
@@ -273,9 +279,23 @@
     }
     strokeP(ctx, twist, P.juteDeep, 0.9, 1.6);
     const kx = 396, ky = 1326;
-    L.inkPath(ctx, L.ellipsePts(kx, ky, 18, 14, 20), { closed: true, fill: L.mix(P.jute, P.white, 0.2), width: 2.6, seed: sd('knot'), taper: [3, 6] });
-    L.inkPath(ctx, [[kx - 4, ky + 10], [kx - 14, ky + 60], [kx - 8, ky + 110]], { width: 6, color: P.juteDeep, seed: sd('end1') });
-    L.inkPath(ctx, [[kx + 6, ky + 10], [kx + 18, ky + 54], [kx + 26, ky + 96]], { width: 6, color: P.juteDeep, seed: sd('end2') });
+    L.inkPath(ctx, L.ellipsePts(kx, ky, 18, 14, 20), { closed: true, fill: L.mix(P.jute, P.white, 0.2), width: 2.6, boil: bi, seed: sd('knot'), taper: [3, 6] });
+    L.inkPath(ctx, [[kx - 4, ky + 10], [kx - 14, ky + 60], [kx - 8, ky + 110]], { width: 6, color: P.juteDeep, boil: bi, seed: sd('end1') });
+    L.inkPath(ctx, [[kx + 6, ky + 10], [kx + 18, ky + 54], [kx + 26, ky + 96]], { width: 6, color: P.juteDeep, boil: bi, seed: sd('end2') });
+  }
+
+  // cached sprites of the static sack art, two boil drawings each
+  const SPR_Y0 = 1080;
+  function sprite(L, key, b, fn) {
+    const S = FILM.S || 1;
+    return L.cached([key, ID, b, S].join('|'), () => {
+      const c = canvas(Math.round(1080 * S), Math.round((1920 - SPR_Y0) * S));
+      const x = c.getContext('2d');
+      x.scale(S, S);
+      x.translate(0, -SPR_Y0);
+      fn(x);
+      return c;
+    });
   }
 
   // the mouth: back rim, inside, heap (rising), front rim
@@ -397,8 +417,8 @@
     L.inkPath(ctx, out, { closed: true, fill: P.beanGreen, width: Math.max(2.4, 5 * Math.sqrt(s)), seed: sd('hero'), taper: [10, 22] });
     if (s > 0.3) {
       // matte tone: hatching on the shadow side (light from the upper left), a cross layer deep down
-      L.hatch(ctx, out, { spacing: 7 * Math.max(0.6, s), width: 1.5, color: P.beanGreenDeep, alpha: 0.85, length: [16, 60].map((v) => v * Math.max(0.5, s)), seed: sd('herohatch'), density: (x, y) => sstep(-0.15, 0.7, shadeD(x, y)) });
-      L.hatch(ctx, out, { angle: -Math.PI / 4 - Math.PI / 3, spacing: 7 * Math.max(0.6, s), width: 1.3, color: P.beanGreenDeep, alpha: 0.8, length: [14, 44].map((v) => v * Math.max(0.5, s)), seed: sd('herox'), density: (x, y) => sstep(0.45, 0.95, shadeD(x, y)) });
+      L.hatch(ctx, out, { spacing: 5.5 * Math.max(0.6, s), width: 1.5, color: P.beanGreenDeep, alpha: 0.85, length: [16, 60].map((v) => v * Math.max(0.5, s)), seed: sd('herohatch'), density: (x, y) => sstep(-0.15, 0.7, shadeD(x, y)) });
+      L.hatch(ctx, out, { angle: -Math.PI / 4 - Math.PI / 3, spacing: 7 * Math.max(0.6, s), width: 1.3, color: P.beanGreenDeep, alpha: 0.8, length: [14, 44].map((v) => v * Math.max(0.5, s)), seed: sd('herox'), density: (x, y) => sstep(0.3, 0.9, shadeD(x, y)) });
       // dull surface: fine stipple all over, denser in shade
       L.stipple(ctx, out, { spacing: 9 * Math.max(0.6, s), r: [0.8, 1.6].map((v) => v * Math.max(0.6, s)), color: P.beanGreenDeep, alpha: 0.6, seed: sd('herostip'), density: (x, y) => 0.25 + 0.6 * sstep(-0.4, 0.6, shadeD(x, y)) });
       // a faint lit edge on the upper left (matte, not a gloss)
@@ -408,7 +428,7 @@
     // crease groove: beanGreenDeep, 12 px tapering to 3, an inked edge, the silverskin inside
     const cr = place(g.creaseLoc, cx, cy, s, rot);
     const gw = ribbonPoly(cr, (u) => s * (3 + 9 * Math.pow(Math.sin(Math.PI * u), 0.55)));
-    L.inkPath(ctx, gw, { closed: true, fill: P.beanGreenDeep, width: Math.max(1, 1.8 * s), color: P.ink, alpha: 0.85, seed: sd('herogroove'), taper: [6, 10], wobble: 0.8 * s });
+    L.inkPath(ctx, gw, { closed: true, fill: L.mix(P.beanGreenDeep, P.ink, 0.25), width: Math.max(1, 1.8 * s), color: P.ink, alpha: 0.85, seed: sd('herogroove'), taper: [6, 10], wobble: 0.8 * s });
     L.inkPath(ctx, place(g.silverLoc, cx, cy, s, rot), { width: Math.max(0.8, 3 * s), color: P.silverskin, seed: sd('herosilver'), taper: [12 * s, 16 * s], wobble: 0.6 });
     if (s > 0.3) {
       // the doubled hero outline, occasional
@@ -438,7 +458,7 @@
 
       // heap level: rises from the first landings, faster after the tip
       const heapU = clamp((tw - 0.55) / 0.95);
-      let yh = lerp(1232, 1176, L.ease.outQuad(heapU));
+      let yh = lerp(1206, 1138, L.ease.outQuad(heapU));
       // sack slump (3 percent squash) on the 8th at T 23.625, outBack over 3 frames on its frame
       const slumpK = f >= 27 ? L.ease.outBack(clamp((f - 26) / 3)) : 0;
       const sy = 1 - 0.03 * slumpK, sx = 1 + 0.015 * slumpK;
@@ -448,11 +468,11 @@
       if (enter > 0) {
         ctx.save();
         ctx.translate(0, sackDY);
-        drawBackSacks(ctx, L, P, bi);
+        ctx.drawImage(sprite(L, 'backsacks', bi % 2, (x) => drawBackSacks(x, L, P, bi % 2)), 0, SPR_Y0, 1080, 1920 - SPR_Y0);
         ctx.translate(SACK_PIVOT[0], SACK_PIVOT[1]);
         ctx.scale(sx, sy);
         ctx.translate(-SACK_PIVOT[0], -SACK_PIVOT[1]);
-        drawSack(ctx, L, P, g, yh, bi);
+        ctx.drawImage(sprite(L, 'sack', bi % 2, (x) => drawSack(x, L, P, g, 0, bi % 2)), 0, SPR_Y0, 1080, 1920 - SPR_Y0);
         mouthBack(ctx, L, P, g, yh, bi);
         ctx.restore();
       }
@@ -509,6 +529,19 @@
       }
 
       // 7 overlays
+      // an annYellow attention ring off the bean as the shot opens (expands and fades, 9 frames)
+      if (f < 9) {
+        const u = (f + 1) / 9;
+        const k = L.ease.outExpo(u);
+        ctx.save();
+        ctx.strokeStyle = P.annYellow;
+        ctx.globalAlpha = 1 - sstep(0.35, 1, u);
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(G1X, G1Y, lerp(200, 300, k) * Math.max(s, 0.3), lerp(270, 380, k) * Math.max(s, 0.3), G1ROT, 0, TAU);
+        ctx.stroke();
+        ctx.restore();
+      }
       if (f >= 9) {
         const prog = L.ease.outExpo((f - 8) / 6);
         const x = 640, y0 = LIP[1] + 40, y1 = yhScreen - 30;

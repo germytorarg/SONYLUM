@@ -412,7 +412,7 @@ const LS_END = J[1] - 781 - R_STRAIGHT * Math.sin(15 * DEG); // straight length 
       tx /= tl;
       ty /= tl;
       const u = i / (n - 1);
-      const w = (STEM_W / 2) * (1 - 0.18 * sstep(0.85, 1, u)) * (extra && extra.thin ? 0.85 : 1);
+      const w = (STEM_W / 2) * (1 - 0.18 * sstep(0.85, 1, u)) * (extra && extra.ws ? extra.ws : 1);
       left.push([C[i][0] + ty * w, C[i][1] - tx * w]);
       right.push([C[i][0] - ty * w, C[i][1] + tx * w]);
       nrm.push([-ty, tx]);
@@ -451,9 +451,11 @@ const LS_END = J[1] - 781 - R_STRAIGHT * Math.sin(15 * DEG); // straight length 
       const s = nx * 0.7 + ny * 0.7 >= 0 ? -1 : 1;
       lit.push([C[i][0] + nx * s * 5, C[i][1] + ny * s * 5]);
     }
-    L.inkPath(ctx, lit, { width: 2.2, color: P.white, alpha: 0.5, seed: sd('stemlit'), taper: [20, 20], wobble: 0.4 });
-    L.inkPath(ctx, left, { width: 3, color: P.ink, seed: sd('stemL'), taper: [0, 4], wobble: 0.7 });
-    L.inkPath(ctx, right, { width: 3, color: P.ink, seed: sd('stemR'), taper: [0, 4], wobble: 0.7 });
+    const k = (extra && extra.key) || 'hero';
+    const lw = extra && extra.ws ? 2.4 : 3;
+    L.inkPath(ctx, lit, { width: 2.2 * (extra && extra.ws ? extra.ws : 1), color: P.white, alpha: 0.5, seed: sd('stemlit', k), taper: [20, 20], wobble: 0.4 });
+    L.inkPath(ctx, left, { width: lw, color: P.ink, seed: sd('stemL', k), taper: [0, 4], wobble: 0.7 });
+    L.inkPath(ctx, right, { width: lw, color: P.ink, seed: sd('stemR', k), taper: [0, 4], wobble: 0.7 });
   }
 
   // the seed in its parchment hull, inked: centre c, scale s, rotation rot (G1 exactly at (540, 900), 1, -15 deg)
@@ -574,6 +576,59 @@ const LS_END = J[1] - 781 - R_STRAIGHT * Math.sin(15 * DEG); // straight length 
   }
 
   // ---------------------------------------------------------------------------
+  // the seedbed: two neighbours at other stages (left just hooked through, right a week older),
+  // so the row reads as a nursery and the tall frame stays dense
+  // ---------------------------------------------------------------------------
+
+  function drawNeighbours(ctx, L, P, tw, bi) {
+    const sw = Math.sin(Math.floor(tw * 12) * 1.7) * 1.2; // a small sway, on twos
+    // left: the hook has just broken the surface, the seed still hangs in the soil
+    {
+      const j = [196, 1290];
+      const root = LIB.smoothPts([j, [192, 1380], [201, 1470], [196, 1560]], false, 5);
+      L.inkPath(ctx, root, { width: 8, color: P.ink, seed: sd('nr0'), taper: [0, 40], swell: 0, pressure: (u) => lerp(1, 0.3, u), wobble: 0.5 });
+      L.inkPath(ctx, root, { width: 4.5, color: L.mix(P.flowerWhite, P.tan, 0.35), seed: sd('nr1'), taper: [0, 40], swell: 0, pressure: (u) => lerp(1, 0.25, u), wobble: 0.5 });
+      const R = 24, top = 1172 + sw;
+      const pts = [j, [196, top + R]];
+      for (let i = 1; i <= 10; i++) {
+        const a = (Math.PI * i) / 10;
+        pts.push([196 + R - R * Math.cos(a), top + R - R * Math.sin(a)]);
+      }
+      pts.push([196 + 2 * R, top + R + 14]);
+      drawStem(ctx, L, P, pts, bi, { ws: 0.6, key: 'nl' });
+      drawBean(ctx, L, P, [196 + 2 * R + 2, top + R + 14 + 48], 0.2, 172 * DEG, 'nlseed');
+    }
+    // right: an older seedling, cotyledons flat and the first true leaves out
+    {
+      const j = [890, 1300];
+      const root = LIB.smoothPts([j, [896, 1400], [884, 1520], [890, 1650]], false, 5);
+      L.inkPath(ctx, root, { width: 9, color: P.ink, seed: sd('rr0'), taper: [0, 40], swell: 0, pressure: (u) => lerp(1, 0.3, u), wobble: 0.5 });
+      L.inkPath(ctx, root, { width: 5, color: L.mix(P.flowerWhite, P.tan, 0.35), seed: sd('rr1'), taper: [0, 40], swell: 0, pressure: (u) => lerp(1, 0.25, u), wobble: 0.5 });
+      for (const [u, side, l] of [[0.35, -1, 46], [0.55, 1, 56], [0.75, -1, 40]]) {
+        const p = root[Math.floor(u * (root.length - 1))];
+        L.inkPath(ctx, [p, [p[0] + side * l * 0.5, p[1] + l * 0.25], [p[0] + side * l, p[1] + l * 0.55]], { width: 2.2, color: P.ink, seed: sd('rrl', u), taper: [0, 12], swell: 0, wobble: 0.3 });
+      }
+      const node = [886 + sw, 930];
+      drawStem(ctx, L, P, [j, [889, 1150], [887 + sw * 0.5, 1020], node], bi, { ws: 0.62, key: 'nr' });
+      drawCotyledon(ctx, L, P, node, (180 + 18) * DEG, 0.5, 0.5, 'ncl', true);
+      drawCotyledon(ctx, L, P, node, -18 * DEG, 0.5, 0.5, 'ncr', false);
+      // true leaves: a pointed pair rising between the cotyledons
+      for (const s of [-1, 1]) {
+        const a = (-90 + s * 26) * DEG + sw * 0.01;
+        const len = 104;
+        const tip = [node[0] + Math.cos(a) * len, node[1] + Math.sin(a) * len];
+        const nx = -Math.sin(a), ny = Math.cos(a);
+        const m1 = [lerp(node[0], tip[0], 0.42), lerp(node[1], tip[1], 0.42)];
+        const lf = LIB.smoothPts([node, [m1[0] + nx * 22, m1[1] + ny * 22], tip, [m1[0] - nx * 22, m1[1] - ny * 22]], true, 3);
+        fillPoly(ctx, lf, P.leafCoffee);
+        L.hatch(ctx, lf, { angle: -Math.PI / 4, spacing: 5, width: 1.2, color: P.leafDeep, alpha: 0.9, length: [6, 16], seed: sd('ntl', s), density: s > 0 ? 0.8 : 0.35 });
+        L.inkPath(ctx, [node, m1, tip], { width: 1.4, color: P.leafSheen, alpha: 0.8, seed: sd('ntlm', s), taper: [2, 10], wobble: 0.3 });
+        L.inkPath(ctx, lf, { closed: true, width: 2.2, color: P.ink, seed: sd('ntlo', s), wobble: 0.4 });
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // scene
   // ---------------------------------------------------------------------------
 
@@ -612,13 +667,13 @@ const LS_END = J[1] - 781 - R_STRAIGHT * Math.sin(15 * DEG); // straight length 
         L.guideCircle(ctx, 540, 700, 330, { color: P.inkFaint, alpha: 0.22, width: 1.5, dash: [3, 8] });
         // a height scale on the left, surface up to the soldier height
         const sc = new Path2D();
-        sc.moveTo(110, SURF);
-        sc.lineTo(110, 640);
+        sc.moveTo(70, SURF);
+        sc.lineTo(70, 640);
         for (let k = 0; k <= 27; k++) {
           const y = SURF - k * 20;
           if (y < 640) break;
-          sc.moveTo(110, y);
-          sc.lineTo(110 + (k % 5 === 0 ? 22 : 10), y);
+          sc.moveTo(70, y);
+          sc.lineTo(70 + (k % 5 === 0 ? 22 : 10), y);
         }
         strokePath(ctx, sc, P.inkFaint, 0.5, 1.5);
         const marks = new Path2D();
@@ -633,6 +688,9 @@ const LS_END = J[1] - 781 - R_STRAIGHT * Math.sin(15 * DEG); // straight length 
 
       // ---- 3 soil -------------------------------------------------------------------------
       drawSoil(ctx, L, P, g, bi);
+
+      // ---- 3b the neighbours in the seedbed ---------------------------------------------------
+      drawNeighbours(ctx, L, P, tw, bi);
 
       // ---- 4 root -------------------------------------------------------------------------
       const kRoot = hit(B_ROOT, 9, E.outExpo);

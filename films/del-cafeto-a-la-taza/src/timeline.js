@@ -48,7 +48,7 @@ FILM.TIMELINE = {
     { t: 9.625, kind: 'sfx', note: 'Ripe fruit: fmBell B5' },
     { t: 9.75, kind: 'cut', note: 'Kick, pad to Bm9' },
     { t: 10.5, kind: 'sfx', note: 'Yellows: plucks A4 B4 D5 E5 on triplets' },
-    { t: 11.25, kind: 'sfx', note: 'Reds: glock F#5 A5 B5 D6 E6 on triplets with pops' },
+    { t: 11.25, kind: 'sfx', note: 'Reds: glock F#5 A5 B5 D6 E6 in pairs on 11.25, 11.5 and a single on 11.75, with pops' },
     { t: 11.625, kind: 'sfx', note: 'Overripe: low tock' },
     { t: 12.0, kind: 'cut', note: 'Act 2: kick, brush loop, pad to Gmaj7; first pick snap' },
     { t: 12.375, kind: 'sfx', note: 'Pick snap' },

@@ -485,8 +485,8 @@
             wf.moveTo(CX + rx, yc);
             wf.ellipse(CX, yc, rx, rx * 0.16, 0, 0, Math.PI);
           }
-          stroke(ctx, wf, lav, 0.2, 1);
-          L.hexLattice(ctx, G.inner9, { r: 10, alpha: 0.07, color: lav, seed: sd('skinhex') });
+          stroke(ctx, wf, lav, 0.3, 1);
+          L.hexLattice(ctx, G.inner9, { r: 10, alpha: 0.13, color: lav, seed: sd('skinhex') });
           // shade ticks inside the fruit, lower right (form turning from the light)
           L.hatch(ctx, G.inner9, { color: lav, alpha: 0.14, spacing: 9, width: 1, length: [10, 26], seed: sd('osh'), density: (x, y) => sstep(0.35, 0.95, ((x - CX) / RX + (y - CY) / RY) * 0.7) });
           ctx.restore();

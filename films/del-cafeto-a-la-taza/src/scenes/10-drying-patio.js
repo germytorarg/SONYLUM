@@ -268,30 +268,24 @@
       x.fillStyle = pal.gap;
       x.fillRect(-60, BACK_Y - 10, 1200, FRONT_Y - BACK_Y + 20);
       for (const row of g.rows) {
-        const sh = new Path2D(), ol = new Path2D(), hi = new Path2D();
+        const sh = new Path2D(), hi = new Path2D();
         const tp = [new Path2D(), new Path2D(), new Path2D()];
         for (const b of row) {
           const o = 1.1 * depthScale(b.y);
           sh.moveTo(b.x + o + b.rx, b.y + o);
-          sh.ellipse(b.x + o, b.y + o, b.rx, b.ry, b.rot, 0, TAU);
+          sh.ellipse(b.x + o, b.y + o, b.rx + 0.5, b.ry + 0.5, b.rot, 0, TAU);
           tp[b.tone].moveTo(b.x - o * 0.4 + b.rx, b.y - o * 0.4);
           tp[b.tone].ellipse(b.x - o * 0.4, b.y - o * 0.4, b.rx, b.ry, b.rot, 0, TAU);
-          ol.moveTo(b.x - o * 0.4 + b.rx, b.y - o * 0.4);
-          ol.ellipse(b.x - o * 0.4, b.y - o * 0.4, b.rx, b.ry, b.rot, 0, TAU);
-          // a lit fleck on the upper left of the hull
-          const hx = b.x - o * 0.4 - b.rx * 0.38, hy = b.y - o * 0.4 - b.ry * 0.42;
-          hi.moveTo(hx + b.rx * 0.28, hy);
-          hi.ellipse(hx, hy, b.rx * 0.28, b.ry * 0.22, b.rot, 0, TAU);
+          if (b.h < 0.55) {
+            // a lit fleck on the upper left of the hull
+            const hx = b.x - o * 0.4 - b.rx * 0.38, hy = b.y - o * 0.4 - b.ry * 0.42;
+            hi.moveTo(hx + b.rx * 0.28, hy);
+            hi.ellipse(hx, hy, b.rx * 0.28, b.ry * 0.22, b.rot, 0, TAU);
+          }
         }
         fillP(x, sh, pal.shadow, 0.95);
         for (let i = 0; i < 3; i++) fillP(x, tp[i], pal.tones[i]);
         fillP(x, hi, pal.hi, wet ? 0.55 : 0.35);
-        x.save();
-        x.strokeStyle = P.ink;
-        x.globalAlpha = pal.line;
-        x.lineWidth = 0.7;
-        x.stroke(ol);
-        x.restore();
       }
       // raking patches: slightly deeper tone where beans were turned
       for (const [px, py, pr, ph] of g.patches) {
@@ -857,9 +851,14 @@
       // 7 the bean field: dry underneath, wet on top fading out
       ctx.drawImage(beanField(L, P, false), 0, SPR_Y, 1080, SPR_H);
       if (st.wet > 0.004) {
+        // wet: the mucilage-slick beans read darker and warmer (a multiply tint over the dry field)
         ctx.save();
-        ctx.globalAlpha = st.wet;
-        ctx.drawImage(beanField(L, P, true), 0, SPR_Y, 1080, SPR_H);
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.globalAlpha = 0.85 * st.wet;
+        ctx.fillStyle = L.mix(P.parchmentDeep, P.mucilage, 0.3);
+        ctx.beginPath();
+        L.tracePath(ctx, BED, true);
+        ctx.fill();
         ctx.restore();
       }
       if (st.night) {
