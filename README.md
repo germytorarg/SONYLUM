@@ -18,4 +18,4 @@ Nuevo proyecto: copiar `plantilla-motion/` a `proyectos/<nombre>/`, `npm install
 Render: `npm run render` · `npm run render:4k` · `npm run render:16x9`.
 
 Remotion y el resto de las skills de la cuenta ya están disponibles en cada sesión.
-Los proyectos anteriores (TEFILMO, LocalBA, Mirinda, Ser Asertivo) quedan guardados en sus ramas.
+Los proyectos anteriores (TEFILMO, LocalBA) quedan guardados en la rama ccr-0635ff16-cpd22g.
