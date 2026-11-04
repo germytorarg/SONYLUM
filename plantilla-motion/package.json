@@ -1,0 +1,12 @@
+{
+  "name": "plantilla-motion",
+  "private": true,
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render Vertical out/vertical_1080x1920.mp4",
+    "render:4k": "remotion render Vertical4K out/vertical_2160x3840.mp4",
+    "render:16x9": "remotion render Horizontal4K out/horizontal_3840x2160.mp4"
+  },
+  "dependencies": {"@remotion/cli": "4.0.537", "remotion": "4.0.537", "react": "18.3.1", "react-dom": "18.3.1"},
+  "devDependencies": {"@types/react": "18.3.12", "typescript": "5.6.3"}
+}
