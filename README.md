@@ -7,7 +7,7 @@ assets/          material reutilizable
   marcas/        logos y manuales de cada marca
   tipografias/   fuentes (woff2 / ttf)
   audio/         música y efectos
-  video/         footage y tomas
+  video/         footage: dron/, camara/, celular/
   imagenes/      fotos, PNG, texturas
 proyectos/       una carpeta por trabajo (ej. proyectos/2026-11-mirinda/)
 plantilla-motion/ base de Remotion: 1080×1920, 4K vertical (2160×3840) y 4K horizontal (3840×2160)
