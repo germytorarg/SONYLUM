@@ -216,7 +216,7 @@ dive / $1.87 connector; 720p ≈ $1.21 / $0.76; 480p previz ≈ $0.28 / $0.35.
 monid_frame_url() { # localPng remoteName  (JPEG-compresses on the way up)
   jpg="$WORK/sfs_$2.jpg"
   ffmpeg -v error -y -i "$1" -vf "scale='min(1536,iw)':-2" -q:v 2 "$jpg"
-  size=$(stat -f%z "$jpg")
+  size=$(wc -c < "$jpg" | tr -d " ")   # portable (macOS, Linux, Git Bash)
   up=$(NO_COLOR=1 monid run -p sfs -e /put \
     -i "{\"path\":\"chain/$2.jpg\",\"sizeBytes\":$size,\"ttl\":\"1h\"}" -w 60 -j \
     | jq -r '.output.uploadUrl')
