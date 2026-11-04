@@ -11,7 +11,9 @@ assets/          material reutilizable
   imagenes/      fotos, PNG, texturas
 proyectos/       una carpeta por trabajo (ej. proyectos/2026-11-mirinda/)
 plantilla-motion/ base de Remotion: 1080×1920, 4K vertical (2160×3840) y 4K horizontal (3840×2160)
-.claude/skills/  taste-skill, impeccable, ui-ux-pro-max, awesome-design-md
+.claude/skills/  diseño (taste, impeccable, ui-ux-pro-max, awesome-design-md) y video
+                 (hyperframes*, faceless-explainer estilo Vox, motion-graphics, music-to-video,
+                 talking-head-recut, embedded-captions, remotion-reels, procedural-film, scroll-world…)
 ```
 
 Nuevo proyecto: copiar `plantilla-motion/` a `proyectos/<nombre>/`, `npm install`, `npm run studio`.
