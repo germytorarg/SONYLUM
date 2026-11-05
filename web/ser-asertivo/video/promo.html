@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<title>Ser Asertivo · Promo vertical</title>
+<!-- 1080x1920 composition. Every motion lives on one paused GSAP timeline so
+     render.mjs can seek it frame by frame; nothing here runs on wall-clock time. -->
+<link rel="stylesheet" href="../vendor/fonts/fonts.css">
+<link rel="stylesheet" href="../vendor/phosphor/style.css">
+<style>
+:root {
+  --plum-0: #0f0a14;
+  --plum-1: #1b1224;
+  --plum-2: #2a1f36;
+  --lilac: #cdbde6;
+  --lilac-2: #bea6e8;
+  --violet: #6a4c9c;
+  --paper: #f4f0f8;
+  --wa: #25d366;
+  --serif: "Newsreader", Georgia, serif;
+  --sans: "Hanken Grotesk", system-ui, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--plum-0); }
+body { font-family: var(--sans); color: var(--paper); -webkit-font-smoothing: antialiased; }
+
+#stage { position: absolute; inset: 0; overflow: hidden; perspective: 2200px; }
+
+/* Backdrop: two drifting light pools and a vignette, like a dark studio */
+.bg { position: absolute; inset: -20%; background:
+  radial-gradient(40% 30% at 30% 30%, rgba(106,76,156,.55), transparent 70%),
+  radial-gradient(45% 35% at 75% 75%, rgba(190,166,232,.28), transparent 70%),
+  radial-gradient(60% 50% at 50% 50%, var(--plum-1), var(--plum-0)); }
+.pool { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .0; }
+.pool-a { width: 900px; height: 900px; left: -200px; top: 200px; background: #7b54c4; }
+.pool-b { width: 800px; height: 800px; right: -260px; bottom: 120px; background: #c9a7ff; }
+.vignette { position: absolute; inset: 0; background: radial-gradient(75% 60% at 50% 45%, transparent 55%, rgba(5,2,8,.85)); pointer-events: none; z-index: 40; }
+#grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .07; mix-blend-mode: overlay; z-index: 41; }
+
+/* Light sweep that crosses the frame on scene changes */
+.sweep { position: absolute; top: -40%; left: -60%; width: 40%; height: 180%; transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(230,215,255,.35), transparent); filter: blur(20px); z-index: 30; opacity: 0; }
+
+/* ---------- Phone ---------- */
+.phone-wrap { position: absolute; left: 50%; top: 44%; width: 600px; height: 1220px; margin: -610px 0 0 -300px; transform-style: preserve-3d; }
+.phone { position: absolute; inset: 0; border-radius: 96px; padding: 18px; transform-style: preserve-3d;
+  background: linear-gradient(145deg, #3b3146, #120c18 40%, #2c2236 70%, #0b070f);
+  box-shadow: 0 0 0 3px #4d4159 inset, 0 80px 160px -40px rgba(0,0,0,.9), 0 0 120px rgba(150,110,220,.25); }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 80px; overflow: hidden;
+  background: linear-gradient(170deg, #2b1d3d 0%, #5b3d8f 45%, #a88ad8 85%, #e5d8f7 100%); }
+.screen::after { /* glass reflection */ content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(115deg, rgba(255,255,255,.16) 0%, transparent 28%, transparent 70%, rgba(255,255,255,.06)); pointer-events: none; z-index: 20; }
+.island { position: absolute; top: 26px; left: 50%; width: 170px; height: 48px; margin-left: -85px; border-radius: 30px; background: #000; z-index: 21; }
+.status { position: absolute; top: 32px; left: 54px; right: 50px; display: flex; justify-content: space-between; font-weight: 600; font-size: 28px; z-index: 21; }
+.status i { font-size: 28px; margin-left: 6px; }
+
+/* Lock screen */
+.lock { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: 140px; }
+.lock-date { font-size: 30px; font-weight: 500; opacity: .85; }
+.lock-time { font-family: var(--serif); font-weight: 400; font-size: 200px; line-height: 1; letter-spacing: -4px; }
+.notif { position: absolute; left: 34px; right: 34px; top: 560px; padding: 26px 28px; border-radius: 40px; display: flex; gap: 22px;
+  background: rgba(255,255,255,.2); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,.25); box-shadow: 0 20px 50px -20px rgba(20,8,40,.6); }
+.notif img { width: 76px; height: 76px; border-radius: 20px; flex: none; }
+.notif-head { display: flex; justify-content: space-between; font-size: 24px; opacity: .8; margin-bottom: 4px; }
+.notif-head b { font-weight: 600; opacity: 1; }
+.notif p { font-size: 30px; line-height: 1.25; font-weight: 500; }
+.lock-bar { position: absolute; bottom: 26px; left: 50%; width: 220px; height: 10px; margin-left: -110px; border-radius: 10px; background: rgba(255,255,255,.85); }
+
+/* Topics screen */
+.topics { position: absolute; inset: 0; padding: 150px 44px 0; opacity: 0; background: linear-gradient(180deg, #f4f0f8, #e3d8f1); color: #241a2e; }
+.topics h3 { font-family: var(--serif); font-weight: 400; font-size: 64px; line-height: 1.05; letter-spacing: -1px; margin-bottom: 40px; }
+.topics h3 em { color: var(--violet); }
+.chip { display: flex; align-items: center; gap: 18px; padding: 26px 30px; border-radius: 30px; margin-bottom: 18px; font-size: 34px; font-weight: 600;
+  background: #fff; box-shadow: 0 10px 30px -14px rgba(58,36,92,.35); }
+.chip i { font-size: 38px; color: var(--violet); }
+.chip .check { margin-left: auto; width: 46px; height: 46px; border-radius: 50%; border: 3px solid #d6cae4; display: grid; place-items: center; }
+.chip .check i { font-size: 26px; color: #fff; opacity: 0; }
+.chip.is-on { background: var(--violet); color: #fff; }
+.chip.is-on > i { color: var(--lilac); }
+.chip.is-on .check { background: var(--paper); border-color: var(--paper); }
+.chip.is-on .check i { color: var(--violet); opacity: 1; }
+
+/* WhatsApp screen */
+.wa { position: absolute; inset: 0; opacity: 0; background: #efe7dd; color: #111; display: flex; flex-direction: column; }
+.wa-top { padding: 100px 30px 22px; background: #f6f6f6; display: flex; align-items: center; gap: 18px; border-bottom: 1px solid #ddd; }
+.wa-top img { width: 72px; height: 72px; border-radius: 50%; }
+.wa-top b { font-size: 32px; display: block; }
+.wa-top span { font-size: 24px; color: #667; }
+.wa-top > i { margin-left: auto; font-size: 40px; color: #075e54; }
+.wa-body { flex: 1; padding: 40px 28px; display: flex; flex-direction: column; justify-content: flex-end; gap: 16px;
+  background-image: radial-gradient(rgba(0,0,0,.035) 2px, transparent 2px); background-size: 34px 34px; }
+.bubble { max-width: 80%; padding: 18px 24px 30px; border-radius: 26px; font-size: 32px; line-height: 1.3; position: relative; box-shadow: 0 2px 2px rgba(0,0,0,.06); }
+.bubble small { position: absolute; right: 18px; bottom: 8px; font-size: 20px; color: #6b7; }
+.bubble.out { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 8px; }
+.wa-input { display: flex; gap: 16px; padding: 18px 22px 60px; align-items: center; background: #f6f6f6; }
+.wa-field { display: flex; justify-content: flex-end; flex: 1; min-height: 80px; border-radius: 40px; background: #fff; padding: 20px 30px; font-size: 32px; color: #111; white-space: nowrap; overflow: hidden; }
+.wa-field.empty { justify-content: flex-start; }
+.wa-field > span:first-child { flex: none; }
+.wa-field .caret { flex: none; display: inline-block; width: 3px; height: 36px; background: #128c7e; vertical-align: -6px; margin-left: 2px; }
+.wa-send { width: 80px; height: 80px; border-radius: 50%; background: #128c7e; display: grid; place-items: center; color: #fff; font-size: 38px; }
+
+/* ---------- Venn → portrait ---------- */
+.venn { position: absolute; left: 50%; top: 40%; width: 900px; height: 900px; margin: -450px 0 0 -450px; opacity: 0; }
+.venn svg { width: 100%; height: 100%; overflow: visible; }
+.venn circle.c { fill: rgba(190,166,232,.16); stroke: var(--lilac); stroke-width: 3; }
+.venn text { font-family: var(--serif); font-style: italic; font-size: 46px; fill: var(--paper); text-anchor: middle; }
+.venn .halo { fill: none; stroke: var(--lilac-2); stroke-width: 2; opacity: 0; }
+
+/* ---------- Logo reveal ---------- */
+.logo { position: absolute; left: 0; right: 0; top: 30%; display: flex; flex-direction: column; align-items: center; opacity: 0; }
+.mono { position: relative; width: 300px; height: 300px; border-radius: 50%; overflow: hidden;
+  box-shadow: 0 0 0 10px rgba(205,189,230,.12), 0 0 140px rgba(190,166,232,.55); }
+.mono img { width: 100%; height: 100%; object-fit: cover; }
+.mono::after { content: ""; position: absolute; inset: -10%; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.75) 50%, transparent 65%);
+  transform: translateX(var(--shine, -120%)); }
+.wordmark { margin-top: 50px; font-family: var(--serif); font-size: 128px; font-weight: 400; letter-spacing: -3px; line-height: 1; display: flex; overflow: hidden; padding: 10px 20px 24px; }
+.wordmark span { display: inline-block; }
+.wordmark em { color: var(--lilac-2); }
+.tagline { margin-top: 10px; font-size: 34px; letter-spacing: 8px; text-transform: uppercase; color: var(--lilac); font-weight: 500; }
+.pills { margin-top: 44px; display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; width: 860px; }
+.pill { padding: 16px 30px; border-radius: 999px; font-size: 32px; font-weight: 500; border: 2px solid rgba(205,189,230,.45); background: rgba(205,189,230,.1); }
+
+/* ---------- End card ---------- */
+.end { position: absolute; left: 0; right: 0; top: 24%; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: 0; }
+.end h2 { font-family: var(--serif); font-weight: 400; font-size: 132px; line-height: .98; letter-spacing: -3px; }
+.end h2 .line { display: block; overflow: hidden; padding: 0 20px 14px; }
+.end h2 .line > span { display: inline-block; }
+.end h2 em { color: var(--lilac-2); }
+.cta { margin-top: 70px; display: inline-flex; align-items: center; gap: 18px; padding: 34px 64px; border-radius: 999px; font-size: 46px; font-weight: 600;
+  background: var(--paper); color: #241a2e; box-shadow: 0 0 0 0 rgba(205,189,230,.6), 0 30px 60px -20px rgba(0,0,0,.7); }
+.cta i { font-size: 54px; color: #1aa851; }
+.handle { margin-top: 36px; font-size: 34px; color: var(--lilac); letter-spacing: 1px; }
+.ripple { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; border-radius: 50%; border: 3px solid var(--lilac); opacity: 0; transform: translate(-50%,-50%); }
+
+/* ---------- Captions, word by word, inside the TikTok safe zone ---------- */
+.captions { position: absolute; left: 70px; right: 170px; top: 1290px; height: 200px; display: grid; place-items: center; z-index: 35; }
+.word { position: absolute; font-family: var(--sans); font-weight: 600; font-size: 104px; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap;
+  color: #fff; -webkit-text-stroke: 3px #fff; paint-order: stroke fill;
+  text-shadow: 0 0 2px #1b1224, 3px 3px 0 #1b1224, -3px 3px 0 #1b1224, 3px -3px 0 #1b1224, -3px -3px 0 #1b1224, 0 10px 0 #1b1224, 0 0 50px rgba(27,18,36,.9); opacity: 0; }
+.word.hl { color: var(--lilac-2); -webkit-text-stroke-color: var(--lilac-2); }
+.word.serif { font-family: var(--serif); font-style: italic; font-weight: 500; text-transform: none; -webkit-text-stroke: 0; font-size: 120px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="bg" data-bg></div>
+  <div class="pool pool-a" data-pool-a></div>
+  <div class="pool pool-b" data-pool-b></div>
+
+  <!-- Venn diagram fuses into Sandra's portrait (same motif as the site) -->
+  <div class="venn" data-venn>
+    <svg viewBox="-450 -450 900 900">
+      <defs><clipPath id="clip"><circle r="190"/></clipPath></defs>
+      <circle class="halo" r="200" data-halo="0"/><circle class="halo" r="200" data-halo="1"/><circle class="halo" r="200" data-halo="2"/>
+      <image href="../assets/sandra-avatar.jpg" x="-190" y="-190" width="380" height="380" clip-path="url(#clip)" data-venn-photo opacity="0"/>
+      <g data-vc="0"><circle class="c" r="190"/><text y="14">Empatía</text></g>
+      <g data-vc="1"><circle class="c" r="190"/><text y="14">Aceptación</text></g>
+      <g data-vc="2"><circle class="c" r="190"/><text y="14">Autenticidad</text></g>
+    </svg>
+  </div>
+
+  <div class="phone-wrap" data-phone-wrap>
+    <div class="phone" data-phone>
+      <div class="screen">
+        <div class="island"></div>
+        <div class="status" data-status><span>9:41</span><span><i class="ph ph-cell-signal-high"></i><i class="ph ph-wifi-high"></i><i class="ph ph-battery-high"></i></span></div>
+
+        <div class="lock" data-lock>
+          <div class="lock-date">jueves 15 de octubre</div>
+          <div class="lock-time">9:41</div>
+          <div class="notif" data-notif>
+            <img src="../assets/sa-highlight.jpg" alt="">
+            <div>
+              <div class="notif-head"><b>ser.asertivo</b><span>ahora</span></div>
+              <p>¿Cuándo fue la última vez que dijiste <b>que no</b> sin sentir culpa?</p>
+            </div>
+          </div>
+          <div class="lock-bar"></div>
+        </div>
+
+        <div class="topics" data-topics>
+          <h3>¿Qué te está <em>pesando</em> hoy?</h3>
+          <div class="chip" data-chip><i class="ph ph-hand-palm"></i>Decir que no<span class="check"><i class="ph ph-check"></i></span></div>
+          <div class="chip" data-chip><i class="ph ph-shield"></i>Poner límites<span class="check"><i class="ph ph-check"></i></span></div>
+          <div class="chip" data-chip><i class="ph ph-heart"></i>Autoestima<span class="check"><i class="ph ph-check"></i></span></div>
+          <div class="chip" data-chip><i class="ph ph-users-three"></i>Vínculos<span class="check"><i class="ph ph-check"></i></span></div>
+          <div class="chip" data-chip><i class="ph ph-wind"></i>Ansiedad y estrés<span class="check"><i class="ph ph-check"></i></span></div>
+          <div class="chip" data-chip><i class="ph ph-signpost"></i>Decisiones<span class="check"><i class="ph ph-check"></i></span></div>
+        </div>
+
+        <div class="wa" data-wa>
+          <div class="wa-top"><img src="../assets/sa-highlight.jpg" alt=""><div><b>Sandra · ser.asertivo</b><span>en línea</span></div><i class="ph ph-phone"></i></div>
+          <div class="wa-body" data-wa-body>
+            <div class="bubble out" data-bubble style="opacity:0">Hola Sandra, quiero empezar 🙂<small>9:42 ✓✓</small></div>
+          </div>
+          <div class="wa-input"><div class="wa-field empty"><span data-typed></span><span class="caret" data-caret></span></div><div class="wa-send" data-send><i class="ph ph-paper-plane-right"></i></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="logo" data-logo>
+    <div class="mono" data-mono><img src="../assets/sa-highlight.jpg" alt=""></div>
+    <div class="wordmark" data-wordmark></div>
+    <div class="tagline" data-tagline>Counseling · Sandra Sproviero</div>
+    <div class="pills">
+      <span class="pill" data-pill>Empatía</span><span class="pill" data-pill>Aceptación</span><span class="pill" data-pill>Autenticidad</span>
+      <span class="pill" data-pill>Enfoque Centrado en la Persona</span>
+    </div>
+  </div>
+
+  <div class="end" data-end>
+    <h2><span class="line"><span>Conocerse es</span></span><span class="line"><span><em>comprenderse.</em></span></span></h2>
+    <div class="cta" data-cta><i class="ph ph-whatsapp-logo"></i>Escribime</div>
+    <div class="handle" data-handle>@ser.asertivo</div>
+    <span class="ripple" data-ripple></span><span class="ripple" data-ripple></span>
+  </div>
+
+  <div class="captions" data-captions></div>
+  <div class="sweep" data-sweep></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div class="vignette"></div>
+</div>
+
+<script src="../vendor/gsap.min.js"></script>
+<script>
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => [...document.querySelectorAll(s)];
+const FPS_HINT = 60;
+const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.out" } });
+
+/* Captions: [word, start, end, style] — timed like a voiceover read */
+const CAPTIONS = [
+  ["¿Cuándo", 0.35], ["fue", 0.7], ["la", 0.92], ["última", 1.1], ["vez", 1.45],
+  ["que", 1.75], ["dijiste", 1.95], ["que no", 2.4, "hl"],
+  ["sin", 3.0], ["culpa?", 3.3, "hl"],
+  ["Decir", 4.1], ["que no", 4.45], ["poner", 4.9], ["límites", 5.2, "hl"],
+  ["quererte", 5.75], ["mejor", 6.2, "hl"],
+  ["Ser", 7.0], ["asertivo", 7.3, "hl"], ["es", 7.85], ["saber", 8.05], ["qué", 8.4], ["sentís", 8.65, "serif"],
+  ["y", 9.3], ["elegir", 9.5, "hl"], ["desde", 9.95], ["vos", 10.3, "serif"],
+  ["ser.asertivo", 11.3, "serif"],
+  ["El", 14.0], ["primer", 14.2], ["paso", 14.6, "hl"],
+  ["es", 15.1], ["un", 15.3], ["mensaje", 15.5, "serif"],
+  ["Escribime", 18.0, "hl"],
+];
+const capBox = $("[data-captions]");
+CAPTIONS.forEach(([w, t, cls], i) => {
+  const el = document.createElement("span");
+  el.className = "word" + (cls ? " " + cls : "");
+  el.textContent = w;
+  capBox.appendChild(el);
+  const next = CAPTIONS[i + 1];
+  const end = Math.min(next ? next[1] : t + 1.2, t + 0.9);
+  tl.fromTo(el, { opacity: 0, scale: 1.45, y: 18, filter: "blur(8px)" },
+    { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 0.16, ease: "back.out(2.4)" }, t);
+  tl.to(el, { opacity: 0, duration: 0.06, ease: "none" }, end - 0.04);
+});
+
+/* Wordmark letters */
+const wm = $("[data-wordmark]");
+"ser.asertivo".split("").forEach((ch, i) => {
+  const s = document.createElement(i >= 4 ? "em" : "span");
+  s.textContent = ch; s.style.display = "inline-block";
+  wm.appendChild(s);
+});
+
+/* Ambient: light pools breathe for the whole piece */
+tl.fromTo("[data-pool-a]", { opacity: .25, x: 0, y: 0 }, { opacity: .55, x: 260, y: -180, duration: 20, ease: "sine.inOut" }, 0);
+tl.fromTo("[data-pool-b]", { opacity: .2, x: 0, y: 0 }, { opacity: .45, x: -240, y: -320, duration: 20, ease: "sine.inOut" }, 0);
+tl.fromTo("[data-bg]", { scale: 1.05, rotate: 0 }, { scale: 1.18, rotate: 8, duration: 20, ease: "none" }, 0);
+
+/* ---------- Scene 1 · 0–3.9s: phone floats in, notification lands ---------- */
+const P = "[data-phone-wrap]";
+tl.fromTo(P, { rotateX: 28, rotateY: -32, rotateZ: 8, z: -900, y: 260, opacity: 0 },
+  { rotateX: 12, rotateY: -18, rotateZ: 3, z: -120, y: 0, opacity: 1, duration: 1.4, ease: "expo.out" }, 0);
+tl.to(P, { rotateX: 6, rotateY: 14, rotateZ: -2, z: 40, duration: 2.6, ease: "sine.inOut" }, 1.3);
+tl.fromTo("[data-notif]", { y: -260, scale: .85, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: .7, ease: "back.out(1.6)" }, .55);
+tl.to("[data-notif]", { scale: 1.06, duration: .25, yoyo: true, repeat: 1, ease: "sine.inOut" }, 2.35);
+
+/* ---------- Scene 2 · 3.9–6.9s: topics, chips tick on ---------- */
+tl.to("[data-lock]", { opacity: 0, scale: 1.08, filter: "blur(12px)", duration: .4, ease: "power2.in" }, 3.75);
+tl.fromTo("[data-topics]", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: .55 }, 3.9);
+tl.to("[data-status]", { color: "#241a2e", duration: .3 }, 3.9);
+tl.to(P, { rotateX: 4, rotateY: -22, rotateZ: 2, z: 180, y: -40, duration: 3, ease: "sine.inOut" }, 3.9);
+$$("[data-chip]").forEach((c, i) => {
+  tl.fromTo(c, { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: .45 }, 4.05 + i * 0.08);
+});
+[[0, 4.45], [1, 5.2], [2, 6.2]].forEach(([i, t]) => {
+  const c = $$("[data-chip]")[i];
+  tl.to(c, { scale: .94, duration: .1, ease: "power2.in" }, t - .1);
+  tl.add(() => {}, t);
+  tl.set(c, { className: "chip is-on" }, t);
+  tl.to(c, { scale: 1, duration: .45, ease: "elastic.out(1, .45)" }, t);
+});
+
+/* ---------- Scene 3 · 6.9–10.9s: phone flies off, three circles fuse into Sandra ---------- */
+tl.to(P, { rotateY: 75, rotateX: -10, z: -600, x: 900, opacity: 0, duration: .8, ease: "power3.in" }, 6.75);
+tl.fromTo("[data-sweep]", { xPercent: 0, opacity: 1 }, { xPercent: 520, opacity: 1, duration: .9, ease: "power2.inOut" }, 6.7);
+tl.set("[data-sweep]", { opacity: 0 }, 7.6);
+tl.to("[data-venn]", { opacity: 1, duration: .3 }, 7.0);
+const R = 210, ang = [-90, 150, 30];
+ang.forEach((a, i) => {
+  const rad = a * Math.PI / 180;
+  tl.fromTo(`[data-vc="${i}"]`, { x: Math.cos(rad) * 900, y: Math.sin(rad) * 900, scale: .4, opacity: 0 },
+    { x: Math.cos(rad) * R * .62, y: Math.sin(rad) * R * .62, scale: 1, opacity: 1, duration: 1.0, ease: "expo.out" }, 7.0 + i * .12);
+  // pass through each other and fuse at the center
+  tl.to(`[data-vc="${i}"]`, { x: 0, y: 0, duration: .9, ease: "power4.inOut" }, 8.7);
+  tl.to(`[data-vc="${i}"] text`, { opacity: 0, duration: .3 }, 8.8);
+});
+tl.to("[data-venn] svg", { rotate: 40, duration: 2.4, ease: "sine.inOut" }, 7.0);
+tl.to("[data-venn] svg", { rotate: 0, duration: .9, ease: "power4.inOut" }, 8.7);
+tl.fromTo("[data-venn-photo]", { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: .8, transformOrigin: "50% 50%" }, 9.4);
+tl.to("[data-vc] circle", { fill: "rgba(190,166,232,0)", duration: .6 }, 9.4);
+$$("[data-halo]").forEach((h, i) => {
+  tl.fromTo(h, { attr: { r: 195 }, opacity: .9 }, { attr: { r: 430 }, opacity: 0, duration: 1.6, ease: "power2.out" }, 9.5 + i * .25);
+});
+tl.to("[data-venn]", { scale: .55, y: -300, opacity: 0, duration: .7, ease: "power3.in" }, 10.6);
+
+/* ---------- Scene 4 · 11–13.6s: logo reveal ---------- */
+tl.to("[data-logo]", { opacity: 1, duration: .01 }, 10.95);
+tl.fromTo("[data-mono]", { scale: 0, rotate: -120 }, { scale: 1, rotate: 0, duration: 1, ease: "back.out(1.5)" }, 11.0);
+tl.fromTo("[data-mono]", { "--shine": "-120%" }, { "--shine": "120%", duration: .9, ease: "power2.inOut" }, 11.6);
+tl.fromTo("[data-wordmark] > *", { yPercent: 120, rotate: 12 }, { yPercent: 0, rotate: 0, duration: .8, stagger: .035, ease: "expo.out" }, 11.25);
+tl.fromTo("[data-tagline]", { opacity: 0, letterSpacing: "26px" }, { opacity: 1, letterSpacing: "8px", duration: 1, ease: "expo.out" }, 11.7);
+tl.fromTo("[data-pill]", { opacity: 0, y: 40, scale: .8 }, { opacity: 1, y: 0, scale: 1, duration: .5, stagger: .12, ease: "back.out(2)" }, 12.1);
+tl.to("[data-logo]", { opacity: 0, y: -120, filter: "blur(16px)", duration: .45, ease: "power2.in" }, 13.4);
+
+/* ---------- Scene 5 · 13.7–17.4s: the first message ---------- */
+tl.set("[data-lock]", { opacity: 0 }, 13.6);
+tl.set("[data-topics]", { opacity: 0 }, 13.6);
+tl.set("[data-wa]", { opacity: 1 }, 13.6);
+tl.set("[data-status]", { color: "#111" }, 13.6);
+tl.fromTo(P, { x: -900, rotateY: -70, rotateX: 10, rotateZ: 0, z: -400, y: 0, opacity: 0 },
+  { x: 0, rotateY: -12, rotateX: 6, rotateZ: 2, z: 60, opacity: 1, duration: 1, ease: "expo.out", immediateRender: false }, 13.6);
+tl.to(P, { rotateY: 10, rotateX: 2, rotateZ: -1, z: 220, duration: 2.8, ease: "sine.inOut" }, 14.6);
+const msg = "Hola Sandra, quiero empezar 🙂";
+const typed = $("[data-typed]");
+const typer = { n: 0 };
+const field = $(".wa-field");
+function showTyped() {
+  const n = Math.round(typer.n);
+  typed.textContent = [...msg].slice(0, n).join("");
+  field.classList.toggle("empty", n === 0);
+}
+tl.to(typer, { n: [...msg].length, duration: 1.4, ease: "none", onUpdate: showTyped }, 14.3);
+tl.fromTo("[data-caret]", { opacity: 1 }, { opacity: 0, duration: .25, repeat: 9, yoyo: true, ease: "steps(1)" }, 13.8);
+tl.to("[data-send]", { scale: .8, duration: .1, ease: "power2.in" }, 15.9);
+tl.to("[data-send]", { scale: 1, duration: .5, ease: "elastic.out(1,.4)" }, 16.0);
+tl.add(() => {}, 16.0);
+tl.to(typer, { n: 0, duration: .01, onUpdate: showTyped }, 16.0);
+tl.set("[data-caret]", { opacity: 0 }, 16.0);
+tl.fromTo("[data-bubble]", { opacity: 0, y: 60, scale: .7, transformOrigin: "100% 100%" }, { opacity: 1, y: 0, scale: 1, duration: .55, ease: "back.out(1.8)" }, 16.0);
+
+/* ---------- Scene 6 · 17.4–20.5s: end card ---------- */
+tl.to(P, { z: 1400, opacity: 0, duration: .6, ease: "power3.in" }, 17.2);
+tl.fromTo("[data-sweep]", { xPercent: 0, opacity: 1 }, { xPercent: 520, opacity: 1, duration: .9, ease: "power2.inOut", immediateRender: false }, 17.2);
+tl.to("[data-end]", { opacity: 1, duration: .01 }, 17.5);
+tl.fromTo("[data-end] .line > span", { yPercent: 110 }, { yPercent: 0, duration: 1, stagger: .15, ease: "expo.out" }, 17.5);
+tl.fromTo("[data-cta]", { opacity: 0, y: 60, scale: .85 }, { opacity: 1, y: 0, scale: 1, duration: .7, ease: "back.out(1.8)" }, 17.95);
+tl.fromTo("[data-handle]", { opacity: 0 }, { opacity: 1, duration: .6 }, 18.4);
+tl.to("[data-cta]", { scale: 1.06, duration: .35, yoyo: true, repeat: 3, ease: "sine.inOut" }, 18.6);
+$$("[data-ripple]").forEach((r, i) => {
+  tl.set(r, { top: 448, left: "50%" }, 0);
+  tl.fromTo(r, { width: 300, height: 120, opacity: .8, borderRadius: 999 }, { width: 760, height: 360, opacity: 0, duration: 1.4, ease: "power2.out" }, 18.6 + i * .6);
+});
+tl.to({}, { duration: .01 }, 20.5); // tail hold
+
+/* Film grain, seeded per frame so renders are reproducible */
+const g = $("#grain"), gx = g.getContext("2d"), img = gx.createImageData(g.width, g.height);
+function grain(frame) {
+  let s = (frame * 2654435761) >>> 0;
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
+    const v = (s >>> 0) & 255;
+    d[i] = d[i + 1] = d[i + 2] = v; d[i + 3] = 255;
+  }
+  gx.putImageData(img, 0, 0);
+}
+
+window.DURATION = tl.duration();
+window.seek = (t) => { tl.time(t, false); grain(Math.round(t * FPS_HINT)); };
+window.seek(0);
+window.ready = document.fonts.ready.then(() => Promise.all([...document.images].map((im) => im.decode().catch(() => {}))));
+
+/* Opened directly in a browser (no ?render), play it in real time */
+if (!location.search.includes("render")) {
+  const t0 = performance.now();
+  (function loop(now) { window.seek(((now - t0) / 1000) % window.DURATION); requestAnimationFrame(loop); })(t0);
+}
+</script>
+</body>
+</html>

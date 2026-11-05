@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<title>Papel higiénico · 3D</title>
+<!-- 1080x1920. Real 3D (three.js): a tiled bathroom (toilet, towel, plant) shot with shallow depth
+     of field. The roll unrolls, then a handwritten message appears line by line, top to bottom.
+     window.seek(t) renders one deterministic frame for render.mjs; opened directly it plays live.
+     ?tiles=brown|white  ?text=line|line|line -->
+<link rel="stylesheet" href="vendor/fonts/fonts.css">
+<style>
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #2a1f18; }
+  canvas#gl { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(85% 65% at 50% 42%, transparent 52%, rgba(20,14,10,.42)); }
+  #grain { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .06; mix-blend-mode: overlay; pointer-events: none; }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.js" } }</script>
+</head>
+<body>
+<canvas id="gl" width="1080" height="1920"></canvas>
+<div class="vignette"></div>
+<canvas id="grain" width="540" height="960"></canvas>
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "./vendor/three/RoomEnvironment.js";
+import { RoundedBoxGeometry } from "./vendor/three/geometries/RoundedBoxGeometry.js";
+import { EffectComposer } from "./vendor/three/postprocessing/EffectComposer.js";
+import { RenderPass } from "./vendor/three/postprocessing/RenderPass.js";
+import { BokehPass } from "./vendor/three/postprocessing/BokehPass.js";
+import { OutputPass } from "./vendor/three/postprocessing/OutputPass.js";
+
+const params = new URLSearchParams(location.search);
+const LINES = (params.get("text") || "Hasta esto|se puede|contar bien.|Creando Contenidos").split("|");
+const INK = "#0a1248";
+const TILES = params.get("tiles") === "white"
+  ? { grout: "#dcdcda", tile: (r) => { const v = 250 + r() * 5; return [v, v, v]; }, shade: 4, bg: "#f3f3f1" }
+  : { grout: "#d9ccb6", tile: (r) => { const k = r() * 26 - 13; return [86 + k, 54 + k * .7, 36 + k * .5]; }, shade: 14, bg: "#3a2a20" };
+
+/* ---------- Dimensions (meters). Real bathroom scale: holder at 72 cm, beside the toilet ---------- */
+const R = 0.056, W = 0.102, CORE = 0.021;   // roll radius, paper width, core radius
+const SH = 0.11;                            // sheet length (perforations)
+const LINE = 0.052;                         // distance between handwritten lines
+const Y0 = 0.72, Z0 = 0.095, X0 = 0.02;     // roll axis
+const L_END = 0.11 + LINES.length * LINE + 0.12; // hanging length once unrolled
+const LT = L_END + 0.02;
+
+/* ---------- Renderer + depth of field ---------- */
+const canvas = document.getElementById("gl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(1080, 1920, false);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = .95;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(TILES.bg);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.03).texture;
+scene.environmentIntensity = .7;
+const camera = new THREE.PerspectiveCamera(36, 1080 / 1920, 0.02, 30);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bokeh = new BokehPass(scene, camera, { focus: 1, aperture: .14, maxblur: .028 });
+composer.addPass(bokeh);
+composer.addPass(new OutputPass());
+
+/* ---------- Procedural textures ---------- */
+function rand(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function canvasTex(w, h, draw, { srgb = true, repeat = [1, 1] } = {}) {
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  draw(c.getContext("2d"), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(...repeat);
+  t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace; t.anisotropy = 8;
+  return t;
+}
+// Subway tiles 15 x 7.5 cm, staggered. One texture = 4 x 8 tiles (0.6 x 0.6 m).
+function tiles(ctx, w, h, kind) {
+  const r = rand(7), tw = w / 4, th = h / 8, g = 10;
+  ctx.fillStyle = kind === "color" ? TILES.grout : kind === "bump" ? "#000" : "#e8e8e8";
+  ctx.fillRect(0, 0, w, h);
+  for (let row = 0; row < 8; row++) for (let col = -1; col < 5; col++) {
+    const x = col * tw + (row % 2 ? tw / 2 : 0), y = row * th;
+    if (kind === "color") {
+      const [cr, cg, cb] = TILES.tile(r), d = TILES.shade;
+      const grd = ctx.createLinearGradient(x, y, x + tw, y + th);
+      grd.addColorStop(0, `rgb(${cr},${cg},${cb})`); grd.addColorStop(1, `rgb(${cr - d},${cg - d},${cb - d})`);
+      ctx.fillStyle = grd;
+    } else if (kind === "bump") {
+      const grd = ctx.createRadialGradient(x + tw / 2, y + th / 2, 0, x + tw / 2, y + th / 2, tw * .7);
+      grd.addColorStop(0, "#fff"); grd.addColorStop(.85, "#f2f2f2"); grd.addColorStop(1, "#bbb");
+      ctx.fillStyle = grd;
+    } else ctx.fillStyle = `rgb(${40 + Math.floor(r() * 20)},0,0)`;
+    ctx.beginPath(); ctx.roundRect(x + g / 2, y + g / 2, tw - g, th - g, 8); ctx.fill();
+  }
+}
+const tileTex = (kind, rep, srgb) => canvasTex(2048, 2048, (c, w, h) => tiles(c, w, h, kind), { srgb, repeat: rep });
+function wallMaterial(rep) {
+  return new THREE.MeshStandardMaterial({ map: tileTex("color", rep, true), bumpMap: tileTex("bump", rep, false), bumpScale: 2.5,
+    roughnessMap: tileTex("rough", rep, false), roughness: 1 });
+}
+const floorTex = canvasTex(1024, 1024, (ctx, w) => {
+  ctx.fillStyle = "#cfc8bf"; ctx.fillRect(0, 0, w, w);
+  const r = rand(11);
+  for (let y = 0; y < 2; y++) for (let x = 0; x < 2; x++) {
+    const v = 70 + r() * 14; ctx.fillStyle = `rgb(${v},${v - 4},${v - 9})`;
+    ctx.fillRect(x * w / 2 + 4, y * w / 2 + 4, w / 2 - 8, w / 2 - 8);
+  }
+}, { repeat: [6, 6] });
+// Quilted emboss for one sheet, perforation along its top edge.
+const EMB_W = 256, EMB_H = Math.round(256 * SH / W);
+function emboss(ctx, w, h, withPerf) {
+  ctx.fillStyle = "#808080"; ctx.fillRect(0, 0, w, h);
+  const step = w / 9;
+  for (let y = step / 2; y < h; y += step) for (let x = 0; x <= w; x += step) {
+    const ox = (Math.round(y / step) % 2) * step / 2;
+    const grd = ctx.createRadialGradient(x + ox, y, 0, x + ox, y, step * .55);
+    grd.addColorStop(0, "#b8b8b8"); grd.addColorStop(1, "rgba(128,128,128,0)");
+    ctx.fillStyle = grd; ctx.fillRect(x + ox - step, y - step, step * 2, step * 2);
+  }
+  if (withPerf) { ctx.fillStyle = "#202020"; for (let x = 0; x < w; x += 9) ctx.fillRect(x, 0, 5, 3); }
+}
+const sheetBump = canvasTex(EMB_W, EMB_H, (c, w, h) => emboss(c, w, h, true), { srgb: false, repeat: [1, LT / SH] });
+const rollBump = canvasTex(EMB_W, EMB_H, (c, w, h) => emboss(c, w, h, false), { srgb: false, repeat: [1, 9] });
+const ringTex = canvasTex(512, 512, (ctx, w) => {
+  ctx.fillStyle = "#f4f2ee"; ctx.fillRect(0, 0, w, w);
+  const r = rand(3);
+  for (let rr = w * CORE / R / 2; rr < w / 2; rr += 1.6) {
+    ctx.strokeStyle = `rgba(150,140,125,${.05 + r() * .12})`; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(w / 2, w / 2, rr, 0, Math.PI * 2); ctx.stroke();
+  }
+});
+const terry = canvasTex(256, 256, (ctx, w) => {   // towel loops
+  const r = rand(5); ctx.fillStyle = "#808080"; ctx.fillRect(0, 0, w, w);
+  for (let i = 0; i < 5000; i++) { const v = 90 + r() * 120; ctx.fillStyle = `rgb(${v},${v},${v})`; ctx.fillRect(r() * w, r() * w, 2, 2); }
+}, { srgb: false, repeat: [8, 12] });
+
+/* ---------- Handwriting on the hanging strip ---------- */
+const PX_PER_M = 6200;
+const inkCanvas = document.createElement("canvas");
+inkCanvas.width = Math.round(W * PX_PER_M); inkCanvas.height = Math.round(LT * PX_PER_M);
+const ink = inkCanvas.getContext("2d");
+const sheetMap = new THREE.CanvasTexture(inkCanvas);
+sheetMap.colorSpace = THREE.SRGBColorSpace; sheetMap.anisotropy = 8;
+const written = LINES.map(() => 0);
+function drawInk() {
+  const w = inkCanvas.width, h = inkCanvas.height;
+  ink.fillStyle = "#f7f5f1"; ink.fillRect(0, 0, w, h);
+  ink.fillStyle = "rgba(160,150,135,.55)";
+  for (let k = 1; k * SH * PX_PER_M < h; k++) for (let x = 6; x < w; x += 16) ink.fillRect(x, h - k * SH * PX_PER_M - 1, 8, 2);
+  LINES.forEach((line, k) => {
+    const p = written[k]; if (p <= 0) return;
+    // line k sits at distance s from the roll once fully unrolled; canvas bottom = free end
+    const s = 0.1 + (k + .5) * LINE;
+    const cy = h - (L_END - s) * PX_PER_M;
+    let size = 175;
+    ink.font = `500 ${size}px Caveat`;
+    while (ink.measureText(line).width > w * .88 && size > 70) { size -= 5; ink.font = `500 ${size}px Caveat`; }
+    const tw = ink.measureText(line).width, x0 = (w - tw) / 2 + (k % 2 ? 14 : -10);
+    ink.save();
+    ink.translate(w / 2, cy); ink.rotate((k % 2 ? 1 : -1) * 0.03); ink.translate(-w / 2, -cy);
+    ink.beginPath(); ink.rect(x0 - 20, cy - size, (tw + 40) * p, size * 2); ink.clip();
+    ink.fillStyle = INK; ink.shadowColor = "rgba(20,30,100,.35)"; ink.shadowBlur = 3;
+    ink.textBaseline = "middle"; ink.fillText(line, x0, cy + 6);
+    ink.restore();
+  });
+  sheetMap.needsUpdate = true;
+}
+
+/* ---------- Materials ---------- */
+const paperProps = { color: "#ffffff", roughness: .92, metalness: 0, sheen: .2, sheenRoughness: .8, sheenColor: new THREE.Color("#fffaf2") };
+const sheetMat = new THREE.MeshPhysicalMaterial({ ...paperProps, map: sheetMap, bumpMap: sheetBump, bumpScale: 1.4, side: THREE.DoubleSide });
+const rollMat = new THREE.MeshPhysicalMaterial({ ...paperProps, color: "#f6f4f0", bumpMap: rollBump, bumpScale: 1.4 });
+const ringMat = new THREE.MeshStandardMaterial({ map: ringTex, roughness: .95, side: THREE.DoubleSide });
+const coreMat = new THREE.MeshStandardMaterial({ color: "#a98a63", roughness: .9, side: THREE.DoubleSide });
+const chrome = new THREE.MeshStandardMaterial({ color: "#f2f2f2", metalness: 1, roughness: .09 });
+const ceramic = new THREE.MeshPhysicalMaterial({ color: "#fbfbf9", roughness: .12, clearcoat: 1, clearcoatRoughness: .05 });
+const towelMat = new THREE.MeshStandardMaterial({ color: "#7f8c6c", roughness: 1, bumpMap: terry, bumpScale: 3, side: THREE.DoubleSide });
+const shadowy = (m) => { m.castShadow = true; m.receiveShadow = true; return m; };
+
+/* ---------- Room ---------- */
+const wall = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), wallMaterial([6.67, 5]));
+wall.position.set(0, 1.5, 0); wall.receiveShadow = true; scene.add(wall);
+const sideWall = new THREE.Mesh(new THREE.PlaneGeometry(3, 3), wallMaterial([5, 5]));
+sideWall.rotation.y = Math.PI / 2; sideWall.position.set(-1.05, 1.5, 1.5); sideWall.receiveShadow = true; scene.add(sideWall);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), new THREE.MeshStandardMaterial({ map: floorTex, roughness: .55 }));
+floor.rotation.x = -Math.PI / 2; floor.position.set(0, 0, 2); floor.receiveShadow = true; scene.add(floor);
+
+/* ---------- Toilet (left of the holder) ---------- */
+const toilet = new THREE.Group(); toilet.position.set(-0.42, 0, 0); scene.add(toilet);
+const tank = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.42, .36, .17, 6, .025), ceramic)); tank.position.set(0, .6, .095); toilet.add(tank);
+const tankLid = shadowy(new THREE.Mesh(new RoundedBoxGeometry(.44, .03, .19, 6, .012), ceramic)); tankLid.position.set(0, .795, .095); toilet.add(tankLid);
+const flush = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.022, .022, .008, 40), chrome)); flush.position.set(.06, .813, .1); toilet.add(flush);
+const bowlProfile = [[0, 0], [.1, 0], [.1, .02], [.085, .12], [.11, .24], [.17, .33], [.185, .385], [.18, .4], [0, .4]].map(([x, y]) => new THREE.Vector2(x, y));
+const bowl = shadowy(new THREE.Mesh(new THREE.LatheGeometry(bowlProfile, 64), ceramic)); bowl.scale.set(1, 1, 1.32); bowl.position.set(0, 0, .42); toilet.add(bowl);
+const seat = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.19, .19, .025, 64), ceramic)); seat.scale.set(1, 1, 1.3); seat.position.set(0, .415, .41); toilet.add(seat);
+const lid = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.185, .185, .02, 64), ceramic)); lid.scale.set(1, 1, 1.28); lid.position.set(0, .438, .4); toilet.add(lid);
+// a small plant and a glass bottle on the tank
+const pot = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.045, .036, .08, 40), new THREE.MeshStandardMaterial({ color: "#d9d2c6", roughness: .7 })));
+pot.position.set(-.1, .85, .1); toilet.add(pot);
+const leafMat = new THREE.MeshStandardMaterial({ color: "#3f6b3a", roughness: .55, side: THREE.DoubleSide });
+const leafShape = new THREE.Shape(); leafShape.moveTo(0, 0); leafShape.quadraticCurveTo(.03, .08, 0, .18); leafShape.quadraticCurveTo(-.03, .08, 0, 0);
+const lr = rand(21);
+for (let i = 0; i < 11; i++) {
+  const leaf = shadowy(new THREE.Mesh(new THREE.ShapeGeometry(leafShape, 8), leafMat));
+  leaf.position.set(-.1, .885, .1); leaf.rotation.set(-.35 - lr() * .6, i * .57, (lr() - .5) * .4); leaf.scale.setScalar(.8 + lr() * .6);
+  toilet.add(leaf);
+}
+const bottle = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.028, .028, .13, 40),
+  new THREE.MeshPhysicalMaterial({ color: "#c7b28c", roughness: .05, transmission: .6, thickness: .02, ior: 1.45 })));
+bottle.position.set(.1, .875, .09); toilet.add(bottle);
+const pump = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.01, .01, .035, 20), chrome)); pump.position.set(.1, .955, .09); toilet.add(pump);
+
+/* ---------- Towel on a bar, right of the holder ---------- */
+const bar = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.009, .009, .5, 32), chrome));
+bar.rotation.z = Math.PI / 2; bar.position.set(.4, 1.12, .07); scene.add(bar);
+for (const sx of [-1, 1]) {
+  const post = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(.01, .01, .07, 24), chrome));
+  post.rotation.x = Math.PI / 2; post.position.set(.4 + sx * .23, 1.12, .035); scene.add(post);
+}
+const towelGeo = new THREE.PlaneGeometry(.44, 1.0, 40, 80);
+{ // folded over the bar: front panel hangs to 0.62, back panel shorter; vertical folds
+  const p = towelGeo.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), v = (p.getY(i) + .5); // 0 bottom .. 1 top of the flat towel
+    const len = v * 1.0;                      // distance along the towel from its front bottom edge
+    const fold = Math.sin(x * 38) * .006 + Math.sin(x * 13 + 1) * .008;
+    let y, z;
+    if (len < .5) { y = 1.12 - (.5 - len); z = .085 + fold + (.5 - len) * .02; }        // front panel
+    else if (len < .56) { const a = (len - .5) / .06 * Math.PI; y = 1.12 + Math.sin(a) * .018; z = .07 + Math.cos(a) * .018; } // over the bar
+    else { y = 1.12 - (len - .56); z = .052 - fold * .5; }                                   // back panel
+    p.setXYZ(i, .4 + x, y, z);
+  }
+  towelGeo.computeVertexNormals();
+}
+scene.add(shadowy(new THREE.Mesh(towelGeo, towelMat)));
+
+/* ---------- Holder + roll ---------- */
+const cyl = (r, l, m) => shadowy(new THREE.Mesh(new THREE.CylinderGeometry(r, r, l, 48), m));
+for (const sx of [-1, 1]) {
+  const plate = cyl(.021, .01, chrome); plate.rotation.x = Math.PI / 2; plate.position.set(X0 + sx * .074, Y0, .005); scene.add(plate);
+  const arm = cyl(.0085, Z0, chrome); arm.rotation.x = Math.PI / 2; arm.position.set(X0 + sx * .074, Y0, Z0 / 2 + .005); scene.add(arm);
+  const knuckle = shadowy(new THREE.Mesh(new THREE.SphereGeometry(.011, 32, 16), chrome)); knuckle.position.set(X0 + sx * .074, Y0, Z0); scene.add(knuckle);
+}
+const rod = cyl(.0065, .148, chrome); rod.rotation.z = Math.PI / 2; rod.position.set(X0, Y0, Z0); scene.add(rod);
+const roll = new THREE.Group(); roll.position.set(X0, Y0, Z0); scene.add(roll);
+const outer = shadowy(new THREE.Mesh(new THREE.CylinderGeometry(R, R, W, 128, 1, true), rollMat)); outer.rotation.z = Math.PI / 2; roll.add(outer);
+for (const sx of [-1, 1]) {
+  const cap = new THREE.Mesh(new THREE.RingGeometry(CORE + .0015, R, 128), ringMat);
+  cap.rotation.y = sx * Math.PI / 2; cap.position.x = sx * W / 2; cap.receiveShadow = true; roll.add(cap);
+}
+const core = new THREE.Mesh(new THREE.CylinderGeometry(CORE + .0015, CORE + .0015, W + .002, 64, 1, true), coreMat);
+core.rotation.z = Math.PI / 2; roll.add(core);
+
+/* ---------- Hanging strip, rebuilt every frame ---------- */
+const NX = 14, NY = 220;
+const stripGeo = new THREE.BufferGeometry();
+const pos = new Float32Array((NX + 1) * (NY + 1) * 3), uv = new Float32Array((NX + 1) * (NY + 1) * 2), idx = [];
+for (let j = 0; j < NY; j++) for (let i = 0; i < NX; i++) { const a = j * (NX + 1) + i, b = a + 1, c = a + NX + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+stripGeo.setIndex(idx);
+stripGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+stripGeo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+const strip = shadowy(new THREE.Mesh(stripGeo, sheetMat)); scene.add(strip);
+function buildStrip(L, t, swing) {
+  for (let j = 0; j <= NY; j++) {
+    const s = (j / NY) * L;
+    const sway = Math.sin(t * 1.1 + s * 7) * .005 * Math.min(1, s / .15) + s * s * .05 + swing * s * s * .9;
+    const curl = Math.pow(Math.max(0, (s - (L - .045)) / .045), 2) * .018;
+    const twist = Math.sin(t * .7 + s * 4) * .22 * Math.min(1, s / .2);
+    for (let i = 0; i <= NX; i++) {
+      const u = i / NX, x = (u - .5) * W * .985, k = j * (NX + 1) + i;
+      const bow = (Math.cos((u - .5) * Math.PI) - .7) * .004 * Math.min(1, s / .1);
+      pos[k * 3] = X0 + x; pos[k * 3 + 1] = Y0 - s; pos[k * 3 + 2] = Z0 + R + .0006 + sway + curl + bow + x * twist * .12;
+      uv[k * 2] = u; uv[k * 2 + 1] = (L - s) / LT;
+    }
+  }
+  stripGeo.attributes.position.needsUpdate = true; stripGeo.attributes.uv.needsUpdate = true;
+  stripGeo.computeVertexNormals(); stripGeo.computeBoundingSphere();
+}
+
+/* ---------- Lights: window from the left, warm bounce ---------- */
+const sun = new THREE.DirectionalLight("#fff6ea", 3.4);
+sun.position.set(-1.6, 2.0, 1.8); sun.target.position.set(-.1, .6, 0);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 6; sun.shadow.bias = -.0004; sun.shadow.normalBias = .01;
+Object.assign(sun.shadow.camera, { left: -1.1, right: 1.1, top: 1.0, bottom: -.6, near: .5, far: 6 });
+scene.add(sun, sun.target);
+scene.add(new THREE.HemisphereLight("#fff8f0", "#8a7666", .6));
+const fill = new THREE.PointLight("#ffe9d2", .8, 5); fill.position.set(1.3, 1.5, 1.6); scene.add(fill);
+
+/* ---------- Choreography ---------- */
+const L0 = .04, PULL_AT = .5, PULL = 1.9;        // the roll unrolls in one pull
+const WRITE_AT = 2.9, PER_LINE = 1.15;            // then each line is written, top to bottom
+const DURATION = WRITE_AT + LINES.length * PER_LINE + 1.6;
+const ease = (x) => { x = Math.min(1, Math.max(0, x)); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+function state(t) {
+  const p = ease((t - PULL_AT) / PULL);
+  const L = L0 + (L_END - L0) * p;
+  // after the pull the free end swings back and settles
+  const after = Math.max(0, t - PULL_AT - PULL * .8);
+  const swing = p > .02 ? Math.sin(after * 4.2) * Math.exp(-after * 1.6) * .35 * Math.min(1, p * 3) : 0;
+  LINES.forEach((_, k) => { written[k] = Math.min(1, Math.max(0, (t - WRITE_AT - k * PER_LINE) / (PER_LINE * .85))); });
+  return { L, swing };
+}
+
+/* Camera: starts wide on the bathroom, pushes in to the paper while it is written */
+const focusPoint = new THREE.Vector3();
+function setCamera(t) {
+  const k = smooth(t / (WRITE_AT + 1.2)), d = smooth(t / DURATION);
+  camera.position.set(.62 - k * .36 - d * .03, .98 - k * .22, 1.75 - k * .88 - d * .05);
+  const look = new THREE.Vector3(-.1 + k * .12, .6 + (1 - k) * .02, .12);
+  camera.lookAt(look);
+  camera.fov = 38 - k * 6; camera.updateProjectionMatrix();
+  focusPoint.set(X0, Y0 - .1 - k * .08, Z0 + R);
+  bokeh.uniforms.focus.value = camera.position.distanceTo(focusPoint);
+}
+
+/* Film grain */
+const g = document.getElementById("grain"), gx = g.getContext("2d"), gimg = gx.createImageData(g.width, g.height);
+function grain(frame) {
+  let s = (frame * 2654435761 + 1) >>> 0; const d = gimg.data;
+  for (let i = 0; i < d.length; i += 4) { s ^= s << 13; s ^= s >>> 17; s ^= s << 5; d[i] = d[i + 1] = d[i + 2] = s & 255; d[i + 3] = 255; }
+  gx.putImageData(gimg, 0, 0);
+}
+
+let lastInk = "";
+window.DURATION = DURATION;
+window.seek = (t) => {
+  const { L, swing } = state(t);
+  roll.rotation.x = (L - L0) / R;
+  buildStrip(L, t, swing);
+  const key = written.map((w) => w.toFixed(3)).join();
+  if (key !== lastInk) { drawInk(); lastInk = key; }
+  setCamera(t);
+  composer.render();
+  grain(Math.round(t * 60));
+};
+window.ready = document.fonts.load("500 100px Caveat").then(() => { window.seek(0); });
+
+if (!params.has("render")) {
+  await window.ready;
+  const t0 = performance.now();
+  (function loop(now) { window.seek(((now - t0) / 1000) % DURATION); requestAnimationFrame(loop); })(t0);
+}
+</script>
+</body>
+</html>
