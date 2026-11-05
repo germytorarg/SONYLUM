@@ -16,7 +16,7 @@ segs[0][0] = 15.25
 dur_total = float(subprocess.check_output(["ffprobe","-v","error","-show_entries","format=duration","-of","csv=p=0",NAR]))
 segs[-1][1] = segs[-1][1]  # tramo final hasta 794.6
 plan = []
-for a,b,v,au in oncam: plan.append(("cam", a, b, v, au))
+for j,(a,b,v,au) in enumerate(oncam): plan.append(("img", a, b, f"imagenes/broll/c{j+1}.png", None))
 for i,(a,b) in enumerate(segs): plan.append(("img", a, b, f"imagenes/broll/{i:02d}.png", None))
 plan.sort(key=lambda x: x[1])
 os.makedirs("render/piezas", exist_ok=True)
@@ -39,5 +39,5 @@ for k,(tipo,a,b,src,au) in enumerate(plan):
     print(k, tipo, round(b-a,2), flush=True)
 open("render/lista.txt","w").write("".join(f"file 'piezas/{os.path.basename(x)}'\n" for x in lista))
 run(["ffmpeg","-v","error","-y","-f","concat","-safe","0","-i","render/lista.txt",
-     "-c:v","copy","-c:a","aac","-b:a","192k","render/vivir-o-generar-contenido-1080p.mp4"])
+     "-c:v","copy","-c:a","aac","-b:a","192k","render/vivir-o-generar-contenido-voz-1080p.mp4"])
 print("listo")
