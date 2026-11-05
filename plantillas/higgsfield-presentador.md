@@ -13,12 +13,12 @@ Usado en `proyectos/2026-11-ansiedad/` (5/11/2026). Pedile a Claude: "usá el se
 
 ## Prompt base (siempre igual)
 ```
-@Video1 is the reference of the character and voice. Preserve the wardrobe and his true slim, lean build: narrow shoulders, thin arms, flat stomach, a lean face and neck; do not make him heavier or broader than in @Video1. Its room, light and framing are not the scene. @Image1 defines the location: its space, furniture, materials and light. It is a place, not a fixed camera position; the shot below sets the camera and the presenter's position in it.
+@Video1 is the reference of the character and voice. Preserve the wardrobe and his face exactly as in @Video1. Keep his body slightly slimmer: an average, trim build with a flat stomach, not heavy or chubby, but not thin or skinny either. Its room, light and framing are not the scene. @Image1 defines the location: its space, furniture, materials and light. It is a place, not a fixed camera position; the shot below sets the camera and the presenter's position in it.
 
 Audio: Generate only the presenter's clean, close-miked speaking voice in Spanish, with the same timbre and accent as @Video1. Use reference audio for voice identity only. Keep the background silent. No music, score, instrumental bed, ambient sounds, sound effects or other voices. Do not carry over background audio from the references.
 ```
 
-Nota: en la primera tanda salió más robusto de lo real; la frase "slim, lean build" corrige eso.
+Nota: en la primera tanda salió más robusto de lo real; la frase sobre el cuerpo "slightly slimmer… not heavy, not skinny" corrige eso. La cara se deja igual.
 
 ## Parte que cambia en cada clip
 ```
